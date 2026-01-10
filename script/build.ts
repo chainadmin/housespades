@@ -1,6 +1,7 @@
 import { build as esbuild } from "esbuild";
 import { build as viteBuild } from "vite";
 import { rm, readFile } from "fs/promises";
+import { execSync } from "child_process";
 
 // server deps to bundle to reduce openat(2) syscalls
 // which helps cold start times
@@ -59,6 +60,20 @@ async function buildAll() {
     external: externals,
     logLevel: "info",
   });
+
+  // Run database migration (idempotent - only applies changes if needed)
+  if (process.env.DATABASE_URL) {
+    console.log("running database migration...");
+    try {
+      execSync("npx drizzle-kit push", { stdio: "inherit" });
+      console.log("database migration complete");
+    } catch (error) {
+      console.error("database migration failed:", error);
+      throw error;
+    }
+  } else {
+    console.log("skipping database migration (no DATABASE_URL)");
+  }
 }
 
 buildAll().catch((err) => {
