@@ -1,4 +1,81 @@
 import { z } from "zod";
+import { pgTable, text, integer, timestamp, boolean, serial } from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
+import { relations } from "drizzle-orm";
+
+// Database tables for PostgreSQL (using Drizzle ORM)
+
+// Users table with authentication and ranking
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  username: text("username").notNull().unique(),
+  email: text("email").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  rating: integer("rating").notNull().default(1000),
+  gamesPlayed: integer("games_played").notNull().default(0),
+  gamesWon: integer("games_won").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  rating: true,
+  gamesPlayed: true,
+  gamesWon: true,
+  createdAt: true,
+});
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type DbUser = typeof users.$inferSelect;
+
+// Password reset tokens
+export const passwordResets = pgTable("password_resets", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  used: boolean("used").notNull().default(false),
+});
+
+// Match history for tracking games
+export const matchHistory = pgTable("match_history", {
+  id: serial("id").primaryKey(),
+  gameMode: text("game_mode").notNull(),
+  pointGoal: text("point_goal").notNull(),
+  winningTeamScore: integer("winning_team_score").notNull(),
+  losingTeamScore: integer("losing_team_score").notNull(),
+  completedAt: timestamp("completed_at").defaultNow().notNull(),
+});
+
+// Player participation in matches
+export const matchPlayers = pgTable("match_players", {
+  id: serial("id").primaryKey(),
+  matchId: integer("match_id").notNull().references(() => matchHistory.id),
+  userId: integer("user_id").references(() => users.id),
+  isBot: boolean("is_bot").notNull().default(false),
+  teamIndex: integer("team_index").notNull(),
+  ratingChange: integer("rating_change").notNull().default(0),
+});
+
+// Relations
+export const usersRelations = relations(users, ({ many }) => ({
+  matchPlayers: many(matchPlayers),
+  passwordResets: many(passwordResets),
+}));
+
+export const matchHistoryRelations = relations(matchHistory, ({ many }) => ({
+  players: many(matchPlayers),
+}));
+
+export const matchPlayersRelations = relations(matchPlayers, ({ one }) => ({
+  match: one(matchHistory, {
+    fields: [matchPlayers.matchId],
+    references: [matchHistory.id],
+  }),
+  user: one(users, {
+    fields: [matchPlayers.userId],
+    references: [users.id],
+  }),
+}));
 
 // Card suits and values
 export const SUITS = ["spades", "hearts", "diamonds", "clubs"] as const;
@@ -110,17 +187,16 @@ export const lobbySchema = z.object({
 });
 export type Lobby = z.infer<typeof lobbySchema>;
 
-// User schema (for session tracking)
+// User schema (for API responses - excludes password)
 export const userSchema = z.object({
-  id: z.string(),
+  id: z.number(),
   username: z.string(),
+  email: z.string(),
+  rating: z.number(),
   gamesPlayed: z.number(),
   gamesWon: z.number(),
 });
 export type User = z.infer<typeof userSchema>;
-
-export const insertUserSchema = userSchema.omit({ id: true, gamesPlayed: true, gamesWon: true });
-export type InsertUser = z.infer<typeof insertUserSchema>;
 
 // WebSocket message types
 export const WS_MESSAGE_TYPES = [

@@ -1,69 +1,103 @@
-import { type User, type InsertUser, type GameState, type Lobby } from "@shared/schema";
+import { 
+  users, passwordResets, matchHistory, matchPlayers,
+  type DbUser, type InsertUser, type GameState, type Lobby 
+} from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
-  updateUserStats(id: string, won: boolean): Promise<User | undefined>;
+  // Users
+  getUser(id: number): Promise<DbUser | undefined>;
+  getUserByEmail(email: string): Promise<DbUser | undefined>;
+  getUserByUsername(username: string): Promise<DbUser | undefined>;
+  createUser(user: InsertUser): Promise<DbUser>;
+  updateUserStats(id: number, won: boolean, ratingChange: number): Promise<DbUser | undefined>;
   
-  // Game lobbies
+  // Password resets
+  createPasswordReset(userId: number, token: string, expiresAt: Date): Promise<void>;
+  getPasswordReset(token: string): Promise<{ userId: number; expiresAt: Date; used: boolean } | undefined>;
+  markPasswordResetUsed(token: string): Promise<void>;
+  
+  // Game lobbies (in-memory for real-time)
   getLobby(id: string): Promise<Lobby | undefined>;
   createLobby(lobby: Omit<Lobby, "id">): Promise<Lobby>;
   updateLobby(id: string, lobby: Partial<Lobby>): Promise<Lobby | undefined>;
   deleteLobby(id: string): Promise<boolean>;
   getActiveLobbies(): Promise<Lobby[]>;
   
-  // Active games
+  // Active games (in-memory for real-time)
   getGame(id: string): Promise<GameState | undefined>;
   saveGame(game: GameState): Promise<GameState>;
   deleteGame(id: string): Promise<boolean>;
+  
+  // Match history
+  recordMatch(
+    gameMode: string,
+    pointGoal: string,
+    winningScore: number,
+    losingScore: number,
+    players: { userId: number | null; isBot: boolean; teamIndex: number; ratingChange: number }[]
+  ): Promise<void>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
+export class DatabaseStorage implements IStorage {
   private lobbies: Map<string, Lobby>;
   private games: Map<string, GameState>;
 
   constructor() {
-    this.users = new Map();
     this.lobbies = new Map();
     this.games = new Map();
   }
 
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+  async getUser(id: number): Promise<DbUser | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+  async getUserByEmail(email: string): Promise<DbUser | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { 
-      ...insertUser, 
-      id,
-      gamesPlayed: 0,
-      gamesWon: 0,
-    };
-    this.users.set(id, user);
+  async getUserByUsername(username: string): Promise<DbUser | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<DbUser> {
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
-  async updateUserStats(id: string, won: boolean): Promise<User | undefined> {
-    const user = this.users.get(id);
+  async updateUserStats(id: number, won: boolean, ratingChange: number): Promise<DbUser | undefined> {
+    const user = await this.getUser(id);
     if (!user) return undefined;
     
-    const updatedUser: User = {
-      ...user,
-      gamesPlayed: user.gamesPlayed + 1,
-      gamesWon: user.gamesWon + (won ? 1 : 0),
-    };
-    this.users.set(id, updatedUser);
-    return updatedUser;
+    const [updated] = await db
+      .update(users)
+      .set({
+        gamesPlayed: user.gamesPlayed + 1,
+        gamesWon: user.gamesWon + (won ? 1 : 0),
+        rating: Math.max(0, user.rating + ratingChange),
+      })
+      .where(eq(users.id, id))
+      .returning();
+    
+    return updated;
+  }
+
+  async createPasswordReset(userId: number, token: string, expiresAt: Date): Promise<void> {
+    await db.insert(passwordResets).values({ userId, token, expiresAt });
+  }
+
+  async getPasswordReset(token: string): Promise<{ userId: number; expiresAt: Date; used: boolean } | undefined> {
+    const [reset] = await db.select().from(passwordResets).where(eq(passwordResets.token, token));
+    return reset || undefined;
+  }
+
+  async markPasswordResetUsed(token: string): Promise<void> {
+    await db.update(passwordResets).set({ used: true }).where(eq(passwordResets.token, token));
   }
 
   async getLobby(id: string): Promise<Lobby | undefined> {
@@ -108,6 +142,34 @@ export class MemStorage implements IStorage {
   async deleteGame(id: string): Promise<boolean> {
     return this.games.delete(id);
   }
+
+  async recordMatch(
+    gameMode: string,
+    pointGoal: string,
+    winningScore: number,
+    losingScore: number,
+    players: { userId: number | null; isBot: boolean; teamIndex: number; ratingChange: number }[]
+  ): Promise<void> {
+    const [match] = await db
+      .insert(matchHistory)
+      .values({
+        gameMode,
+        pointGoal,
+        winningTeamScore: winningScore,
+        losingTeamScore: losingScore,
+      })
+      .returning();
+
+    for (const player of players) {
+      await db.insert(matchPlayers).values({
+        matchId: match.id,
+        userId: player.userId,
+        isBot: player.isBot,
+        teamIndex: player.teamIndex,
+        ratingChange: player.ratingChange,
+      });
+    }
+  }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

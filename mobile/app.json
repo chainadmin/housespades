@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "House Spades",
+    "slug": "house-spades",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1a1a2e"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.housespades.app",
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-XXXXXXXX~XXXXXXXX"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1a1a2e"
+      },
+      "package": "com.housespades.app",
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-XXXXXXXX~XXXXXXXX"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "scheme": "housespades",
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ]
+  }
+}
