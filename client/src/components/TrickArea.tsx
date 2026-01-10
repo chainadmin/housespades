@@ -13,7 +13,7 @@ export function TrickArea({ trick, playerPositions }: TrickAreaProps) {
     north: { bottom: "80%", left: "40%", transform: "translateX(-50%)" },
     south: { top: "80%", left: "40%", transform: "translateX(-50%)" },
     east: { top: "40%", left: "80%", transform: "translate(-50%, -50%)" },
-    west: { top: "40%", left: "20%", transform: "translate(-50%, -50%)" },
+    west: { top: "40%", left: "0", transform: "translateY(-50%)" },
   };
 
   const slideDirection: Record<Position, { x: number; y: number }> = {
