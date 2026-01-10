@@ -127,34 +127,46 @@ export function GameTable({
       </div>
 
       {/* Main game area */}
-      <div className="flex-1 flex items-center justify-center p-2 sm:p-4 md:p-8">
-        <div className="relative w-full h-full max-w-5xl flex items-center justify-center">
-          {/* North player (across) - positioned at top center */}
-          {northPlayer && (
-            <div className="absolute top-2 sm:top-4 left-1/2 -translate-x-1/2 z-0">
-              <PlayerZone
-                player={northPlayer}
-                position="north"
-                isCurrentTurn={gameState.players[gameState.currentPlayerIndex]?.id === northPlayer.id}
-                teamColor={getTeamColor(northPlayer)}
-              />
-            </div>
-          )}
+      <div className="flex-1 relative">
+        {/* North player - top center edge */}
+        {northPlayer && (
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10">
+            <PlayerZone
+              player={northPlayer}
+              position="north"
+              isCurrentTurn={gameState.players[gameState.currentPlayerIndex]?.id === northPlayer.id}
+              teamColor={getTeamColor(northPlayer)}
+            />
+          </div>
+        )}
 
-          {/* West player (left) - positioned at left */}
-          {westPlayer && (
-            <div className="absolute left-1 sm:left-4 top-1/2 -translate-y-1/2 z-0">
-              <PlayerZone
-                player={westPlayer}
-                position="west"
-                isCurrentTurn={gameState.players[gameState.currentPlayerIndex]?.id === westPlayer.id}
-                teamColor={getTeamColor(westPlayer)}
-              />
-            </div>
-          )}
+        {/* West player - left center edge */}
+        {westPlayer && (
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 z-10">
+            <PlayerZone
+              player={westPlayer}
+              position="west"
+              isCurrentTurn={gameState.players[gameState.currentPlayerIndex]?.id === westPlayer.id}
+              teamColor={getTeamColor(westPlayer)}
+            />
+          </div>
+        )}
 
-          {/* Center: Trick area or Bidding panel - highest z-index */}
-          <div className="relative z-20 flex flex-col items-center gap-4">
+        {/* East player - right center edge */}
+        {eastPlayer && (
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10">
+            <PlayerZone
+              player={eastPlayer}
+              position="east"
+              isCurrentTurn={gameState.players[gameState.currentPlayerIndex]?.id === eastPlayer.id}
+              teamColor={getTeamColor(eastPlayer)}
+            />
+          </div>
+        )}
+
+        {/* Center: Trick area or Bidding panel */}
+        <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+          <div className="pointer-events-auto">
             {isBiddingPhase && isMyTurn && (
               <BiddingPanel
                 onBid={onBid}
@@ -171,11 +183,11 @@ export function GameTable({
             )}
 
             {isBiddingPhase && !isMyTurn && (
-              <div className="bg-card/90 backdrop-blur-sm rounded-lg p-6 shadow-lg">
-                <p className="text-lg font-medium text-center animate-pulse">
+              <div className="bg-card/90 backdrop-blur-sm rounded-lg p-4 sm:p-6 shadow-lg">
+                <p className="text-base sm:text-lg font-medium text-center animate-pulse">
                   Waiting for bids...
                 </p>
-                <div className="mt-2 flex justify-center gap-4 text-sm text-muted-foreground">
+                <div className="mt-2 flex flex-wrap justify-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                   {gameState.players.map((p) => (
                     <span key={p.id} className={cn(
                       "flex items-center gap-1",
@@ -188,18 +200,6 @@ export function GameTable({
               </div>
             )}
           </div>
-
-          {/* East player (right) - positioned at right */}
-          {eastPlayer && (
-            <div className="absolute right-1 sm:right-4 top-1/2 -translate-y-1/2 z-0">
-              <PlayerZone
-                player={eastPlayer}
-                position="east"
-                isCurrentTurn={gameState.players[gameState.currentPlayerIndex]?.id === eastPlayer.id}
-                teamColor={getTeamColor(eastPlayer)}
-              />
-            </div>
-          )}
         </div>
       </div>
 

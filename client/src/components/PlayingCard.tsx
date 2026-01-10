@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import type { Card } from "@shared/schema";
 import { getSuitSymbol, getSuitColor, formatCardValue, isJoker } from "@/lib/gameUtils";
 import { cn } from "@/lib/utils";
-import basicCard from "@/assets/basic-card.png";
 
 interface PlayingCardProps {
   card: Card;
@@ -60,50 +59,43 @@ export function PlayingCard({
       }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
       className={cn(
-        "relative flex flex-col items-center justify-between rounded-lg border-2 border-gray-200 shadow-lg cursor-pointer select-none p-1.5 overflow-hidden",
+        "relative flex flex-col items-center justify-between rounded-lg bg-white border-2 border-gray-300 shadow-md cursor-pointer select-none p-1.5",
         sizeClasses[size],
         disabled && "cursor-not-allowed grayscale-[30%]",
         selected && "ring-2 ring-primary ring-offset-2",
-        !disabled && "hover:shadow-xl",
+        !disabled && "hover:shadow-lg",
         className
       )}
-      style={{
-        backgroundImage: `url(${basicCard})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
       data-testid={`card-${card.id}`}
       aria-label={isJokerCard ? (card.value === "BJ" ? "Big Joker" : "Little Joker") : `${displayValue} of ${card.suit}`}
     >
-      {/* White overlay for readability */}
-      <div className="absolute inset-0 bg-white/85" />
       {/* Top left corner */}
-      <div className={cn("absolute top-1 left-1.5 flex flex-col items-center leading-none z-10", suitColorClass)}>
-        <span className={cn("font-bold drop-shadow-sm", valueSizeClasses[size])}>{displayValue}</span>
-        <span className={cn("drop-shadow-sm", symbolSizeClasses[size])}>{suitSymbol}</span>
+      <div className={cn("absolute top-1 left-1.5 flex flex-col items-center leading-none", suitColorClass)}>
+        <span className={cn("font-bold", valueSizeClasses[size])}>{displayValue}</span>
+        <span className={symbolSizeClasses[size]}>{suitSymbol}</span>
       </div>
 
       {/* Center symbol (large) */}
-      <div className={cn("absolute inset-0 flex items-center justify-center z-10", suitColorClass)}>
+      <div className={cn("absolute inset-0 flex items-center justify-center", suitColorClass)}>
         <span className={cn(
           size === "sm" ? "text-4xl" : size === "md" ? "text-5xl" : "text-6xl",
-          "opacity-30 drop-shadow-sm"
+          "opacity-20"
         )}>
           {suitSymbol}
         </span>
       </div>
 
       {/* Bottom right corner (rotated) */}
-      <div className={cn("absolute bottom-1 right-1.5 flex flex-col items-center leading-none rotate-180 z-10", suitColorClass)}>
-        <span className={cn("font-bold drop-shadow-sm", valueSizeClasses[size])}>{displayValue}</span>
-        <span className={cn("drop-shadow-sm", symbolSizeClasses[size])}>{suitSymbol}</span>
+      <div className={cn("absolute bottom-1 right-1.5 flex flex-col items-center leading-none rotate-180", suitColorClass)}>
+        <span className={cn("font-bold", valueSizeClasses[size])}>{displayValue}</span>
+        <span className={symbolSizeClasses[size]}>{suitSymbol}</span>
       </div>
 
       {/* Joker label */}
       {isJokerCard && (
-        <div className="absolute inset-0 flex items-center justify-center z-10">
+        <div className="absolute inset-0 flex items-center justify-center">
           <span className={cn(
-            "font-bold text-center rotate-0 drop-shadow-sm",
+            "font-bold text-center rotate-0",
             card.value === "BJ" ? "text-red-500" : "text-gray-900",
             size === "sm" ? "text-[8px]" : size === "md" ? "text-[10px]" : "text-xs"
           )}>
