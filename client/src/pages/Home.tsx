@@ -9,7 +9,7 @@ import { PointGoalSelector } from "@/components/TimeControlSelector";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAuth } from "@/lib/auth";
 import type { GameMode, PointGoal } from "@shared/schema";
-import { Users, Bot, Trophy, TrendingUp, LogOut, User } from "lucide-react";
+import { Users, Bot, Trophy, TrendingUp, LogOut, User, ShoppingBag } from "lucide-react";
 import houseCardLogo from "@/assets/house-card-logo.png";
 import chainLogo from "@/assets/12by12.jpg";
 
@@ -60,6 +60,14 @@ export default function Home() {
               </Badge>
             </div>
             <ThemeToggle />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => navigate("/shop")}
+              data-testid="button-shop"
+            >
+              <ShoppingBag className="h-4 w-4" />
+            </Button>
             <Button 
               variant="ghost" 
               size="icon" 

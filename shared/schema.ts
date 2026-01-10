@@ -14,6 +14,7 @@ export const users = pgTable("users", {
   rating: integer("rating").notNull().default(1000),
   gamesPlayed: integer("games_played").notNull().default(0),
   gamesWon: integer("games_won").notNull().default(0),
+  removeAds: boolean("remove_ads").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -195,6 +196,7 @@ export const userSchema = z.object({
   rating: z.number(),
   gamesPlayed: z.number(),
   gamesWon: z.number(),
+  removeAds: z.boolean(),
 });
 export type User = z.infer<typeof userSchema>;
 

@@ -14,8 +14,13 @@ export async function migrate() {
         rating INTEGER NOT NULL DEFAULT 1000,
         games_played INTEGER NOT NULL DEFAULT 0,
         games_won INTEGER NOT NULL DEFAULT 0,
+        remove_ads BOOLEAN NOT NULL DEFAULT false,
         created_at TIMESTAMP DEFAULT NOW()
       )
+    `);
+    
+    await db.execute(sql`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS remove_ads BOOLEAN NOT NULL DEFAULT false
     `);
 
     await db.execute(sql`

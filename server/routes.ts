@@ -202,6 +202,7 @@ export async function registerRoutes(
         rating: user.rating,
         gamesPlayed: user.gamesPlayed,
         gamesWon: user.gamesWon,
+        removeAds: user.removeAds,
       });
     } catch (error) {
       console.error("Get me error:", error);
@@ -216,6 +217,46 @@ export async function registerRoutes(
       }
       res.json({ message: "Logged out successfully" });
     });
+  });
+
+  // Purchase Routes - for verifying in-app purchases
+  app.post("/api/purchase/verify", async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const { platform, receipt, productId } = req.body;
+      
+      if (!platform || !receipt || !productId) {
+        return res.status(400).json({ error: "Missing purchase data" });
+      }
+
+      // TODO: Verify receipt with Google Play or Apple App Store
+      // For now, we'll trust the mobile app's verification
+      // In production, implement server-side receipt validation:
+      // - iOS: https://developer.apple.com/documentation/appstorereceipts
+      // - Android: https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.products
+      
+      if (productId === "remove_ads") {
+        const updated = await storage.setRemoveAds(userId, true);
+        if (!updated) {
+          return res.status(400).json({ error: "Failed to update purchase" });
+        }
+        
+        return res.json({ 
+          success: true, 
+          message: "Ads removed successfully",
+          removeAds: true 
+        });
+      }
+
+      res.status(400).json({ error: "Unknown product" });
+    } catch (error) {
+      console.error("Purchase verification error:", error);
+      res.status(500).json({ error: "Failed to verify purchase" });
+    }
   });
 
   // User Routes
