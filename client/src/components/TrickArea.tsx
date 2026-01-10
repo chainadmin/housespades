@@ -10,26 +10,26 @@ interface TrickAreaProps {
 
 export function TrickArea({ trick, playerPositions }: TrickAreaProps) {
   const positionStyles: Record<Position, React.CSSProperties> = {
-    north: { top: "4px", left: "50%", transform: "translateX(-50%)" },
-    south: { bottom: "4px", left: "50%", transform: "translateX(-50%)" },
-    east: { top: "50%", right: "4px", transform: "translateY(-50%)" },
-    west: { top: "50%", left: "4px", transform: "translateY(-50%)" },
+    north: { top: "0", left: "50%", transform: "translateX(-50%)" },
+    south: { bottom: "0", left: "50%", transform: "translateX(-50%)" },
+    east: { top: "50%", right: "0", transform: "translateY(-50%)" },
+    west: { top: "50%", left: "0", transform: "translateY(-50%)" },
   };
 
   const slideDirection: Record<Position, { x: number; y: number }> = {
-    north: { x: 0, y: -40 },
-    south: { x: 0, y: 40 },
-    east: { x: 40, y: 0 },
-    west: { x: -40, y: 0 },
+    north: { x: 0, y: -30 },
+    south: { x: 0, y: 30 },
+    east: { x: 30, y: 0 },
+    west: { x: -30, y: 0 },
   };
 
   return (
     <div 
-      className="relative w-36 h-36 sm:w-48 sm:h-48 md:w-56 md:h-56"
+      className="relative w-32 h-32 sm:w-44 sm:h-44 md:w-52 md:h-52"
       data-testid="trick-area"
     >
       {/* Center indicator */}
-      <div className="absolute inset-4 sm:inset-8 rounded-full bg-accent/30 border border-accent" />
+      <div className="absolute inset-3 sm:inset-6 rounded-full bg-accent/30 border border-accent" />
 
       <AnimatePresence>
         {trick.cards.map(({ playerId, card }, index) => {
