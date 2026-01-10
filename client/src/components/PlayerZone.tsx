@@ -29,7 +29,7 @@ export function PlayerZone({ player, isCurrentTurn, position, teamColor = "prima
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       className={cn(
-        "flex gap-3 p-3 rounded-xl transition-all duration-300",
+        "flex gap-1 sm:gap-3 p-1.5 sm:p-3 rounded-xl transition-all duration-300",
         positionClasses[position],
         isCurrentTurn && "bg-accent/50 ring-2 ring-primary/50",
       )}
@@ -37,12 +37,12 @@ export function PlayerZone({ player, isCurrentTurn, position, teamColor = "prima
     >
       {/* Avatar and name */}
       <div className={cn(
-        "flex gap-2 items-center",
+        "flex gap-1 sm:gap-2 items-center",
         isVertical ? "flex-col" : "flex-col"
       )}>
         <div className="relative">
           <Avatar className={cn(
-            "h-12 w-12 border-2",
+            "h-8 w-8 sm:h-12 sm:w-12 border-2",
             teamColor === "primary" ? "border-primary" : "border-chart-2"
           )}>
             <AvatarFallback className={cn(
@@ -60,16 +60,16 @@ export function PlayerZone({ player, isCurrentTurn, position, teamColor = "prima
           )}
         </div>
         
-        <div className="flex flex-col items-center gap-1">
-          <span className="text-sm font-medium truncate max-w-20">{player.name}</span>
-          <div className="flex gap-1">
+        <div className="flex flex-col items-center gap-0.5 sm:gap-1">
+          <span className="text-xs sm:text-sm font-medium truncate max-w-16 sm:max-w-20">{player.name}</span>
+          <div className="flex gap-0.5 sm:gap-1">
             {player.bid !== null && (
-              <Badge variant="outline" className="text-xs">
-                Bid: {player.bid}
+              <Badge variant="outline" className="text-[10px] sm:text-xs px-1 sm:px-2">
+                {player.bid}
               </Badge>
             )}
-            <Badge variant="secondary" className="text-xs">
-              {player.tricks} books
+            <Badge variant="secondary" className="text-[10px] sm:text-xs px-1 sm:px-2">
+              {player.tricks}
             </Badge>
           </div>
         </div>

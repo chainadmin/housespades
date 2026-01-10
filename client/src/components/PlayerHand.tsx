@@ -28,15 +28,18 @@ export function PlayerHand({
     return playableCards.some((c) => c.id === card.id);
   };
 
-  // Calculate overlap based on number of cards
+  // Calculate overlap based on number of cards and screen width
   const getCardOffset = (index: number, total: number): number => {
-    const baseOffset = Math.min(70, 800 / total);
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+    const maxWidth = isMobile ? 320 : 800;
+    const cardWidth = isMobile ? 60 : 80;
+    const baseOffset = Math.min(isMobile ? 45 : 70, (maxWidth - cardWidth) / Math.max(total - 1, 1));
     return index * baseOffset;
   };
 
   return (
     <motion.div
-      className="relative flex justify-center items-end min-h-36 py-4"
+      className="relative flex justify-center items-end min-h-28 sm:min-h-36 py-2 sm:py-4 px-2 overflow-x-auto"
       data-testid="player-hand"
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
@@ -44,8 +47,8 @@ export function PlayerHand({
       <div 
         className="relative flex"
         style={{ 
-          width: `${getCardOffset(sortedCards.length - 1, sortedCards.length) + 100}px`,
-          height: "140px",
+          width: `${getCardOffset(sortedCards.length - 1, sortedCards.length) + 80}px`,
+          height: "120px",
         }}
       >
         {sortedCards.map((card, index) => {
@@ -79,7 +82,7 @@ export function PlayerHand({
             >
               <PlayingCard
                 card={card}
-                size="lg"
+                size="md"
                 onClick={() => canPlay && onCardClick?.(card)}
                 disabled={!canPlay}
                 selected={isSelected}
