@@ -162,9 +162,9 @@ export function GameTable({
         </div>
       )}
 
-      {/* Center: Trick area or Bidding panel - positioned below north player */}
-      <div className="absolute top-24 sm:top-28 bottom-32 sm:bottom-36 left-0 right-0 flex items-center justify-center z-20 pointer-events-none">
-        <div className="pointer-events-auto">
+      {/* Center: Trick area or Bidding panel - true center shifted down */}
+      <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+        <div className="pointer-events-auto translate-y-8 sm:translate-y-12">
           {isBiddingPhase && isMyTurn && (
             <BiddingPanel
               onBid={onBid}
