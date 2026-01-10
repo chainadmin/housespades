@@ -10,10 +10,10 @@ interface TrickAreaProps {
 
 export function TrickArea({ trick, playerPositions }: TrickAreaProps) {
   const positionStyles: Record<Position, React.CSSProperties> = {
-    north: { top: "calc(50% - 70px)", left: "50%", transform: "translateX(-50%)" },
-    south: { top: "calc(50% + 10px)", left: "50%", transform: "translateX(-50%)" },
-    east: { top: "50%", left: "calc(50% + 10px)", transform: "translateY(-50%)" },
-    west: { top: "50%", left: "calc(50% - 70px)", transform: "translateY(-50%)" },
+    north: { top: "calc(50% - 92px)", left: "50%", transform: "translateX(-50%)" },
+    south: { top: "calc(50% + 12px)", left: "50%", transform: "translateX(-50%)" },
+    east: { top: "50%", left: "calc(50% + 12px)", transform: "translateY(-50%)" },
+    west: { top: "50%", left: "calc(50% - 68px)", transform: "translateY(-50%)" },
   };
 
   const slideDirection: Record<Position, { x: number; y: number }> = {
