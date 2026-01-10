@@ -25,17 +25,9 @@ export function TrickArea({ trick, playerPositions }: TrickAreaProps) {
 
   return (
     <div 
-      className="relative w-56 h-64 sm:w-64 sm:h-72 md:w-72 md:h-80 border-2 border-red-500"
+      className="relative w-56 h-64 sm:w-64 sm:h-72 md:w-72 md:h-80"
       data-testid="trick-area"
     >
-      {/* Temporary grid overlay */}
-      <div className="absolute inset-0 grid grid-cols-5 grid-rows-5 pointer-events-none z-50">
-        {Array.from({ length: 25 }, (_, i) => (
-          <div key={i} className="border border-yellow-400/50 flex items-center justify-center">
-            <span className="text-yellow-400 text-xs font-bold bg-black/70 px-1 rounded">{i + 1}</span>
-          </div>
-        ))}
-      </div>
       {/* Center indicator */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-accent/30 border border-accent" />
 
