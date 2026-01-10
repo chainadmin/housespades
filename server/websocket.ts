@@ -17,6 +17,7 @@ interface GameRoom {
   clients: Map<string, Client>;
   botTimer: NodeJS.Timeout | null;
   statsSaved: boolean;
+  isRanked: boolean; // Only true for multiplayer (2+ authenticated humans)
 }
 
 export class GameWebSocketServer {
@@ -102,11 +103,17 @@ export class GameWebSocketServer {
 
       const gameState = GameEngine.createGame(updatedPlayers, mode, pointGoal);
       
+      // Count authenticated human players to determine if this is a ranked game
+      // Ranked games require 2+ authenticated (non-bot) players
+      const authenticatedHumans = updatedPlayers.filter(p => !p.isBot && p.userId).length;
+      const isRanked = authenticatedHumans >= 2;
+      
       const gameRoom: GameRoom = {
         gameState,
         clients: new Map(),
         botTimer: null,
         statsSaved: false,
+        isRanked,
       };
 
       // Add human players to room
@@ -262,14 +269,15 @@ export class GameWebSocketServer {
       });
     });
 
-    // Check if game is over and save stats (only once)
-    if (room.gameState.phase === "game_over" && !room.statsSaved) {
+    // Check if game is over and save stats (only once, only for ranked multiplayer games)
+    if (room.gameState.phase === "game_over" && !room.statsSaved && room.isRanked) {
       room.statsSaved = true;
       this.saveGameStats(room.gameState);
     }
   }
 
   private async saveGameStats(gameState: GameState) {
+    // This is only called for ranked multiplayer games (2+ authenticated humans)
     try {
       const winningTeamIndex = gameState.teams.findIndex(
         (t) => t.score >= gameState.winningScore

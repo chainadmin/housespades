@@ -167,6 +167,8 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
 
 ### Game Statistics
 - Match history saved to database when games complete
+- **Stats and rankings only count for multiplayer games** (2+ authenticated human players)
+- Solo games vs bots do not affect user stats or ELO ratings
 - Stats saved only once per game (guard against duplicate broadcasts)
 - Recording includes game mode, scores, and player participation
 
