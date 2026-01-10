@@ -165,11 +165,11 @@ export default function Home() {
             <CardContent className="space-y-3 text-sm text-muted-foreground">
               <p>
                 <strong className="text-foreground">Objective:</strong> Work with your partner to 
-                win at least as many tricks as you bid. First team to reach the point goal wins.
+                win at least as many books as you bid. First team to reach the point goal wins.
               </p>
               <p>
                 <strong className="text-foreground">Bidding:</strong> Each player bids how many 
-                tricks they think they can win. Team bids are combined.
+                books they think they can win. Team bids are combined.
               </p>
               <p>
                 <strong className="text-foreground">Playing:</strong> Follow the lead suit if 
@@ -177,7 +177,7 @@ export default function Home() {
               </p>
               <p>
                 <strong className="text-foreground">Scoring:</strong> Make your bid = 10 points 
-                per trick bid + 1 point per overtrick. Fail = lose 10 points per trick bid.
+                per book bid + 1 point per extra book. Fail = lose 10 points per book bid.
               </p>
             </CardContent>
           </Card>

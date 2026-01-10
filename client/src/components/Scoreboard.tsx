@@ -105,7 +105,7 @@ export function Scoreboard({ teams, players, winningScore, roundNumber, compact 
                   {team.totalBid !== null && (
                     <span>Bid: {teamBid}</span>
                   )}
-                  <span>Tricks: {team.tricksWon}</span>
+                  <span>Books: {team.tricksWon}</span>
                   <span className="text-muted-foreground">
                     Bags: {team.bags}
                   </span>

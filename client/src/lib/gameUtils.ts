@@ -8,12 +8,12 @@ export const SUIT_SYMBOLS: Record<Suit, string> = {
   clubs: "♣",
 };
 
-// Suit colors
+// Suit colors - using explicit colors since cards have white backgrounds
 export const SUIT_COLORS: Record<Suit, string> = {
-  spades: "text-foreground",
+  spades: "text-gray-900",
   hearts: "text-red-500",
   diamonds: "text-red-500",
-  clubs: "text-foreground",
+  clubs: "text-gray-900",
 };
 
 // Get suit symbol

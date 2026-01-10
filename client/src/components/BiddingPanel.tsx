@@ -100,7 +100,7 @@ export function BiddingPanel({ onBid, disabled = false, partnerBid, maxBid = 13 
 
           {selectedBid === 0 && (
             <p className="text-xs text-center text-muted-foreground">
-              Nil bid: +100 if successful, -100 if you take any tricks
+              Nil bid: +100 if successful, -100 if you take any books
             </p>
           )}
         </CardContent>

@@ -23,7 +23,7 @@ export function PlayingCard({
   const isJokerCard = isJoker(card);
   const suitSymbol = isJokerCard ? "★" : getSuitSymbol(card.suit);
   const suitColorClass = isJokerCard 
-    ? (card.value === "BJ" ? "text-red-500" : "text-foreground")
+    ? (card.value === "BJ" ? "text-red-500" : "text-gray-900")
     : getSuitColor(card.suit);
   const displayValue = formatCardValue(card.value);
 
@@ -96,7 +96,7 @@ export function PlayingCard({
         <div className="absolute inset-0 flex items-center justify-center">
           <span className={cn(
             "font-bold text-center rotate-0",
-            card.value === "BJ" ? "text-red-500" : "text-foreground",
+            card.value === "BJ" ? "text-red-500" : "text-gray-900",
             size === "sm" ? "text-[8px]" : size === "md" ? "text-[10px]" : "text-xs"
           )}>
             {card.value === "BJ" ? "BIG" : "LITTLE"}
