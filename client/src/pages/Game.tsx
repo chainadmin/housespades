@@ -209,7 +209,7 @@ export default function Game() {
         players: newPlayers,
         teams: newTeams,
         phase: newPhase,
-        currentPlayerIndex: allBid ? 0 : (prev.currentPlayerIndex + 1) % 4,
+        currentPlayerIndex: allBid ? (prev.dealerIndex + 1) % 4 : (prev.currentPlayerIndex + 1) % 4,
       };
     });
   }, [gameState]);

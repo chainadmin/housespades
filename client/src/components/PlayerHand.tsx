@@ -8,6 +8,7 @@ interface PlayerHandProps {
   cards: Card[];
   mode: GameMode;
   onCardClick?: (card: Card) => void;
+  onCardDoubleClick?: (card: Card) => void;
   selectedCard?: Card | null;
   playableCards?: Card[];
   disabled?: boolean;
@@ -17,6 +18,7 @@ export function PlayerHand({
   cards,
   mode,
   onCardClick,
+  onCardDoubleClick,
   selectedCard,
   playableCards,
   disabled = false,
@@ -84,6 +86,7 @@ export function PlayerHand({
                 card={card}
                 size="md"
                 onClick={() => canPlay && onCardClick?.(card)}
+                onDoubleClick={() => canPlay && onCardDoubleClick?.(card)}
                 disabled={!canPlay}
                 selected={isSelected}
               />

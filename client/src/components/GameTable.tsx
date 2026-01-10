@@ -87,12 +87,14 @@ export function GameTable({
 
   const handleCardClick = (card: Card) => {
     if (!isMyTurn || !isPlayingPhase) return;
-    
-    if (selectedCard?.id === card.id) {
+    onSelectCard(card);
+  };
+
+  const handleCardDoubleClick = (card: Card) => {
+    if (!isMyTurn || !isPlayingPhase) return;
+    if (playableCards.some((c) => c.id === card.id)) {
       onPlayCard(card);
       onSelectCard(null);
-    } else {
-      onSelectCard(card);
     }
   };
 
@@ -208,6 +210,7 @@ export function GameTable({
               cards={currentPlayer.hand}
               mode={gameState.mode}
               onCardClick={handleCardClick}
+              onCardDoubleClick={handleCardDoubleClick}
               selectedCard={selectedCard}
               playableCards={playableCards}
               disabled={!isMyTurn || !isPlayingPhase}

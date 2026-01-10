@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 interface PlayingCardProps {
   card: Card;
   onClick?: () => void;
+  onDoubleClick?: () => void;
   disabled?: boolean;
   selected?: boolean;
   size?: "sm" | "md" | "lg";
@@ -15,6 +16,7 @@ interface PlayingCardProps {
 export function PlayingCard({
   card,
   onClick,
+  onDoubleClick,
   disabled = false,
   selected = false,
   size = "md",
@@ -48,6 +50,7 @@ export function PlayingCard({
   return (
     <motion.button
       onClick={onClick}
+      onDoubleClick={onDoubleClick}
       disabled={disabled}
       whileHover={!disabled ? { y: -8, scale: 1.02 } : undefined}
       whileTap={!disabled ? { scale: 0.98 } : undefined}
