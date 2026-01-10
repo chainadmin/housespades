@@ -12,8 +12,8 @@ export function TrickArea({ trick, playerPositions }: TrickAreaProps) {
   const positionStyles: Record<Position, React.CSSProperties> = {
     north: { top: "0", left: "50%", transform: "translateX(-50%)" },
     south: { bottom: "0", left: "50%", transform: "translateX(-50%)" },
-    east: { top: "50%", right: "0", transform: "translateY(-50%)" },
-    west: { top: "50%", left: "0", transform: "translateY(-50%)" },
+    east: { top: "40%", right: "0", transform: "translateY(-50%)" },
+    west: { top: "40%", left: "0", transform: "translateY(-50%)" },
   };
 
   const slideDirection: Record<Position, { x: number; y: number }> = {
