@@ -46,6 +46,8 @@ export async function registerRoutes(
       const passwordHash = await bcrypt.hash(password, 10);
       const user = await storage.createUser({ username, email, passwordHash });
 
+      req.session.userId = user.id;
+
       res.json({
         id: user.id,
         username: user.username,
@@ -78,6 +80,8 @@ export async function registerRoutes(
       if (!validPassword) {
         return res.status(401).json({ error: "Invalid email or password" });
       }
+
+      req.session.userId = user.id;
 
       res.json({
         id: user.id,
@@ -136,6 +140,42 @@ export async function registerRoutes(
       console.error("Reset password error:", error);
       res.status(500).json({ error: "Failed to reset password" });
     }
+  });
+
+  app.get("/api/auth/me", async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const user = await storage.getUser(userId);
+      if (!user) {
+        req.session.destroy(() => {});
+        return res.status(401).json({ error: "User not found" });
+      }
+
+      res.json({
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        rating: user.rating,
+        gamesPlayed: user.gamesPlayed,
+        gamesWon: user.gamesWon,
+      });
+    } catch (error) {
+      console.error("Get me error:", error);
+      res.status(500).json({ error: "Failed to get user" });
+    }
+  });
+
+  app.post("/api/auth/logout", (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ error: "Failed to logout" });
+      }
+      res.json({ message: "Logged out successfully" });
+    });
   });
 
   // User Routes

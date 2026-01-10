@@ -7,11 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { GameModeCard } from "@/components/GameModeCard";
 import { PointGoalSelector } from "@/components/TimeControlSelector";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useAuth } from "@/lib/auth";
 import type { GameMode, PointGoal } from "@shared/schema";
-import { Users, Bot, Trophy, TrendingUp } from "lucide-react";
+import { Users, Bot, Trophy, TrendingUp, LogOut, User } from "lucide-react";
 
 export default function Home() {
   const [, navigate] = useLocation();
+  const { user, logout } = useAuth();
   const [selectedMode, setSelectedMode] = useState<GameMode>("ace_high");
   const [selectedPointGoal, setSelectedPointGoal] = useState<PointGoal>("300");
 
@@ -23,50 +25,61 @@ export default function Home() {
     navigate(`/matchmaking?mode=${selectedMode}&points=${selectedPointGoal}`);
   };
 
+  const winRate = user && user.gamesPlayed > 0 
+    ? Math.round((user.gamesWon / user.gamesPlayed) * 100) 
+    : 0;
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground text-2xl font-bold">♠</span>
+    <div className="min-h-screen bg-background flex flex-col">
+      <header className="border-b sticky top-0 bg-background/95 backdrop-blur z-10">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
+              <span className="text-primary-foreground text-xl sm:text-2xl font-bold">&#9824;</span>
             </div>
-            <h1 className="text-2xl font-semibold">House Spades</h1>
+            <h1 className="text-lg sm:text-2xl font-semibold truncate">House Spades</h1>
           </div>
           
-          <div className="flex items-center gap-4">
-            {/* Quick stats */}
-            <div className="hidden md:flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <div className="hidden sm:flex items-center gap-4">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Trophy className="h-4 w-4" />
-                <span>0 Wins</span>
+                <span>{user?.gamesWon || 0} Wins</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <TrendingUp className="h-4 w-4" />
-                <span>0% Win Rate</span>
+                <span>{winRate}%</span>
               </div>
+              <Badge variant="outline" className="text-xs">
+                <User className="h-3 w-3 mr-1" />
+                {user?.rating || 1000}
+              </Badge>
             </div>
             <ThemeToggle />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={logout}
+              data-testid="button-logout"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </header>
 
-      {/* Main content */}
-      <main className="max-w-4xl mx-auto px-4 py-12">
+      <main className="flex-1 max-w-4xl mx-auto px-4 py-6 sm:py-12 w-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="space-y-12"
         >
-          {/* Hero section */}
-          <div className="text-center space-y-4">
-            <h2 className="text-4xl font-bold tracking-tight">
-              Play Spades Online
+          <div className="text-center space-y-3">
+            <h2 className="text-2xl sm:text-4xl font-bold tracking-tight">
+              Welcome, {user?.username || "Player"}
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Challenge bots or find real opponents. Choose your game mode and point goal, 
-              then jump into a game of classic or custom Spades.
+            <p className="text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto">
+              Choose your game mode and point goal, then jump into a game.
             </p>
           </div>
 
@@ -184,10 +197,9 @@ export default function Home() {
         </motion.div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t mt-16">
-        <div className="max-w-6xl mx-auto px-4 py-6 text-center text-sm text-muted-foreground">
-          House Spades - Play classic card games online
+      <footer className="border-t mt-auto">
+        <div className="max-w-6xl mx-auto px-4 py-4 text-center text-xs text-muted-foreground">
+          House Spades
         </div>
       </footer>
     </div>
