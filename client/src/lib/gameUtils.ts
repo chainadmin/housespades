@@ -106,13 +106,13 @@ export function sortHand(hand: Card[], mode: GameMode): Card[] {
   });
 }
 
-// Get time control display name
-export function getTimeControlName(timeControl: string): string {
-  switch (timeControl) {
-    case "blitz": return "Blitz (10s)";
-    case "standard": return "Standard (30s)";
-    case "long": return "Long (60s)";
-    default: return timeControl;
+// Get point goal display name
+export function getPointGoalName(pointGoal: string): string {
+  switch (pointGoal) {
+    case "100": return "100 pts";
+    case "300": return "300 pts";
+    case "500": return "500 pts";
+    default: return `${pointGoal} pts`;
   }
 }
 

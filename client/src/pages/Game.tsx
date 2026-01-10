@@ -5,8 +5,8 @@ import { GameTable } from "@/components/GameTable";
 import { GameResultsModal } from "@/components/GameResultsModal";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
-import type { GameState, Card, Player, Team, Trick, GameMode, TimeControl, Position } from "@shared/schema";
-import { getCardPower, isTrump } from "@shared/schema";
+import type { GameState, Card, Player, Team, Trick, GameMode, PointGoal, Position } from "@shared/schema";
+import { getCardPower, isTrump, POINT_GOAL_VALUES } from "@shared/schema";
 import { generateStandardDeck, generateJJDDDeck, shuffleArray, sortHand } from "@/lib/gameUtils";
 import { ArrowLeft, Settings } from "lucide-react";
 
@@ -19,7 +19,7 @@ export default function Game() {
   const params = new URLSearchParams(searchString);
   
   const mode = (params.get("mode") as GameMode) || "ace_high";
-  const timeControl = (params.get("time") as TimeControl) || "standard";
+  const pointGoal = (params.get("points") as PointGoal) || "300";
   const gameType = params.get("type") || "solo";
   
   const [gameState, setGameState] = useState<GameState | null>(null);
@@ -33,7 +33,7 @@ export default function Game() {
   // Initialize game
   useEffect(() => {
     initializeGame();
-  }, [mode, timeControl]);
+  }, [mode, pointGoal]);
 
   const initializeGame = () => {
     const deck = mode === "ace_high" ? generateStandardDeck() : generateJJDDDeck();
@@ -81,7 +81,7 @@ export default function Game() {
     const initialState: GameState = {
       id: `game-${Date.now()}`,
       mode,
-      timeControl,
+      pointGoal,
       phase: "bidding",
       players,
       teams,
@@ -94,8 +94,7 @@ export default function Game() {
       dealerIndex: 0,
       roundNumber: 1,
       spadesBroken: false,
-      winningScore: 500,
-      turnTimeRemaining: null,
+      winningScore: POINT_GOAL_VALUES[pointGoal],
     };
 
     setGameState(initialState);

@@ -89,7 +89,6 @@ export function GameTable({
     if (!isMyTurn || !isPlayingPhase) return;
     
     if (selectedCard?.id === card.id) {
-      // Double click to play
       onPlayCard(card);
       onSelectCard(null);
     } else {
@@ -106,8 +105,8 @@ export function GameTable({
 
   return (
     <div className="relative w-full h-full min-h-screen bg-gradient-to-b from-accent/30 to-background flex flex-col" data-testid="game-table">
-      {/* Top bar with scores */}
-      <div className="flex items-center justify-between p-4">
+      {/* Top bar with compact scores */}
+      <div className="flex items-center justify-between p-3 border-b bg-background/80 backdrop-blur-sm z-10">
         <Scoreboard 
           teams={gameState.teams}
           players={gameState.players}
@@ -128,11 +127,11 @@ export function GameTable({
       </div>
 
       {/* Main game area */}
-      <div className="flex-1 flex items-center justify-center">
-        <div className="relative w-full max-w-4xl aspect-square md:aspect-video flex items-center justify-center">
-          {/* North player (across) */}
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="relative w-full max-w-3xl aspect-[4/3] flex items-center justify-center">
+          {/* North player (across) - positioned at top center */}
           {northPlayer && (
-            <div className="absolute top-0 left-1/2 -translate-x-1/2">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 z-0">
               <PlayerZone
                 player={northPlayer}
                 position="north"
@@ -142,9 +141,9 @@ export function GameTable({
             </div>
           )}
 
-          {/* West player (left) */}
+          {/* West player (left) - positioned at left center */}
           {westPlayer && (
-            <div className="absolute left-0 top-1/2 -translate-y-1/2">
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 z-0">
               <PlayerZone
                 player={westPlayer}
                 position="west"
@@ -154,8 +153,8 @@ export function GameTable({
             </div>
           )}
 
-          {/* Center: Trick area or Bidding panel */}
-          <div className="flex flex-col items-center gap-4">
+          {/* Center: Trick area or Bidding panel - highest z-index */}
+          <div className="relative z-20 flex flex-col items-center gap-4">
             {isBiddingPhase && isMyTurn && (
               <BiddingPanel
                 onBid={onBid}
@@ -172,15 +171,27 @@ export function GameTable({
             )}
 
             {isBiddingPhase && !isMyTurn && (
-              <p className="text-sm text-muted-foreground animate-pulse">
-                Waiting for bids...
-              </p>
+              <div className="bg-card/90 backdrop-blur-sm rounded-lg p-6 shadow-lg">
+                <p className="text-lg font-medium text-center animate-pulse">
+                  Waiting for bids...
+                </p>
+                <div className="mt-2 flex justify-center gap-4 text-sm text-muted-foreground">
+                  {gameState.players.map((p) => (
+                    <span key={p.id} className={cn(
+                      "flex items-center gap-1",
+                      p.bid !== null && "text-foreground"
+                    )}>
+                      {p.name}: {p.bid !== null ? p.bid : "..."}
+                    </span>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
 
-          {/* East player (right) */}
+          {/* East player (right) - positioned at right center */}
           {eastPlayer && (
-            <div className="absolute right-0 top-1/2 -translate-y-1/2">
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 z-0">
               <PlayerZone
                 player={eastPlayer}
                 position="east"
@@ -194,7 +205,7 @@ export function GameTable({
 
       {/* South player (you) - hand at bottom */}
       {currentPlayer && (
-        <div className="border-t bg-card/50 backdrop-blur-sm">
+        <div className="border-t bg-card/80 backdrop-blur-sm z-10">
           <div className="max-w-4xl mx-auto">
             <PlayerHand
               cards={currentPlayer.hand}
@@ -224,16 +235,6 @@ export function GameTable({
           </div>
         </div>
       )}
-
-      {/* Sidebar scoreboard */}
-      <div className="absolute right-4 top-20 hidden lg:block">
-        <Scoreboard
-          teams={gameState.teams}
-          players={gameState.players}
-          winningScore={gameState.winningScore}
-          roundNumber={gameState.roundNumber}
-        />
-      </div>
     </div>
   );
 }

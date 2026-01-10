@@ -5,8 +5,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, X, User, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getGameModeName, getTimeControlName } from "@/lib/gameUtils";
-import type { GameMode, TimeControl } from "@shared/schema";
+import { getGameModeName } from "@/lib/gameUtils";
+import type { GameMode, PointGoal } from "@shared/schema";
 
 interface MatchmakingPlayer {
   id: string;
@@ -18,7 +18,7 @@ interface MatchmakingPlayer {
 interface MatchmakingScreenProps {
   players: MatchmakingPlayer[];
   mode: GameMode;
-  timeControl: TimeControl;
+  pointGoal: PointGoal;
   elapsedTime: number;
   onCancel: () => void;
   onAddBot?: () => void;
@@ -29,7 +29,7 @@ interface MatchmakingScreenProps {
 export function MatchmakingScreen({
   players,
   mode,
-  timeControl,
+  pointGoal,
   elapsedTime,
   onCancel,
   onAddBot,
@@ -56,7 +56,7 @@ export function MatchmakingScreen({
             <CardTitle className="text-2xl">Finding Players</CardTitle>
             <div className="flex justify-center gap-2 mt-2">
               <Badge variant="outline">{getGameModeName(mode)}</Badge>
-              <Badge variant="secondary">{getTimeControlName(timeControl)}</Badge>
+              <Badge variant="secondary">{pointGoal} pts</Badge>
             </div>
           </CardHeader>
           <CardContent className="space-y-6">

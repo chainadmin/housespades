@@ -56,11 +56,11 @@ export async function registerRoutes(
   // Create a new lobby
   app.post("/api/lobbies", async (req, res) => {
     try {
-      const { mode, timeControl, hostId, hostName } = req.body;
+      const { mode, pointGoal, hostId, hostName } = req.body;
       
       const lobby = await storage.createLobby({
         mode: mode || "ace_high",
-        timeControl: timeControl || "standard",
+        pointGoal: pointGoal || "300",
         hostId,
         players: [{
           id: hostId,

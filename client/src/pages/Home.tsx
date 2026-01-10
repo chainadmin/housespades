@@ -5,22 +5,22 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { GameModeCard } from "@/components/GameModeCard";
-import { TimeControlSelector } from "@/components/TimeControlSelector";
+import { PointGoalSelector } from "@/components/TimeControlSelector";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import type { GameMode, TimeControl } from "@shared/schema";
+import type { GameMode, PointGoal } from "@shared/schema";
 import { Users, Bot, Trophy, TrendingUp } from "lucide-react";
 
 export default function Home() {
   const [, navigate] = useLocation();
   const [selectedMode, setSelectedMode] = useState<GameMode>("ace_high");
-  const [selectedTimeControl, setSelectedTimeControl] = useState<TimeControl>("standard");
+  const [selectedPointGoal, setSelectedPointGoal] = useState<PointGoal>("300");
 
   const handlePlayVsBots = () => {
-    navigate(`/game?mode=${selectedMode}&time=${selectedTimeControl}&type=solo`);
+    navigate(`/game?mode=${selectedMode}&points=${selectedPointGoal}&type=solo`);
   };
 
   const handleFindMatch = () => {
-    navigate(`/matchmaking?mode=${selectedMode}&time=${selectedTimeControl}`);
+    navigate(`/matchmaking?mode=${selectedMode}&points=${selectedPointGoal}`);
   };
 
   return (
@@ -65,7 +65,7 @@ export default function Home() {
               Play Spades Online
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Challenge bots or find real opponents. Choose your game mode and time control, 
+              Challenge bots or find real opponents. Choose your game mode and point goal, 
               then jump into a game of classic or custom Spades.
             </p>
           </div>
@@ -148,12 +148,12 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Time control selection */}
+          {/* Point goal selection */}
           <div className="space-y-4">
-            <h3 className="text-xl font-semibold">Time Control</h3>
-            <TimeControlSelector
-              selected={selectedTimeControl}
-              onChange={setSelectedTimeControl}
+            <h3 className="text-xl font-semibold">Point Goal</h3>
+            <PointGoalSelector
+              selected={selectedPointGoal}
+              onChange={setSelectedPointGoal}
             />
           </div>
 
@@ -165,7 +165,7 @@ export default function Home() {
             <CardContent className="space-y-3 text-sm text-muted-foreground">
               <p>
                 <strong className="text-foreground">Objective:</strong> Work with your partner to 
-                win at least as many tricks as you bid. First team to 500 points wins.
+                win at least as many tricks as you bid. First team to reach the point goal wins.
               </p>
               <p>
                 <strong className="text-foreground">Bidding:</strong> Each player bids how many 

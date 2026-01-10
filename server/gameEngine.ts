@@ -5,11 +5,11 @@ import type {
   Team, 
   Trick, 
   GameMode, 
-  TimeControl, 
+  PointGoal, 
   Position,
   Suit 
 } from "@shared/schema";
-import { getCardPower, isTrump, TIME_CONTROL_SECONDS } from "@shared/schema";
+import { getCardPower, isTrump, POINT_GOAL_VALUES } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 const POSITIONS: Position[] = ["south", "west", "north", "east"];
@@ -88,7 +88,7 @@ export class GameEngine {
   static createGame(
     players: { id: string; name: string; isBot: boolean }[],
     mode: GameMode,
-    timeControl: TimeControl
+    pointGoal: PointGoal
   ): GameState {
     if (players.length !== 4) {
       throw new Error("Spades requires exactly 4 players");
@@ -130,7 +130,7 @@ export class GameEngine {
     return {
       id: randomUUID(),
       mode,
-      timeControl,
+      pointGoal,
       phase: "bidding",
       players: gamePlayers,
       teams,
@@ -143,8 +143,7 @@ export class GameEngine {
       dealerIndex: 0,
       roundNumber: 1,
       spadesBroken: false,
-      winningScore: 500,
-      turnTimeRemaining: TIME_CONTROL_SECONDS[timeControl],
+      winningScore: POINT_GOAL_VALUES[pointGoal],
     };
   }
 

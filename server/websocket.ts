@@ -1,6 +1,6 @@
 import { WebSocketServer, WebSocket } from "ws";
 import type { Server } from "http";
-import type { GameState, WSMessage, GameMode, TimeControl } from "@shared/schema";
+import type { GameState, WSMessage, GameMode, PointGoal } from "@shared/schema";
 import { GameEngine } from "./gameEngine";
 import { BotAI } from "./botAI";
 import { storage } from "./storage";
@@ -84,14 +84,14 @@ export class GameWebSocketServer {
     }
   }
 
-  private handleStartGame(ws: WebSocket, payload: { mode: GameMode; timeControl: TimeControl; players: { id: string; name: string; isBot: boolean }[] }) {
+  private handleStartGame(ws: WebSocket, payload: { mode: GameMode; pointGoal: PointGoal; players: { id: string; name: string; isBot: boolean }[] }) {
     const client = this.clients.get(ws);
     if (!client) return;
 
-    const { mode, timeControl, players } = payload;
+    const { mode, pointGoal, players } = payload;
 
     try {
-      const gameState = GameEngine.createGame(players, mode, timeControl);
+      const gameState = GameEngine.createGame(players, mode, pointGoal);
       
       const gameRoom: GameRoom = {
         gameState,

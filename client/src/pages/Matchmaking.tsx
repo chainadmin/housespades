@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useLocation, useSearch } from "wouter";
 import { MatchmakingScreen } from "@/components/MatchmakingScreen";
-import type { GameMode, TimeControl } from "@shared/schema";
+import type { GameMode, PointGoal } from "@shared/schema";
 
 interface MatchmakingPlayer {
   id: string;
@@ -18,7 +18,7 @@ export default function Matchmaking() {
   const params = new URLSearchParams(searchString);
   
   const mode = (params.get("mode") as GameMode) || "ace_high";
-  const timeControl = (params.get("time") as TimeControl) || "standard";
+  const pointGoal = (params.get("points") as PointGoal) || "300";
   
   const [players, setPlayers] = useState<MatchmakingPlayer[]>([
     { id: "player-1", name: "You", isBot: false, isReady: true }
@@ -79,14 +79,14 @@ export default function Matchmaking() {
     const playerNames = players.map((p) => p.name).join(",");
     const botFlags = players.map((p) => p.isBot ? "1" : "0").join(",");
     
-    navigate(`/game?mode=${mode}&time=${timeControl}&type=match&players=${playerIds}&names=${playerNames}&bots=${botFlags}`);
+    navigate(`/game?mode=${mode}&points=${pointGoal}&type=match&players=${playerIds}&names=${playerNames}&bots=${botFlags}`);
   };
 
   return (
     <MatchmakingScreen
       players={players}
       mode={mode}
-      timeControl={timeControl}
+      pointGoal={pointGoal}
       elapsedTime={elapsedTime}
       onCancel={handleCancel}
       onAddBot={handleAddBot}

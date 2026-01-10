@@ -1,36 +1,35 @@
-import type { TimeControl } from "@shared/schema";
+import type { PointGoal } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { getTimeControlName } from "@/lib/gameUtils";
-import { Zap, Clock, Timer } from "lucide-react";
+import { Target } from "lucide-react";
 
-interface TimeControlSelectorProps {
-  selected: TimeControl;
-  onChange: (timeControl: TimeControl) => void;
+interface PointGoalSelectorProps {
+  selected: PointGoal;
+  onChange: (pointGoal: PointGoal) => void;
 }
 
-const TIME_CONTROLS: TimeControl[] = ["blitz", "standard", "long"];
+const POINT_GOALS: PointGoal[] = ["100", "300", "500"];
 
-const TIME_CONTROL_ICONS: Record<TimeControl, React.ReactNode> = {
-  blitz: <Zap className="h-4 w-4" />,
-  standard: <Clock className="h-4 w-4" />,
-  long: <Timer className="h-4 w-4" />,
+const POINT_GOAL_LABELS: Record<PointGoal, string> = {
+  "100": "100 pts",
+  "300": "300 pts",
+  "500": "500 pts",
 };
 
-export function TimeControlSelector({ selected, onChange }: TimeControlSelectorProps) {
+export function PointGoalSelector({ selected, onChange }: PointGoalSelectorProps) {
   return (
-    <div className="flex gap-2" data-testid="time-control-selector">
-      {TIME_CONTROLS.map((tc) => (
+    <div className="flex gap-2" data-testid="point-goal-selector">
+      {POINT_GOALS.map((pg) => (
         <Button
-          key={tc}
-          variant={selected === tc ? "default" : "outline"}
+          key={pg}
+          variant={selected === pg ? "default" : "outline"}
           size="sm"
-          onClick={() => onChange(tc)}
+          onClick={() => onChange(pg)}
           className={cn("flex gap-2")}
-          data-testid={`button-time-${tc}`}
+          data-testid={`button-points-${pg}`}
         >
-          {TIME_CONTROL_ICONS[tc]}
-          {getTimeControlName(tc)}
+          <Target className="h-4 w-4" />
+          {POINT_GOAL_LABELS[pg]}
         </Button>
       ))}
     </div>

@@ -16,14 +16,14 @@ export type ExtendedValue = (typeof EXTENDED_VALUES)[number];
 export const GAME_MODES = ["ace_high", "joker_joker_deuce_deuce"] as const;
 export type GameMode = (typeof GAME_MODES)[number];
 
-// Time controls similar to chess.com
-export const TIME_CONTROLS = ["blitz", "standard", "long"] as const;
-export type TimeControl = (typeof TIME_CONTROLS)[number];
+// Point goals for winning
+export const POINT_GOALS = ["100", "300", "500"] as const;
+export type PointGoal = (typeof POINT_GOALS)[number];
 
-export const TIME_CONTROL_SECONDS: Record<TimeControl, number> = {
-  blitz: 10,
-  standard: 30,
-  long: 60,
+export const POINT_GOAL_VALUES: Record<PointGoal, number> = {
+  "100": 100,
+  "300": 300,
+  "500": 500,
 };
 
 // Player positions at the table
@@ -81,7 +81,7 @@ export type GamePhase = (typeof GAME_PHASES)[number];
 export const gameStateSchema = z.object({
   id: z.string(),
   mode: z.enum(GAME_MODES),
-  timeControl: z.enum(TIME_CONTROLS),
+  pointGoal: z.enum(POINT_GOALS),
   phase: z.enum(GAME_PHASES),
   players: z.array(playerSchema),
   teams: z.array(teamSchema),
@@ -91,7 +91,6 @@ export const gameStateSchema = z.object({
   roundNumber: z.number(),
   spadesBroken: z.boolean(),
   winningScore: z.number(),
-  turnTimeRemaining: z.number().nullable(),
 });
 export type GameState = z.infer<typeof gameStateSchema>;
 
@@ -99,7 +98,7 @@ export type GameState = z.infer<typeof gameStateSchema>;
 export const lobbySchema = z.object({
   id: z.string(),
   mode: z.enum(GAME_MODES),
-  timeControl: z.enum(TIME_CONTROLS),
+  pointGoal: z.enum(POINT_GOALS),
   players: z.array(z.object({
     id: z.string(),
     name: z.string(),
