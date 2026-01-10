@@ -10,6 +10,8 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAuth } from "@/lib/auth";
 import type { GameMode, PointGoal } from "@shared/schema";
 import { Users, Bot, Trophy, TrendingUp, LogOut, User } from "lucide-react";
+import houseCardLogo from "@/assets/house-card-logo.png";
+import chainLogo from "@/assets/12by12.jpg";
 
 export default function Home() {
   const [, navigate] = useLocation();
@@ -34,9 +36,11 @@ export default function Home() {
       <header className="border-b sticky top-0 bg-background/95 backdrop-blur z-10">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
-              <span className="text-primary-foreground text-xl sm:text-2xl font-bold">&#9824;</span>
-            </div>
+            <img 
+              src={houseCardLogo} 
+              alt="House Spades" 
+              className="w-8 h-8 sm:w-10 sm:h-10 object-contain flex-shrink-0"
+            />
             <h1 className="text-lg sm:text-2xl font-semibold truncate">House Spades</h1>
           </div>
           
@@ -198,8 +202,13 @@ export default function Home() {
       </main>
 
       <footer className="border-t mt-auto">
-        <div className="max-w-6xl mx-auto px-4 py-4 text-center text-xs text-muted-foreground">
-          House Spades
+        <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col items-center gap-2">
+          <img 
+            src={chainLogo} 
+            alt="Chain Software Group" 
+            className="w-8 h-8 object-contain"
+          />
+          <span className="text-xs text-muted-foreground">Chain Software Group</span>
         </div>
       </footer>
     </div>
