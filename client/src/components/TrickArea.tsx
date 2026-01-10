@@ -10,8 +10,8 @@ interface TrickAreaProps {
 
 export function TrickArea({ trick, playerPositions }: TrickAreaProps) {
   const positionStyles: Record<Position, React.CSSProperties> = {
-    north: { bottom: "80%", left: "50%", transform: "translateX(-50%)" },
-    south: { top: "80%", left: "50%", transform: "translateX(-50%)" },
+    north: { bottom: "80%", left: "40%", transform: "translateX(-50%)" },
+    south: { top: "80%", left: "40%", transform: "translateX(-50%)" },
     east: { top: "40%", left: "80%", transform: "translate(-50%, -50%)" },
     west: { top: "40%", left: "20%", transform: "translate(-50%, -50%)" },
   };
