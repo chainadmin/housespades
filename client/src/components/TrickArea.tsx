@@ -10,10 +10,10 @@ interface TrickAreaProps {
 
 export function TrickArea({ trick, playerPositions }: TrickAreaProps) {
   const positionStyles: Record<Position, React.CSSProperties> = {
-    north: { top: "calc(20% - 80px)", left: "50%", transform: "translateX(-50%)" },
+    north: { bottom: "80%", left: "50%", transform: "translateX(-50%)" },
     south: { top: "80%", left: "50%", transform: "translateX(-50%)" },
-    east: { top: "40%", right: "0", transform: "translateY(-50%)" },
-    west: { top: "40%", left: "0", transform: "translateY(-50%)" },
+    east: { top: "40%", left: "80%", transform: "translate(-50%, -50%)" },
+    west: { top: "40%", left: "20%", transform: "translate(-50%, -50%)" },
   };
 
   const slideDirection: Record<Position, { x: number; y: number }> = {
@@ -25,7 +25,7 @@ export function TrickArea({ trick, playerPositions }: TrickAreaProps) {
 
   return (
     <div 
-      className="relative w-48 h-52 sm:w-56 sm:h-60 md:w-64 md:h-72 border-2 border-red-500"
+      className="relative w-56 h-64 sm:w-64 sm:h-72 md:w-72 md:h-80 border-2 border-red-500"
       data-testid="trick-area"
     >
       {/* Temporary grid overlay */}
