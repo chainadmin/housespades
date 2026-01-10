@@ -29,6 +29,12 @@ export default function Game() {
   
   const playerId = "player-1";
   const botThinkingRef = useRef(false);
+  const gameStateRef = useRef<GameState | null>(null);
+  
+  // Keep ref updated with latest state
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
 
   // Initialize game
   useEffect(() => {
@@ -168,29 +174,6 @@ export default function Game() {
     
     return sorted[0]; // Lowest card
   }, []);
-
-  // Handle bot turns
-  useEffect(() => {
-    if (!gameState || botThinkingRef.current) return;
-    
-    const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-    if (!currentPlayer || !currentPlayer.isBot) return;
-    
-    botThinkingRef.current = true;
-    
-    const delay = 800 + Math.random() * 700;
-    
-    setTimeout(() => {
-      if (gameState.phase === "bidding") {
-        const bid = calculateBotBid(currentPlayer.hand);
-        handleBid(bid);
-      } else if (gameState.phase === "playing") {
-        const card = selectBotCard(gameState, gameState.currentPlayerIndex);
-        handlePlayCard(card);
-      }
-      botThinkingRef.current = false;
-    }, delay);
-  }, [gameState?.currentPlayerIndex, gameState?.phase]);
 
   // Handle bidding
   const handleBid = useCallback((bid: number) => {
@@ -417,6 +400,54 @@ export default function Game() {
       };
     });
   }, [gameState]);
+
+  // Create stable refs for handlers to avoid effect re-triggering
+  const handleBidRef = useRef(handleBid);
+  const handlePlayCardRef = useRef(handlePlayCard);
+  
+  useEffect(() => {
+    handleBidRef.current = handleBid;
+    handlePlayCardRef.current = handlePlayCard;
+  }, [handleBid, handlePlayCard]);
+
+  // Handle bot turns using refs to access latest state
+  useEffect(() => {
+    if (!gameState || botThinkingRef.current) return;
+    if (gameState.phase !== "bidding" && gameState.phase !== "playing") return;
+    
+    const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+    if (!currentPlayer || !currentPlayer.isBot) return;
+    
+    botThinkingRef.current = true;
+    
+    const delay = 600 + Math.random() * 400;
+    
+    const timer = setTimeout(() => {
+      const state = gameStateRef.current;
+      if (!state) {
+        botThinkingRef.current = false;
+        return;
+      }
+      
+      const botPlayer = state.players[state.currentPlayerIndex];
+      if (!botPlayer || !botPlayer.isBot) {
+        botThinkingRef.current = false;
+        return;
+      }
+      
+      if (state.phase === "bidding") {
+        const bid = calculateBotBid(botPlayer.hand);
+        handleBidRef.current(bid);
+      } else if (state.phase === "playing") {
+        const card = selectBotCard(state, state.currentPlayerIndex);
+        handlePlayCardRef.current(card);
+      }
+      
+      botThinkingRef.current = false;
+    }, delay);
+    
+    return () => clearTimeout(timer);
+  }, [gameState?.currentPlayerIndex, gameState?.phase, calculateBotBid, selectBotCard]);
 
   // Check for game over
   useEffect(() => {

@@ -51,17 +51,17 @@ export function PlayingCard({
       disabled={disabled}
       whileHover={!disabled ? { y: -8, scale: 1.02 } : undefined}
       whileTap={!disabled ? { scale: 0.98 } : undefined}
-      initial={{ opacity: 0, scale: 0.8 }}
+      initial={{ opacity: 1, scale: 0.8 }}
       animate={{ 
-        opacity: disabled ? 0.5 : 1, 
+        opacity: 1, 
         scale: 1,
         y: selected ? -12 : 0,
       }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
       className={cn(
-        "relative flex flex-col items-center justify-between rounded-lg bg-white dark:bg-gray-100 border-2 shadow-md cursor-pointer select-none p-1.5",
+        "relative flex flex-col items-center justify-between rounded-lg bg-white border-2 border-gray-300 shadow-md cursor-pointer select-none p-1.5",
         sizeClasses[size],
-        disabled && "cursor-not-allowed opacity-50",
+        disabled && "cursor-not-allowed grayscale-[30%]",
         selected && "ring-2 ring-primary ring-offset-2",
         !disabled && "hover:shadow-lg",
         className

@@ -127,11 +127,11 @@ export function GameTable({
       </div>
 
       {/* Main game area */}
-      <div className="flex-1 flex items-center justify-center p-4">
-        <div className="relative w-full max-w-3xl aspect-[4/3] flex items-center justify-center">
+      <div className="flex-1 flex items-center justify-center p-8">
+        <div className="relative w-full max-w-5xl aspect-[4/3] flex items-center justify-center">
           {/* North player (across) - positioned at top center with even spacing */}
           {northPlayer && (
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-0">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 z-0">
               <PlayerZone
                 player={northPlayer}
                 position="north"
@@ -143,7 +143,7 @@ export function GameTable({
 
           {/* West player (left) - positioned at left center with even spacing */}
           {westPlayer && (
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 z-0">
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 z-0">
               <PlayerZone
                 player={westPlayer}
                 position="west"
@@ -191,7 +191,7 @@ export function GameTable({
 
           {/* East player (right) - positioned at right center with even spacing */}
           {eastPlayer && (
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 z-0">
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 z-0">
               <PlayerZone
                 player={eastPlayer}
                 position="east"
