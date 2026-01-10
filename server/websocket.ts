@@ -16,6 +16,7 @@ interface GameRoom {
   gameState: GameState;
   clients: Map<string, Client>;
   botTimer: NodeJS.Timeout | null;
+  statsSaved: boolean;
 }
 
 export class GameWebSocketServer {
@@ -84,19 +85,28 @@ export class GameWebSocketServer {
     }
   }
 
-  private handleStartGame(ws: WebSocket, payload: { mode: GameMode; pointGoal: PointGoal; players: { id: string; name: string; isBot: boolean }[] }) {
+  private handleStartGame(ws: WebSocket, payload: { mode: GameMode; pointGoal: PointGoal; players: { id: string; name: string; isBot: boolean; userId?: number }[] }) {
     const client = this.clients.get(ws);
     if (!client) return;
 
     const { mode, pointGoal, players } = payload;
 
     try {
-      const gameState = GameEngine.createGame(players, mode, pointGoal);
+      // Update the first player's ID to match the client's playerId
+      const updatedPlayers = players.map((p, index) => {
+        if (index === 0 && !p.isBot) {
+          return { ...p, id: client.playerId };
+        }
+        return p;
+      });
+
+      const gameState = GameEngine.createGame(updatedPlayers, mode, pointGoal);
       
       const gameRoom: GameRoom = {
         gameState,
         clients: new Map(),
         botTimer: null,
+        statsSaved: false,
       };
 
       // Add human players to room
@@ -245,13 +255,57 @@ export class GameWebSocketServer {
     if (!room) return;
 
     room.clients.forEach((client) => {
-      // Send game state with hidden opponent hands
       const sanitizedState = this.sanitizeGameState(room.gameState, client.playerId);
       this.sendMessage(client.ws, {
         type: "game_state_update",
         payload: sanitizedState,
       });
     });
+
+    // Check if game is over and save stats (only once)
+    if (room.gameState.phase === "game_over" && !room.statsSaved) {
+      room.statsSaved = true;
+      this.saveGameStats(room.gameState);
+    }
+  }
+
+  private async saveGameStats(gameState: GameState) {
+    try {
+      const winningTeamIndex = gameState.teams.findIndex(
+        (t) => t.score >= gameState.winningScore
+      );
+      if (winningTeamIndex === -1) return;
+
+      const winningTeam = gameState.teams[winningTeamIndex];
+      const losingTeam = gameState.teams[winningTeamIndex === 0 ? 1 : 0];
+
+      const players: { userId: number | null; isBot: boolean; teamIndex: number; ratingChange: number }[] = [];
+
+      for (const player of gameState.players) {
+        const isWinner = winningTeam.players.includes(player.id);
+        const teamIdx = winningTeam.players.includes(player.id) ? winningTeamIndex : (winningTeamIndex === 0 ? 1 : 0);
+        const ratingChange = isWinner ? 25 : -20;
+
+        players.push({
+          userId: null, // User ID tracking will be added when auth is integrated with matchmaking
+          isBot: player.isBot,
+          teamIndex: teamIdx,
+          ratingChange: player.isBot ? 0 : ratingChange,
+        });
+      }
+
+      await storage.recordMatch(
+        gameState.mode,
+        gameState.pointGoal,
+        winningTeam.score,
+        losingTeam.score,
+        players
+      );
+
+      console.log(`Game ${gameState.id} stats saved - Winner: Team ${winningTeamIndex + 1}`);
+    } catch (error) {
+      console.error("Failed to save game stats:", error);
+    }
   }
 
   private sanitizeGameState(state: GameState, playerId: string): GameState {

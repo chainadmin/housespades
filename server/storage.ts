@@ -13,6 +13,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<DbUser | undefined>;
   createUser(user: InsertUser): Promise<DbUser>;
   updateUserStats(id: number, won: boolean, ratingChange: number): Promise<DbUser | undefined>;
+  updateUserPassword(id: number, passwordHash: string): Promise<DbUser | undefined>;
   
   // Password resets
   createPasswordReset(userId: number, token: string, expiresAt: Date): Promise<void>;
@@ -85,6 +86,16 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return updated;
+  }
+
+  async updateUserPassword(id: number, passwordHash: string): Promise<DbUser | undefined> {
+    const [updated] = await db
+      .update(users)
+      .set({ passwordHash })
+      .where(eq(users.id, id))
+      .returning();
+    
+    return updated || undefined;
   }
 
   async createPasswordReset(userId: number, token: string, expiresAt: Date): Promise<void> {

@@ -3,6 +3,7 @@ import { type Server } from "http";
 import { storage } from "./storage";
 import { GameWebSocketServer } from "./websocket";
 import { matchmaking } from "./matchmaking";
+import { sendPasswordResetEmail } from "./email";
 import bcrypt from "bcrypt";
 import { z } from "zod";
 
@@ -106,12 +107,34 @@ export async function registerRoutes(
 
       const user = await storage.getUserByEmail(email);
       if (!user) {
+        // Return same message for security (don't reveal if email exists)
         return res.json({ message: "If email exists, reset link sent" });
       }
 
       const token = crypto.randomUUID();
-      const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
       await storage.createPasswordReset(user.id, token, expiresAt);
+
+      // Get base URL for reset link
+      const protocol = req.headers["x-forwarded-proto"] || req.protocol || "https";
+      const host = req.headers["x-forwarded-host"] || req.headers.host || "localhost:5000";
+      const baseUrl = `${protocol}://${host}`;
+
+      // Send password reset email
+      const emailResult = await sendPasswordResetEmail(user.email, token, baseUrl);
+      
+      if (!emailResult.success) {
+        console.error("Failed to send password reset email to:", email);
+        return res.status(500).json({ error: "Failed to send reset email. Please try again later." });
+      }
+
+      // In dev mode, include the reset link in response for testing
+      if (emailResult.devMode && emailResult.resetLink) {
+        return res.json({ 
+          message: "Reset link generated (dev mode)", 
+          resetLink: emailResult.resetLink 
+        });
+      }
 
       res.json({ message: "If email exists, reset link sent" });
     } catch (error) {
@@ -127,15 +150,32 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Token and password required" });
       }
 
+      if (password.length < 6) {
+        return res.status(400).json({ error: "Password must be at least 6 characters" });
+      }
+
       const reset = await storage.getPasswordReset(token);
       if (!reset || reset.used || reset.expiresAt < new Date()) {
         return res.status(400).json({ error: "Invalid or expired token" });
       }
 
       const passwordHash = await bcrypt.hash(password, 10);
+      
+      // Actually update the user's password
+      const updatedUser = await storage.updateUserPassword(reset.userId, passwordHash);
+      if (!updatedUser) {
+        return res.status(400).json({ error: "Failed to update password" });
+      }
+      
+      // Mark token as used after successful password update
       await storage.markPasswordResetUsed(token);
+      
+      // Clear any existing session for security (force re-login with new password)
+      if (req.session.userId === reset.userId) {
+        req.session.destroy(() => {});
+      }
 
-      res.json({ message: "Password reset successfully" });
+      res.json({ message: "Password reset successfully. Please log in with your new password." });
     } catch (error) {
       console.error("Reset password error:", error);
       res.status(500).json({ error: "Failed to reset password" });

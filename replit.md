@@ -142,8 +142,47 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
 
 - `DATABASE_URL` - PostgreSQL connection string
 - `SESSION_SECRET` - Session encryption key
+- `EMAIL_API_KEY` - Email service API key (optional, for password resets)
+- `EMAIL_FROM` - From email address (default: noreply@housespades.com)
+- `EMAIL_DOMAIN` - Email domain (for Mailgun)
 
 ## User Preferences
 
 - Dark/light theme persisted in localStorage (web) / secure storage (mobile)
 - Game mode and time control remembered between sessions
+
+## Recent Changes (January 2026)
+
+### Multiplayer WebSocket Integration
+- Updated `useWebSocket` hook with auto-reconnect, game state management
+- Game page now supports both solo (local) and multiplayer (WebSocket) modes
+- Pass `?type=multiplayer` to Game page URL to use WebSocket
+- Bots run on server via `BotAI` when playing via WebSocket
+
+### Password Reset Flow (Fixed)
+- Forgot password now generates reset token and sends email
+- Reset password endpoint actually updates the password in database
+- Session is invalidated after password reset for security
+- Dev mode shows reset link in response for testing
+
+### Game Statistics
+- Match history saved to database when games complete
+- Stats saved only once per game (guard against duplicate broadcasts)
+- Recording includes game mode, scores, and player participation
+
+### Email Utility
+- `server/email.ts` ready for Cloudflare Email or Resend/Mailgun
+- Dev mode logs emails to console with reset link
+- Configure `EMAIL_API_KEY` for production email delivery
+
+## Deployment Notes
+
+### Railway Deployment
+- Railway works well for Node.js + PostgreSQL + WebSocket
+- Add PostgreSQL database in Railway dashboard
+- Set environment variables: DATABASE_URL, SESSION_SECRET, EMAIL_API_KEY
+
+### Cloudflare Domain
+- Set DNS record to "DNS only" (grey cloud), not "Proxied"
+- This ensures WebSocket connections work properly
+- SSL certificates are handled by Railway
