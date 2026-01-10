@@ -9,7 +9,6 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Loader2, ArrowLeft, CheckCircle } from "lucide-react";
 import houseCardLogo from "@/assets/house-card-logo.png";
-import chainLogo from "@/assets/12by12.jpg";
 
 export default function ForgotPassword() {
   const { toast } = useToast();
@@ -46,17 +45,9 @@ export default function ForgotPassword() {
           <img 
             src={houseCardLogo} 
             alt="House Spades Logo" 
-            className="w-20 h-20 mx-auto mb-4 object-contain"
+            className="w-24 h-24 mx-auto mb-4 object-contain opacity-60"
           />
           <h1 className="text-3xl font-bold">House Spades</h1>
-          <div className="mt-6 flex flex-col items-center gap-2">
-            <img 
-              src={chainLogo} 
-              alt="Chain Software Group" 
-              className="w-12 h-12 object-contain"
-            />
-            <span className="text-xs text-muted-foreground">Chain Software Group</span>
-          </div>
         </div>
 
         <Card>

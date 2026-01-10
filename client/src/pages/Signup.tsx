@@ -9,7 +9,6 @@ import { useAuth } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import houseCardLogo from "@/assets/house-card-logo.png";
-import chainLogo from "@/assets/12by12.jpg";
 
 export default function Signup() {
   const [, navigate] = useLocation();
@@ -73,18 +72,10 @@ export default function Signup() {
           <img 
             src={houseCardLogo} 
             alt="House Spades Logo" 
-            className="w-20 h-20 mx-auto mb-4 object-contain"
+            className="w-24 h-24 mx-auto mb-4 object-contain opacity-60"
           />
           <h1 className="text-3xl font-bold">House Spades</h1>
           <p className="text-muted-foreground mt-2">Create your account</p>
-          <div className="mt-6 flex flex-col items-center gap-2">
-            <img 
-              src={chainLogo} 
-              alt="Chain Software Group" 
-              className="w-12 h-12 object-contain"
-            />
-            <span className="text-xs text-muted-foreground">Chain Software Group</span>
-          </div>
         </div>
 
         <Card>
