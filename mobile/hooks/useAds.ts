@@ -3,19 +3,26 @@ import { Platform } from 'react-native';
 import { 
   InterstitialAd, 
   AdEventType,
-  TestIds
+  TestIds,
+  BannerAd,
+  BannerAdSize
 } from 'react-native-google-mobile-ads';
 import { useIAP } from './useIAP';
 import { useATT } from './useATT';
 
-import Constants from 'expo-constants';
-
 const INTERSTITIAL_AD_UNIT_ID = __DEV__ 
   ? TestIds.INTERSTITIAL 
   : Platform.select({
-      ios: Constants.expoConfig?.extra?.admobInterstitialIOS,
-      android: Constants.expoConfig?.extra?.admobInterstitialAndroid,
+      ios: 'ca-app-pub-1580761947831808/8594757928',
+      android: 'ca-app-pub-1580761947831808/3258670768',
     }) || TestIds.INTERSTITIAL;
+
+export const BANNER_AD_UNIT_ID = __DEV__ 
+  ? TestIds.BANNER 
+  : Platform.select({
+      ios: 'ca-app-pub-1580761947831808/4571752434',
+      android: 'ca-app-pub-1580761947831808/2983516207',
+    }) || TestIds.BANNER;
 
 const GAMES_BEFORE_AD = 2;
 
@@ -26,6 +33,8 @@ interface UseAdsReturn {
   shouldShowAd: boolean;
   recordGameCompleted: () => void;
   gamesPlayed: number;
+  bannerAdUnitId: string;
+  hasRemoveAds: boolean;
 }
 
 export function useAds(): UseAdsReturn {
@@ -115,5 +124,7 @@ export function useAds(): UseAdsReturn {
     shouldShowAd,
     recordGameCompleted,
     gamesPlayed,
+    bannerAdUnitId: BANNER_AD_UNIT_ID,
+    hasRemoveAds,
   };
 }

@@ -149,9 +149,10 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
 - `EMAIL_DOMAIN` - Email domain (for Mailgun)
 
 ### Mobile App (Expo)
-- `EXPO_PUBLIC_REVENUECAT_IOS_API_KEY` - RevenueCat API key for iOS
-- `EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY` - RevenueCat API key for Android
-- AdMob App IDs configured in `app.json` (replace placeholder values)
+- AdMob App IDs configured in `app.json`:
+  - iOS: `ca-app-pub-1580761947831808~5230227983`
+  - Android: `ca-app-pub-1580761947831808~4819164448`
+- RevenueCat will be added post-launch for "remove ads" purchase ($5.99)
 
 ## User Preferences
 
@@ -169,11 +170,16 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
 - Settings icon in Home header for quick access
 
 ### Mobile App Store Features
-- RevenueCat integration for in-app purchases (remove ads $5.99)
 - App Tracking Transparency (ATT) for iOS ad personalization consent
-- Google Mobile Ads (AdMob) with interstitial ads after every 2 games
+- Google Mobile Ads (AdMob) with banner and interstitial ads:
+  - Banner ads on game screen
+  - Interstitial ads after every 2 completed games
+  - iOS Banner: `ca-app-pub-1580761947831808/4571752434`
+  - iOS Interstitial: `ca-app-pub-1580761947831808/8594757928`
+  - Android Banner: `ca-app-pub-1580761947831808/2983516207`
+  - Android Interstitial: `ca-app-pub-1580761947831808/3258670768`
 - EAS Build configuration for iOS/Android production builds
-- Environment variable based API key management
+- RevenueCat integration deferred to post-launch update
 
 ### Card Sorting in JJDD Mode
 - Trumps now appear first: Big Joker, Little Joker, 2♠, 2♦, A♠...3♠

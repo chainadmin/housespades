@@ -20,6 +20,8 @@ import { PlayerZone } from '@/components/PlayerZone';
 import { TrickArea } from '@/components/TrickArea';
 import { BiddingPanel } from '@/components/BiddingPanel';
 import { Scoreboard } from '@/components/Scoreboard';
+import { AdBanner } from '@/components/AdBanner';
+import { useAds } from '@/hooks/useAds';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -27,6 +29,7 @@ export default function GameScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ mode: GameMode; points: PointGoal; type: string }>();
   const colors = useColors();
+  const { showInterstitialAd, recordGameCompleted, shouldShowAd, hasRemoveAds } = useAds();
   
   const mode = params.mode || 'ace_high';
   const pointGoal = params.points || '300';
@@ -288,6 +291,15 @@ export default function GameScreen() {
   }, [handleBid, handlePlayCard]);
 
   useEffect(() => {
+    if (gameState?.phase === 'game_over') {
+      recordGameCompleted();
+      if (shouldShowAd) {
+        showInterstitialAd();
+      }
+    }
+  }, [gameState?.phase]);
+
+  useEffect(() => {
     if (!gameState || botThinkingRef.current) return;
     if (gameState.phase !== 'bidding' && gameState.phase !== 'playing') return;
     
@@ -397,6 +409,12 @@ export default function GameScreen() {
           />
         </View>
       )}
+
+      {!hasRemoveAds && (
+        <View style={styles.bannerContainer}>
+          <AdBanner />
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -439,6 +457,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   handContainer: {
-    paddingBottom: 16,
+    paddingBottom: 8,
+  },
+  bannerContainer: {
+    alignItems: 'center',
+    paddingBottom: 8,
   },
 });
