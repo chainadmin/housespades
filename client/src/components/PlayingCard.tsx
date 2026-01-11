@@ -88,15 +88,14 @@ export function PlayingCard({
       }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
       className={cn(
-        "relative flex flex-col items-center justify-between rounded-lg border-2 border-gray-300 shadow-md cursor-pointer select-none overflow-hidden",
+        "relative flex flex-col items-center justify-between rounded-lg border-2 border-gray-300 shadow-md cursor-pointer select-none overflow-hidden bg-white",
         sizeClasses[size],
         disabled && "cursor-not-allowed grayscale-[30%]",
         selected && "ring-2 ring-primary ring-offset-2",
         !disabled && "hover:shadow-lg",
-        !hasCustomFront && "bg-white",
         className
       )}
-      style={hasCustomFront ? bgStyle : undefined}
+      style={bgStyle}
       data-testid={`card-${card.id}`}
       aria-label={isJokerCard ? (card.value === "BJ" ? "Big Joker" : "Little Joker") : `${displayValue} of ${card.suit}`}
     >
