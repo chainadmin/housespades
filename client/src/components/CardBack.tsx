@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useCardStyle } from "@/hooks/useCardStyle";
@@ -9,7 +10,7 @@ interface CardBackProps {
   stacked?: boolean;
 }
 
-export function CardBack({ 
+const CardBackInner = memo(function CardBackInner({ 
   count = 1, 
   size = "md", 
   className,
@@ -57,7 +58,7 @@ export function CardBack({
           }}
         >
           <div 
-            className="w-full h-full bg-cover bg-no-repeat"
+            className="w-full h-full"
             style={{
               backgroundImage: `url(${currentStyle.spriteSheet})`,
               backgroundPosition: `-${pos.x * scaleX}px -${pos.y * scaleY}px`,
@@ -74,4 +75,8 @@ export function CardBack({
       )}
     </div>
   );
+});
+
+export function CardBack(props: CardBackProps) {
+  return <CardBackInner {...props} />;
 }

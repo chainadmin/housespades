@@ -524,11 +524,11 @@ export default function Game() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4">
-        <Button variant="ghost" size="icon" onClick={handleReturnToLobby} data-testid="button-back">
+      <header className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between p-4 pointer-events-none">
+        <Button variant="ghost" size="icon" onClick={handleReturnToLobby} data-testid="button-back" className="pointer-events-auto">
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 pointer-events-auto">
           {isMultiplayer && (
             <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-accent/50 text-xs">
               {isConnected ? (
