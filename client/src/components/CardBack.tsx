@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useCardStyle } from "@/hooks/useCardStyle";
 
 interface CardBackProps {
   count?: number;
@@ -14,13 +15,26 @@ export function CardBack({
   className,
   stacked = false,
 }: CardBackProps) {
+  const { currentStyle } = useCardStyle();
+  
   const sizeClasses = {
     sm: "w-14 h-20",
     md: "w-20 h-28",
     lg: "w-24 h-36",
   };
 
+  const sizeDimensions = {
+    sm: { width: 56, height: 80 },
+    md: { width: 80, height: 112 },
+    lg: { width: 96, height: 144 },
+  };
+
   const cards = stacked ? Math.min(count, 5) : 1;
+  const pos = currentStyle.backPosition;
+  const dims = sizeDimensions[size];
+
+  const scaleX = pos.width * 4 / pos.width * dims.width / pos.width;
+  const scaleY = pos.height * 2 / pos.height * dims.height / pos.height;
 
   return (
     <div className={cn("relative", className)}>
@@ -31,7 +45,7 @@ export function CardBack({
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: index * 0.05 }}
           className={cn(
-            "rounded-lg shadow-md overflow-hidden",
+            "rounded-lg shadow-md overflow-hidden border-2 border-gray-300",
             sizeClasses[size],
             stacked && index > 0 && "absolute top-0 left-0",
           )}
@@ -40,24 +54,14 @@ export function CardBack({
             zIndex: cards - index,
           }}
         >
-          {/* Card back pattern */}
-          <div className="w-full h-full bg-gradient-to-br from-primary to-primary/80 p-1.5">
-            <div className="w-full h-full rounded border-2 border-primary-foreground/30 flex items-center justify-center">
-              <div className="w-full h-full rounded bg-primary/20 flex items-center justify-center">
-                {/* Diamond pattern */}
-                <svg viewBox="0 0 40 40" className="w-3/4 h-3/4 opacity-30">
-                  <pattern id="cardPattern" patternUnits="userSpaceOnUse" width="10" height="10">
-                    <path
-                      d="M5 0L10 5L5 10L0 5Z"
-                      fill="currentColor"
-                      className="text-primary-foreground"
-                    />
-                  </pattern>
-                  <rect width="40" height="40" fill="url(#cardPattern)" />
-                </svg>
-              </div>
-            </div>
-          </div>
+          <div 
+            className="w-full h-full bg-cover bg-no-repeat"
+            style={{
+              backgroundImage: `url(${currentStyle.spriteSheet})`,
+              backgroundPosition: `-${pos.x * dims.width / pos.width}px -${pos.y * dims.height / pos.height}px`,
+              backgroundSize: `${pos.width * 4 * dims.width / pos.width}px ${pos.height * 2 * dims.height / pos.height}px`,
+            }}
+          />
         </motion.div>
       ))}
       

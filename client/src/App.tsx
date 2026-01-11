@@ -13,6 +13,7 @@ import Signup from "@/pages/Signup";
 import ForgotPassword from "@/pages/ForgotPassword";
 import Splash from "@/pages/Splash";
 import Shop from "@/pages/Shop";
+import Settings from "@/pages/Settings";
 import NotFound from "@/pages/not-found";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
@@ -57,6 +58,7 @@ function AuthenticatedApp() {
       <Route path="/game" component={Game} />
       <Route path="/matchmaking" component={Matchmaking} />
       <Route path="/shop" component={Shop} />
+      <Route path="/settings" component={Settings} />
       <Route component={NotFound} />
     </Switch>
   );
