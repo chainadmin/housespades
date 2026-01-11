@@ -29,7 +29,7 @@ export default function GameScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ mode: GameMode; points: PointGoal; type: string }>();
   const colors = useColors();
-  const { showInterstitialAd, recordGameCompleted, shouldShowAd, hasRemoveAds } = useAds();
+  const { showInterstitialAd, recordGameCompleted, shouldShowAd, hasRemoveAds, isTrackingAllowed } = useAds();
   
   const mode = params.mode || 'ace_high';
   const pointGoal = params.points || '300';
@@ -40,6 +40,8 @@ export default function GameScreen() {
   const playerId = 'player-1';
   const botThinkingRef = useRef(false);
   const gameStateRef = useRef<GameState | null>(null);
+  const previousPhaseRef = useRef<string | null>(null);
+  const gameCompletedRef = useRef(false);
 
   useEffect(() => {
     gameStateRef.current = gameState;
@@ -291,13 +293,24 @@ export default function GameScreen() {
   }, [handleBid, handlePlayCard]);
 
   useEffect(() => {
-    if (gameState?.phase === 'game_over') {
+    const currentPhase = gameState?.phase;
+    const wasGameOver = previousPhaseRef.current === 'game_over';
+    const isGameOver = currentPhase === 'game_over';
+    
+    if (isGameOver && !wasGameOver && !gameCompletedRef.current) {
+      gameCompletedRef.current = true;
       recordGameCompleted();
       if (shouldShowAd) {
         showInterstitialAd();
       }
     }
-  }, [gameState?.phase]);
+    
+    if (currentPhase === 'bidding' && previousPhaseRef.current !== 'bidding') {
+      gameCompletedRef.current = false;
+    }
+    
+    previousPhaseRef.current = currentPhase || null;
+  }, [gameState?.phase, shouldShowAd]);
 
   useEffect(() => {
     if (!gameState || botThinkingRef.current) return;
@@ -412,7 +425,7 @@ export default function GameScreen() {
 
       {!hasRemoveAds && (
         <View style={styles.bannerContainer}>
-          <AdBanner />
+          <AdBanner hasRemoveAds={hasRemoveAds} isTrackingAllowed={isTrackingAllowed} />
         </View>
       )}
     </SafeAreaView>

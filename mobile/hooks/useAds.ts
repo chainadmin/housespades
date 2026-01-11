@@ -3,9 +3,7 @@ import { Platform } from 'react-native';
 import { 
   InterstitialAd, 
   AdEventType,
-  TestIds,
-  BannerAd,
-  BannerAdSize
+  TestIds
 } from 'react-native-google-mobile-ads';
 import { useIAP } from './useIAP';
 import { useATT } from './useATT';
@@ -35,6 +33,7 @@ interface UseAdsReturn {
   gamesPlayed: number;
   bannerAdUnitId: string;
   hasRemoveAds: boolean;
+  isTrackingAllowed: boolean;
 }
 
 export function useAds(): UseAdsReturn {
@@ -126,5 +125,6 @@ export function useAds(): UseAdsReturn {
     gamesPlayed,
     bannerAdUnitId: BANNER_AD_UNIT_ID,
     hasRemoveAds,
+    isTrackingAllowed,
   };
 }
