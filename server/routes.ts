@@ -219,6 +219,31 @@ export async function registerRoutes(
     });
   });
 
+  app.delete("/api/auth/account", async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const deleted = await storage.deleteUser(userId);
+      if (!deleted) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      req.session.destroy((err) => {
+        if (err) {
+          console.error("Session destroy error:", err);
+        }
+      });
+
+      res.json({ message: "Account deleted successfully" });
+    } catch (error) {
+      console.error("Delete account error:", error);
+      res.status(500).json({ error: "Failed to delete account" });
+    }
+  });
+
   // Purchase Routes - for verifying in-app purchases
   app.post("/api/purchase/verify", async (req, res) => {
     try {

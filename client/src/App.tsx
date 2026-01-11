@@ -13,6 +13,9 @@ import Signup from "@/pages/Signup";
 import ForgotPassword from "@/pages/ForgotPassword";
 import Splash from "@/pages/Splash";
 import Shop from "@/pages/Shop";
+import Settings from "@/pages/Settings";
+import Privacy from "@/pages/Privacy";
+import Terms from "@/pages/Terms";
 import NotFound from "@/pages/not-found";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
@@ -23,7 +26,7 @@ function AuthenticatedApp() {
 
   useEffect(() => {
     if (!isLoading && !user) {
-      const publicPaths = ["/splash", "/login", "/signup", "/forgot-password"];
+      const publicPaths = ["/splash", "/login", "/signup", "/forgot-password", "/privacy", "/terms"];
       if (!publicPaths.includes(location)) {
         setLocation("/splash");
       }
@@ -57,6 +60,9 @@ function AuthenticatedApp() {
       <Route path="/game" component={Game} />
       <Route path="/matchmaking" component={Matchmaking} />
       <Route path="/shop" component={Shop} />
+      <Route path="/settings" component={Settings} />
+      <Route path="/privacy" component={Privacy} />
+      <Route path="/terms" component={Terms} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -9,7 +9,8 @@ import { PointGoalSelector } from "@/components/TimeControlSelector";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAuth } from "@/lib/auth";
 import type { GameMode, PointGoal } from "@shared/schema";
-import { Users, Bot, Trophy, TrendingUp, LogOut, User, ShoppingBag } from "lucide-react";
+import { Users, Bot, Trophy, TrendingUp, LogOut, User, ShoppingBag, Settings } from "lucide-react";
+import { Link } from "wouter";
 import houseCardLogo from "@/assets/house-card-logo.png";
 import chainLogo from "@/assets/12by12.jpg";
 
@@ -67,6 +68,14 @@ export default function Home() {
               data-testid="button-shop"
             >
               <ShoppingBag className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => navigate("/settings")}
+              data-testid="button-settings"
+            >
+              <Settings className="h-4 w-4" />
             </Button>
             <Button 
               variant="ghost" 
@@ -217,6 +226,15 @@ export default function Home() {
             className="w-8 h-8 object-contain"
           />
           <span className="text-xs text-muted-foreground">Chain Software Group</span>
+          <div className="text-xs text-muted-foreground">
+            <Link href="/privacy" className="hover:underline">
+              Privacy
+            </Link>
+            <span className="mx-2">|</span>
+            <Link href="/terms" className="hover:underline">
+              Terms
+            </Link>
+          </div>
         </div>
       </footer>
     </div>

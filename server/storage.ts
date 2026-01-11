@@ -15,6 +15,7 @@ export interface IStorage {
   updateUserStats(id: number, won: boolean, ratingChange: number): Promise<DbUser | undefined>;
   updateUserPassword(id: number, passwordHash: string): Promise<DbUser | undefined>;
   setRemoveAds(id: number, removeAds: boolean): Promise<DbUser | undefined>;
+  deleteUser(id: number): Promise<boolean>;
   
   // Password resets
   createPasswordReset(userId: number, token: string, expiresAt: Date): Promise<void>;
@@ -107,6 +108,18 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return updated || undefined;
+  }
+
+  async deleteUser(id: number): Promise<boolean> {
+    // Delete password resets first (foreign key constraint)
+    await db.delete(passwordResets).where(eq(passwordResets.userId, id));
+    
+    // Delete match player records
+    await db.delete(matchPlayers).where(eq(matchPlayers.userId, id));
+    
+    // Delete the user
+    const result = await db.delete(users).where(eq(users.id, id)).returning();
+    return result.length > 0;
   }
 
   async createPasswordReset(userId: number, token: string, expiresAt: Date): Promise<void> {

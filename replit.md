@@ -66,6 +66,7 @@ PostgreSQL with Drizzle ORM:
 - `POST /api/auth/login` - Login
 - `POST /api/auth/forgot-password` - Request reset
 - `POST /api/auth/reset-password` - Reset password
+- `DELETE /api/auth/account` - Delete user account (requires authentication)
 
 ### Matchmaking
 - `POST /api/matchmaking/join` - Join queue
@@ -140,11 +141,17 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
 
 ## Environment Variables
 
+### Backend (Web)
 - `DATABASE_URL` - PostgreSQL connection string
 - `SESSION_SECRET` - Session encryption key
 - `EMAIL_API_KEY` - Email service API key (optional, for password resets)
 - `EMAIL_FROM` - From email address (default: noreply@housespades.com)
 - `EMAIL_DOMAIN` - Email domain (for Mailgun)
+
+### Mobile App (Expo)
+- `EXPO_PUBLIC_REVENUECAT_IOS_API_KEY` - RevenueCat API key for iOS
+- `EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY` - RevenueCat API key for Android
+- AdMob App IDs configured in `app.json` (replace placeholder values)
 
 ## User Preferences
 
@@ -152,6 +159,26 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
 - Game mode and time control remembered between sessions
 
 ## Recent Changes (January 2026)
+
+### App Store Readiness (Latest)
+- Added Privacy Policy page at `/privacy` with email collection, matchmaking, ads disclosures
+- Added Terms of Service page at `/terms` with gameplay rules, IAP, user conduct
+- Added Settings page with account deletion (type "delete" to confirm)
+- DELETE `/api/auth/account` endpoint for account deletion
+- Footer links to Privacy/Terms on Login and Home pages
+- Settings icon in Home header for quick access
+
+### Mobile App Store Features
+- RevenueCat integration for in-app purchases (remove ads $5.99)
+- App Tracking Transparency (ATT) for iOS ad personalization consent
+- Google Mobile Ads (AdMob) with interstitial ads after every 2 games
+- EAS Build configuration for iOS/Android production builds
+- Environment variable based API key management
+
+### Card Sorting in JJDD Mode
+- Trumps now appear first: Big Joker, Little Joker, 2♠, 2♦, A♠...3♠
+- 2♦ grouped with spades/trumps, not with diamonds
+- Bidding display moved to center to avoid overlapping north player
 
 ### Multiplayer WebSocket Integration
 - Updated `useWebSocket` hook with auto-reconnect, game state management

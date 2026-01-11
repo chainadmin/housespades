@@ -217,12 +217,12 @@ export function GameTable({
 
       {/* Waiting for bids overlay - shown when it's not player's turn during bidding */}
       {isBiddingPhase && !isMyTurn && (
-        <div className="absolute top-20 sm:top-24 left-1/2 -translate-x-1/2 z-25 pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-25 pointer-events-none">
           <div className="bg-card/95 backdrop-blur-sm rounded-lg p-3 sm:p-4 shadow-lg">
             <p className="text-sm sm:text-base font-medium text-center animate-pulse">
               Waiting for bids...
             </p>
-            <div className="mt-2 flex flex-wrap justify-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground">
+            <div className="mt-2 flex flex-wrap justify-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground max-w-xs">
               {gameState.players.map((p) => (
                 <span key={p.id} className={cn(
                   "flex items-center gap-1",

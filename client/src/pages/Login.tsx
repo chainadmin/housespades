@@ -117,6 +117,16 @@ export default function Login() {
             </div>
           </CardContent>
         </Card>
+
+        <div className="mt-8 text-center text-xs text-muted-foreground">
+          <Link href="/privacy" className="hover:underline" data-testid="link-privacy">
+            Privacy Policy
+          </Link>
+          <span className="mx-2">|</span>
+          <Link href="/terms" className="hover:underline" data-testid="link-terms">
+            Terms of Service
+          </Link>
+        </div>
       </motion.div>
     </div>
   );

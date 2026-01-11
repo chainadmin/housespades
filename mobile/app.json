@@ -17,6 +17,14 @@
       "bundleIdentifier": "com.housespades.app",
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-XXXXXXXX~XXXXXXXX"
+      },
+      "infoPlist": {
+        "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you. You can still use the app with non-personalized ads if you decline.",
+        "SKAdNetworkItems": [
+          { "SKAdNetworkIdentifier": "cstr6suwn9.skadnetwork" },
+          { "SKAdNetworkIdentifier": "4fzdc2evr5.skadnetwork" },
+          { "SKAdNetworkIdentifier": "2fnua5tdw4.skadnetwork" }
+        ]
       }
     },
     "android": {
@@ -27,7 +35,10 @@
       "package": "com.housespades.app",
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-XXXXXXXX~XXXXXXXX"
-      }
+      },
+      "permissions": [
+        "com.google.android.gms.permission.AD_ID"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -36,7 +47,33 @@
     "scheme": "housespades",
     "plugins": [
       "expo-router",
-      "expo-secure-store"
-    ]
+      "expo-secure-store",
+      [
+        "expo-tracking-transparency",
+        {
+          "userTrackingPermission": "This identifier will be used to deliver personalized ads to you."
+        }
+      ],
+      [
+        "react-native-purchases",
+        {
+          "ios": {
+            "useStoreKit2": true
+          }
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-XXXXXXXX~XXXXXXXX",
+          "iosAppId": "ca-app-pub-XXXXXXXX~XXXXXXXX"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "your-eas-project-id"
+      }
+    }
   }
 }
