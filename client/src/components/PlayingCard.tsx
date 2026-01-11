@@ -48,10 +48,9 @@ export function PlayingCard({
   };
 
   return (
-    <motion.button
-      onClick={onClick}
-      onDoubleClick={onDoubleClick}
-      disabled={disabled}
+    <motion.div
+      onClick={!disabled ? onClick : undefined}
+      onDoubleClick={!disabled ? onDoubleClick : undefined}
       whileHover={!disabled ? { y: -8, scale: 1.02 } : undefined}
       whileTap={!disabled ? { scale: 0.98 } : undefined}
       initial={{ opacity: 1, scale: 0.8 }}
@@ -62,11 +61,10 @@ export function PlayingCard({
       }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
       className={cn(
-        "relative flex flex-col items-center justify-between rounded-lg bg-white border-2 border-gray-300 shadow-md cursor-pointer select-none p-1.5",
+        "relative flex flex-col items-center justify-between rounded-lg bg-white border-2 border-gray-300 shadow-md select-none p-1.5",
         sizeClasses[size],
-        disabled && "cursor-not-allowed grayscale-[30%]",
+        disabled ? "cursor-not-allowed opacity-70" : "cursor-pointer hover:shadow-lg",
         selected && "ring-2 ring-primary ring-offset-2",
-        !disabled && "hover:shadow-lg",
         className
       )}
       data-testid={`card-${card.id}`}
@@ -106,6 +104,6 @@ export function PlayingCard({
           </span>
         </div>
       )}
-    </motion.button>
+    </motion.div>
   );
 }
