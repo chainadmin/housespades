@@ -85,24 +85,64 @@ export function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
+// Check if a card is a trump in JJDD mode (for sorting purposes)
+function isTrumpInJJDD(card: Card): boolean {
+  if (card.suit === "spades") return true;
+  if (card.value === "LJ" || card.value === "BJ") return true;
+  if (card.suit === "diamonds" && card.value === "2") return true;
+  return false;
+}
+
 // Sort hand by suit then value
 export function sortHand(hand: Card[], mode: GameMode): Card[] {
   const suitOrder: Suit[] = ["spades", "hearts", "clubs", "diamonds"];
-  const valueOrder = mode === "ace_high" 
-    ? ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
-    : ["3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A", "2", "LJ", "BJ"];
+  
+  if (mode === "joker_joker_deuce_deuce") {
+    // JJDD mode: trumps first (Big Joker, Little Joker, 2♠, 2♦, A♠...3♠), then other suits
+    // Trump order from highest to lowest: BJ, LJ, 2♠, 2♦, A, K, Q, J, 10, 9, 8, 7, 6, 5, 4, 3
+    return [...hand].sort((a, b) => {
+      const aIsTrump = isTrumpInJJDD(a);
+      const bIsTrump = isTrumpInJJDD(b);
+      
+      // Trumps come first
+      if (aIsTrump && !bIsTrump) return -1;
+      if (!aIsTrump && bIsTrump) return 1;
+      
+      if (aIsTrump && bIsTrump) {
+        // Both are trumps - sort by power (highest first)
+        // Order: BJ, LJ, 2♠, 2♦, A♠, K♠, Q♠, ... 3♠
+        const trumpOrder = ["BJ", "LJ", "2♠", "2♦", "A", "K", "Q", "J", "10", "9", "8", "7", "6", "5", "4", "3"];
+        
+        const getJJDDTrumpRank = (card: Card): number => {
+          if (card.value === "BJ") return 0;
+          if (card.value === "LJ") return 1;
+          if (card.suit === "spades" && card.value === "2") return 2;
+          if (card.suit === "diamonds" && card.value === "2") return 3;
+          // Regular spades: A=4, K=5, Q=6, etc.
+          const spadeValues = ["A", "K", "Q", "J", "10", "9", "8", "7", "6", "5", "4", "3"];
+          return 4 + spadeValues.indexOf(card.value);
+        };
+        
+        return getJJDDTrumpRank(a) - getJJDDTrumpRank(b);
+      }
+      
+      // Neither is trump - sort by suit then value
+      const suitDiff = suitOrder.indexOf(a.suit) - suitOrder.indexOf(b.suit);
+      if (suitDiff !== 0) return suitDiff;
+      
+      // Value order for non-trumps (A is high)
+      const valueOrder = ["A", "K", "Q", "J", "10", "9", "8", "7", "6", "5", "4", "3"];
+      return valueOrder.indexOf(a.value) - valueOrder.indexOf(b.value);
+    });
+  }
+  
+  // Ace High mode - standard sorting
+  const valueOrder = ["A", "K", "Q", "J", "10", "9", "8", "7", "6", "5", "4", "3", "2"];
   
   return [...hand].sort((a, b) => {
-    // Handle jokers specially
-    if (isJoker(a) && !isJoker(b)) return -1;
-    if (!isJoker(a) && isJoker(b)) return 1;
-    if (isJoker(a) && isJoker(b)) {
-      return a.value === "BJ" ? -1 : 1;
-    }
-    
     const suitDiff = suitOrder.indexOf(a.suit) - suitOrder.indexOf(b.suit);
     if (suitDiff !== 0) return suitDiff;
-    return valueOrder.indexOf(b.value) - valueOrder.indexOf(a.value);
+    return valueOrder.indexOf(a.value) - valueOrder.indexOf(b.value);
   });
 }
 
