@@ -169,9 +169,9 @@ export function GameTable({
         </div>
       )}
 
-      {/* Center: Trick area or Bidding panel - true center shifted down */}
+      {/* Center: Trick area or Bidding panel - positioned higher to avoid overlap */}
       <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-        <div className="pointer-events-auto translate-y-8 sm:translate-y-12">
+        <div className="pointer-events-auto -translate-y-4 sm:translate-y-0">
           {isBiddingPhase && isMyTurn && (
             <BiddingPanel
               onBid={onBid}
@@ -180,32 +180,35 @@ export function GameTable({
             />
           )}
 
-          {(isPlayingPhase || (isBiddingPhase && !isMyTurn)) && (
+          {isPlayingPhase && (
             <TrickArea
               trick={gameState.currentTrick}
               playerPositions={playerPositions}
             />
           )}
-
-          {isBiddingPhase && !isMyTurn && (
-            <div className="bg-card/90 backdrop-blur-sm rounded-lg p-4 sm:p-6 shadow-lg">
-              <p className="text-base sm:text-lg font-medium text-center animate-pulse">
-                Waiting for bids...
-              </p>
-              <div className="mt-2 flex flex-wrap justify-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
-                {gameState.players.map((p) => (
-                  <span key={p.id} className={cn(
-                    "flex items-center gap-1",
-                    p.bid !== null && "text-foreground"
-                  )}>
-                    {p.name}: {p.bid !== null ? p.bid : "..."}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
+
+      {/* Waiting for bids overlay - shown when it's not player's turn during bidding */}
+      {isBiddingPhase && !isMyTurn && (
+        <div className="absolute top-20 sm:top-24 left-1/2 -translate-x-1/2 z-25 pointer-events-none">
+          <div className="bg-card/95 backdrop-blur-sm rounded-lg p-3 sm:p-4 shadow-lg">
+            <p className="text-sm sm:text-base font-medium text-center animate-pulse">
+              Waiting for bids...
+            </p>
+            <div className="mt-2 flex flex-wrap justify-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground">
+              {gameState.players.map((p) => (
+                <span key={p.id} className={cn(
+                  "flex items-center gap-1",
+                  p.bid !== null && "text-foreground font-medium"
+                )}>
+                  {p.name}: {p.bid !== null ? p.bid : "..."}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* South player (you) - hand at bottom - absolute positioned */}
       {currentPlayer && (
@@ -221,7 +224,7 @@ export function GameTable({
                   </Badge>
                 )}
                 <Badge variant="secondary" className="text-xs">
-                  Tricks: {currentPlayer.tricks}
+                  Books: {currentPlayer.tricks}
                 </Badge>
               </div>
             </div>

@@ -69,7 +69,7 @@ export function PlayerZone({ player, isCurrentTurn, position, teamColor = "prima
               </Badge>
             )}
             <Badge variant="secondary" className="text-[10px] sm:text-xs px-1 sm:px-2">
-              {player.tricks}
+              {player.tricks} books
             </Badge>
           </div>
         </div>
