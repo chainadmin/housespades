@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import type { Card } from "@shared/schema";
 import { getSuitSymbol, getSuitColor, formatCardValue, isJoker } from "@/lib/gameUtils";
 import { cn } from "@/lib/utils";
@@ -47,26 +48,37 @@ export function PlayingCard({
   };
 
   return (
-    <button
+    <motion.button
       onClick={onClick}
       onDoubleClick={onDoubleClick}
       disabled={disabled}
+      whileHover={!disabled ? { y: -8, scale: 1.02 } : undefined}
+      whileTap={!disabled ? { scale: 0.98 } : undefined}
+      initial={{ opacity: 1, scale: 0.8 }}
+      animate={{ 
+        opacity: 1, 
+        scale: 1,
+        y: selected ? -12 : 0,
+      }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
       className={cn(
-        "relative flex flex-col items-center justify-between rounded-lg bg-white border-2 border-gray-300 shadow-md cursor-pointer select-none p-1.5 transition-transform",
+        "relative flex flex-col items-center justify-between rounded-lg bg-white border-2 border-gray-300 shadow-md cursor-pointer select-none p-1.5",
         sizeClasses[size],
-        disabled && "cursor-not-allowed opacity-70",
-        selected && "ring-2 ring-primary ring-offset-2 -translate-y-3",
-        !disabled && "hover:shadow-lg hover:-translate-y-2",
+        disabled && "cursor-not-allowed grayscale-[30%]",
+        selected && "ring-2 ring-primary ring-offset-2",
+        !disabled && "hover:shadow-lg",
         className
       )}
       data-testid={`card-${card.id}`}
       aria-label={isJokerCard ? (card.value === "BJ" ? "Big Joker" : "Little Joker") : `${displayValue} of ${card.suit}`}
     >
+      {/* Top left corner */}
       <div className={cn("absolute top-1 left-1.5 flex flex-col items-center leading-none", suitColorClass)}>
         <span className={cn("font-bold", valueSizeClasses[size])}>{displayValue}</span>
         <span className={symbolSizeClasses[size]}>{suitSymbol}</span>
       </div>
 
+      {/* Center symbol (large) */}
       <div className={cn("absolute inset-0 flex items-center justify-center", suitColorClass)}>
         <span className={cn(
           size === "sm" ? "text-4xl" : size === "md" ? "text-5xl" : "text-6xl",
@@ -76,15 +88,17 @@ export function PlayingCard({
         </span>
       </div>
 
+      {/* Bottom right corner (rotated) */}
       <div className={cn("absolute bottom-1 right-1.5 flex flex-col items-center leading-none rotate-180", suitColorClass)}>
         <span className={cn("font-bold", valueSizeClasses[size])}>{displayValue}</span>
         <span className={symbolSizeClasses[size]}>{suitSymbol}</span>
       </div>
 
+      {/* Joker label */}
       {isJokerCard && (
         <div className="absolute inset-0 flex items-center justify-center">
           <span className={cn(
-            "font-bold text-center",
+            "font-bold text-center rotate-0",
             card.value === "BJ" ? "text-red-500" : "text-gray-900",
             size === "sm" ? "text-[8px]" : size === "md" ? "text-[10px]" : "text-xs"
           )}>
@@ -92,6 +106,6 @@ export function PlayingCard({
           </span>
         </div>
       )}
-    </button>
+    </motion.button>
   );
 }

@@ -1,4 +1,5 @@
-import type { Card, GameMode } from "@shared/schema";
+import { motion } from "framer-motion";
+import type { Card, Suit, GameMode } from "@shared/schema";
 import { PlayingCard } from "./PlayingCard";
 import { sortHand } from "@/lib/gameUtils";
 import { cn } from "@/lib/utils";
@@ -29,6 +30,7 @@ export function PlayerHand({
     return playableCards.some((c) => c.id === card.id);
   };
 
+  // Calculate overlap based on number of cards and screen width
   const getCardOffset = (index: number, total: number): number => {
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
     const maxWidth = isMobile ? 320 : 800;
@@ -38,9 +40,11 @@ export function PlayerHand({
   };
 
   return (
-    <div
+    <motion.div
       className="relative flex justify-center items-end min-h-28 sm:min-h-36 py-2 sm:py-4 px-2 overflow-x-auto"
       data-testid="player-hand"
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
     >
       <div 
         className="relative flex"
@@ -54,40 +58,42 @@ export function PlayerHand({
           const isSelected = selectedCard?.id === card.id;
           const canPlay = isPlayable(card) && !disabled;
           
+          // Fan out effect - cards at edges rotate slightly
           const centerIndex = (sortedCards.length - 1) / 2;
           const rotation = (index - centerIndex) * 2;
           
           return (
-            <div
+            <motion.div
               key={card.id}
-              className="absolute bottom-0 origin-bottom"
+              className="absolute bottom-0"
               style={{ 
                 left: offset,
                 zIndex: isSelected ? 100 : index,
-                transform: `rotate(${rotation}deg)`,
               }}
+              initial={{ rotate: 0 }}
+              animate={{ 
+                rotate: rotation,
+                y: isSelected ? -15 : 0,
+              }}
+              whileHover={canPlay ? { 
+                y: -20, 
+                zIndex: 100,
+                rotate: 0,
+              } : undefined}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
-              {/* Inner wrapper for translation - separate from rotation */}
-              <div 
-                className={cn(
-                  "transition-transform duration-150",
-                  isSelected && "-translate-y-4",
-                  canPlay && "hover:-translate-y-5"
-                )}
-              >
-                <PlayingCard
-                  card={card}
-                  size="md"
-                  onClick={() => canPlay && onCardClick?.(card)}
-                  onDoubleClick={() => canPlay && onCardDoubleClick?.(card)}
-                  disabled={!canPlay}
-                  selected={isSelected}
-                />
-              </div>
-            </div>
+              <PlayingCard
+                card={card}
+                size="md"
+                onClick={() => canPlay && onCardClick?.(card)}
+                onDoubleClick={() => canPlay && onCardDoubleClick?.(card)}
+                disabled={!canPlay}
+                selected={isSelected}
+              />
+            </motion.div>
           );
         })}
       </div>
-    </div>
+    </motion.div>
   );
 }
