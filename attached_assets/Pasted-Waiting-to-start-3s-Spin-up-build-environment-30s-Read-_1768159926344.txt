@@ -1,0 +1,609 @@
+Waiting to start
+
+3s
+
+
+Spin up build environment
+
+30s
+
+
+Read package.json
+
+1s
+
+
+Install dependencies
+
+10s
+
+
+Read app config
+
+1s
+
+
+Run expo doctor
+
+4s
+
+
+Prebuild
+
+5s
+
+
+Prepare credentials
+
+1s
+
+
+Bundle JavaScript
+
+19s
+
+
+Run gradlew
+
+2m 50s
+
+
+Running 'gradlew :app:bundleRelease' in /home/expo/workingdir/build/mobile/android
+Welcome to Gradle 8.10.2!
+Here are the highlights of this release:
+- Support for Java 23
+ - Faster configuration cache
+ - Better configuration cache reports
+For more details see https://docs.gradle.org/8.10.2/release-notes.html
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.10.2/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build
+> Task :gradle-plugin:settings-plugin:checkKotlinGradlePluginConfigurationErrors
+> Task :gradle-plugin:shared:checkKotlinGradlePluginConfigurationErrors
+> Task :gradle-plugin:settings-plugin:pluginDescriptors
+> Task :gradle-plugin:settings-plugin:processResources
+> Task :gradle-plugin:shared:processResources NO-SOURCE
+> Task :gradle-plugin:shared:compileKotlin
+> Task :gradle-plugin:shared:compileJava NO-SOURCE
+> Task :gradle-plugin:shared:classes UP-TO-DATE
+> Task :gradle-plugin:shared:jar
+> Task :gradle-plugin:settings-plugin:compileKotlin
+> Task :gradle-plugin:settings-plugin:compileJava NO-SOURCE
+> Task :gradle-plugin:settings-plugin:classes
+> Task :gradle-plugin:settings-plugin:jar
+> Task :gradle-plugin:react-native-gradle-plugin:checkKotlinGradlePluginConfigurationErrors
+> Task :gradle-plugin:react-native-gradle-plugin:pluginDescriptors
+> Task :gradle-plugin:react-native-gradle-plugin:processResources
+> Task :gradle-plugin:react-native-gradle-plugin:compileKotlin
+> Task :gradle-plugin:react-native-gradle-plugin:compileJava NO-SOURCE
+> Task :gradle-plugin:react-native-gradle-plugin:classes
+> Task :gradle-plugin:react-native-gradle-plugin:jar
+> Configure project :expo
+Using expo modules
+  - expo-asset (11.0.5)
+  - expo-constants (17.0.8)
+  - expo-file-system (18.0.12)
+  - expo-font (13.0.4)
+  - expo-linking (7.0.5)
+  - expo-modules-core (2.2.3)
+  - expo-secure-store (14.0.1)
+  - expo-splash-screen (0.29.24)
+  - expo-tracking-transparency (5.1.1)
+> Configure project :react-native-google-mobile-ads
+:react-native-google-mobile-ads package.json found at /home/expo/workingdir/build/mobile/node_modules/react-native-google-mobile-ads/package.json
+**************************************************************************************************************
+WARNING: react-native-google-mobile-ads requires an 'android_app_id' property inside a 'react-native-google-mobile-ads' key in your app.json.
+         No android_app_id property was found in this location. The native Google Mobile Ads SDK will crash on startup without it.
+         You can safely ignore this warning if you are using our Expo config plugin.
+**************************************************************************************************************
+:react-native-google-mobile-ads package.json found at /home/expo/workingdir/build/mobile/node_modules/react-native-google-mobile-ads/package.json
+:react-native-google-mobile-ads:version set from package.json: 14.11.0 (14,11,0 - 14011000)
+:react-native-google-mobile-ads:android.compileSdk using custom value: 35
+:react-native-google-mobile-ads:android.targetSdk using custom value: 34
+:react-native-google-mobile-ads:android.minSdk using custom value: 24
+:react-native-google-mobile-ads:reactNativeAndroidDir /home/expo/workingdir/build/mobile/node_modules/react-native/android
+> Configure project :react-native-reanimated
+Android gradle plugin: 8.6.0
+Gradle: 8.10.2
+> Task :expo-asset:preBuild UP-TO-DATE
+> Task :expo-asset:preReleaseBuild UP-TO-DATE
+> Task :expo-asset:generateReleaseResValues
+> Task :expo-asset:generateReleaseResources
+> Task :expo-asset:packageReleaseResources
+> Task :expo-file-system:preBuild UP-TO-DATE
+> Task :expo-file-system:preReleaseBuild UP-TO-DATE
+> Task :expo-file-system:generateReleaseResValues
+> Task :expo-file-system:generateReleaseResources
+> Task :expo-constants:createExpoConfig
+> Task :expo-constants:preBuild
+> Task :expo-constants:preReleaseBuild
+> Task :expo-constants:generateReleaseResValues
+> Task :expo-constants:generateReleaseResources
+The NODE_ENV environment variable is required but was not specified. Ensure the project is bundled with Expo CLI or NODE_ENV is set.
+Proceeding without mode-specific .env
+> Task :expo-constants:packageReleaseResources
+> Task :expo-font:preBuild UP-TO-DATE
+> Task :expo-font:preReleaseBuild UP-TO-DATE
+> Task :expo-font:generateReleaseResValues
+> Task :expo-font:generateReleaseResources
+> Task :expo-file-system:packageReleaseResources
+> Task :expo-linking:preBuild UP-TO-DATE
+> Task :expo-font:packageReleaseResources
+> Task :expo-modules-core:preBuild UP-TO-DATE
+> Task :expo-linking:preReleaseBuild UP-TO-DATE
+> Task :expo-modules-core:preReleaseBuild UP-TO-DATE
+> Task :expo-modules-core:generateReleaseResValues
+> Task :expo-linking:generateReleaseResValues
+> Task :expo-modules-core:generateReleaseResources
+> Task :expo-linking:generateReleaseResources
+> Task :expo-modules-core:packageReleaseResources
+> Task :expo-secure-store:preBuild UP-TO-DATE
+> Task :expo-secure-store:preReleaseBuild UP-TO-DATE
+> Task :expo-linking:packageReleaseResources
+> Task :expo-splash-screen:preBuild UP-TO-DATE
+> Task :expo-splash-screen:preReleaseBuild UP-TO-DATE
+> Task :expo-secure-store:generateReleaseResValues
+> Task :expo-splash-screen:generateReleaseResValues
+> Task :expo-splash-screen:generateReleaseResources
+> Task :expo-secure-store:generateReleaseResources
+> Task :expo-secure-store:packageReleaseResources
+> Task :expo-tracking-transparency:preBuild UP-TO-DATE
+> Task :expo-tracking-transparency:preReleaseBuild UP-TO-DATE
+> Task :expo-tracking-transparency:generateReleaseResValues
+> Task :expo-tracking-transparency:generateReleaseResources
+> Task :expo-tracking-transparency:packageReleaseResources
+> Task :expo-splash-screen:packageReleaseResources
+> Task :react-native-gesture-handler:preBuild UP-TO-DATE
+> Task :react-native-gesture-handler:preReleaseBuild
+UP-TO-DATE
+> Task :react-native-google-mobile-ads:preBuild UP-TO-DATE
+> Task :react-native-google-mobile-ads:preReleaseBuild UP-TO-DATE
+> Task :react-native-gesture-handler:generateReleaseResValues
+> Task :react-native-google-mobile-ads:generateReleaseResValues
+> Task :react-native-google-mobile-ads:generateReleaseResources
+> Task :react-native-gesture-handler:generateReleaseResources
+> Task :react-native-google-mobile-ads:packageReleaseResources
+> Task :react-native-purchases:preBuild UP-TO-DATE
+> Task :react-native-purchases:preReleaseBuild UP-TO-DATE
+> Task :react-native-gesture-handler:packageReleaseResources
+> Task :react-native-reanimated:assertLatestReactNativeWithNewArchitectureTask SKIPPED
+> Task :react-native-reanimated:assertMinimalReactNativeVersionTask SKIPPED
+> Task :react-native-purchases:generateReleaseResValues
+> Task :react-native-purchases:generateReleaseResources
+> Task :react-native-purchases:packageReleaseResources
+> Task :react-native-safe-area-context:preBuild UP-TO-DATE
+> Task :react-native-safe-area-context:preReleaseBuild UP-TO-DATE
+> Task :react-native-safe-area-context:generateReleaseResValues
+> Task :react-native-safe-area-context:generateReleaseResources
+> Task :react-native-reanimated:prepareReanimatedHeadersForPrefabs
+> Task :react-native-safe-area-context:packageReleaseResources
+> Task :react-native-screens:preBuild UP-TO-DATE
+> Task :react-native-screens:preReleaseBuild UP-TO-DATE
+> Task :react-native-screens:generateReleaseResValues
+> Task :react-native-reanimated:prepareWorkletsHeadersForPrefabs
+> Task :react-native-reanimated:preBuild
+> Task :react-native-reanimated:preReleaseBuild
+> Task :react-native-screens:generateReleaseResources
+> Task :react-native-reanimated:generateReleaseResValues
+> Task :react-native-reanimated:generateReleaseResources
+> Task :react-native-reanimated:packageReleaseResources
+> Task :react-native-svg:preBuild UP-TO-DATE
+> Task :react-native-svg:preReleaseBuild UP-TO-DATE
+> Task :react-native-svg:generateReleaseResValues
+> Task :react-native-svg:generateReleaseResources
+> Task :react-native-screens:packageReleaseResources
+> Task :expo-asset:extractDeepLinksRelease
+> Task :react-native-svg:packageReleaseResources
+> Task :expo-constants:extractDeepLinksRelease
+> Task :expo:generateExpoModulesPackageListTask
+> Task :expo:preBuild
+> Task :expo:preReleaseBuild
+> Task :expo:generateReleaseResValues
+> Task :expo:generateReleaseResources
+> Task :expo:packageReleaseResources
+> Task :expo:extractDeepLinksRelease
+> Task :expo:processReleaseManifest
+> Task :expo-asset:processReleaseManifest
+> Task :expo-constants:processReleaseManifest
+> Task :expo-font:extractDeepLinksRelease
+> Task :expo-file-system:extractDeepLinksRelease
+> Task :expo-linking:extractDeepLinksRelease
+> Task :expo-font:processReleaseManifest
+> Task :expo-modules-core:extractDeepLinksRelease
+> Task :expo-linking:processReleaseManifest
+> Task :expo-file-system:processReleaseManifest
+/home/expo/workingdir/build/mobile/node_modules/expo-file-system/android/src/main/AndroidManifest.xml:6:9-8:20 Warning:
+	provider#expo.modules.filesystem.FileSystemFileProvider@android:authorities was tagged at AndroidManifest.xml:6 to replace other declarations but no other declaration present
+> Task :expo-secure-store:extractDeepLinksRelease
+> Task :expo-modules-core:processReleaseManifest
+/home/expo/workingdir/build/mobile/node_modules/expo-modules-core/android/src/main/AndroidManifest.xml:8:9-11:45 Warning:
+	meta-data#com.facebook.soloader.enabled@android:value was tagged at AndroidManifest.xml:8 to replace other declarations but no other declaration present
+> Task :expo-splash-screen:extractDeepLinksRelease
+> Task :expo-tracking-transparency:extractDeepLinksRelease
+> Task :expo-secure-store:processReleaseManifest
+> Task :expo-splash-screen:processReleaseManifest
+> Task :expo-tracking-transparency:processReleaseManifest
+> Task :react-native-gesture-handler:extractDeepLinksRelease
+> Task :react-native-google-mobile-ads:extractDeepLinksRelease
+> Task :react-native-purchases:extractDeepLinksRelease
+> Task :react-native-gesture-handler:processReleaseManifest
+> Task :react-native-reanimated:extractDeepLinksRelease
+> Task :react-native-google-mobile-ads:processReleaseManifest
+package="io.invertase.googlemobileads" found in source AndroidManifest.xml: /home/expo/workingdir/build/mobile/node_modules/react-native-google-mobile-ads/android/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="io.invertase.googlemobileads" from the source AndroidManifest.xml: /home/expo/workingdir/build/mobile/node_modules/react-native-google-mobile-ads/android/src/main/AndroidManifest.xml.
+/home/expo/workingdir/build/mobile/node_modules/react-native-google-mobile-ads/android/src/main/AndroidManifest.xml:40:7-43:44 Warning:
+	property#android.adservices.AD_SERVICES_CONFIG@android:resource was tagged at AndroidManifest.xml:40 to replace other declarations but no other declaration present
+> Task :react-native-safe-area-context:extractDeepLinksRelease
+> Task :react-native-purchases:processReleaseManifest
+package="com.revenuecat.purchases.react" found in source AndroidManifest.xml: /home/expo/workingdir/build/mobile/node_modules/react-native-purchases/android/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.revenuecat.purchases.react" from the source AndroidManifest.xml: /home/expo/workingdir/build/mobile/node_modules/react-native-purchases/android/src/main/AndroidManifest.xml.
+> Task :react-native-reanimated:processReleaseManifest
+> Task :react-native-svg:extractDeepLinksRelease
+> Task :react-native-screens:extractDeepLinksRelease
+> Task :react-native-safe-area-context:processReleaseManifest
+package="com.th3rdwave.safeareacontext" found in source AndroidManifest.xml: /home/expo/workingdir/build/mobile/node_modules/react-native-safe-area-context/android/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.th3rdwave.safeareacontext" from the source AndroidManifest.xml: /home/expo/workingdir/build/mobile/node_modules/react-native-safe-area-context/android/src/main/AndroidManifest.xml.
+> Task :react-native-svg:processReleaseManifest
+package="com.horcrux.svg" found in source AndroidManifest.xml: /home/expo/workingdir/build/mobile/node_modules/react-native-svg/android/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.horcrux.svg" from the source AndroidManifest.xml: /home/expo/workingdir/build/mobile/node_modules/react-native-svg/android/src/main/AndroidManifest.xml.
+> Task :react-native-screens:processReleaseManifest
+package="com.swmansion.rnscreens" found in source AndroidManifest.xml: /home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.swmansion.rnscreens" from the source AndroidManifest.xml: /home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/AndroidManifest.xml.
+> Task :expo:writeReleaseAarMetadata
+> Task :expo-constants:writeReleaseAarMetadata
+> Task :expo-asset:writeReleaseAarMetadata
+> Task :expo-file-system:writeReleaseAarMetadata
+> Task :expo-linking:writeReleaseAarMetadata
+> Task :expo-font:writeReleaseAarMetadata
+> Task :expo-modules-core:writeReleaseAarMetadata
+> Task :expo-splash-screen:writeReleaseAarMetadata
+> Task :expo-secure-store:writeReleaseAarMetadata
+> Task :expo-tracking-transparency:writeReleaseAarMetadata
+> Task :react-native-gesture-handler:writeReleaseAarMetadata
+> Task :react-native-purchases:writeReleaseAarMetadata
+> Task :react-native-google-mobile-ads:writeReleaseAarMetadata
+> Task :react-native-screens:writeReleaseAarMetadata
+> Task :react-native-svg:writeReleaseAarMetadata
+> Task :react-native-safe-area-context:writeReleaseAarMetadata
+> Task :react-native-reanimated:writeReleaseAarMetadata
+> Task :expo:compileReleaseLibraryResources
+> Task :expo-asset:compileReleaseLibraryResources
+> Task :expo-constants:compileReleaseLibraryResources
+> Task :expo:parseReleaseLocalResources
+> Task :expo-constants:parseReleaseLocalResources
+> Task :expo-asset:parseReleaseLocalResources
+> Task :expo:generateReleaseRFile
+> Task :expo-constants:generateReleaseRFile
+> Task :expo-asset:generateReleaseRFile
+> Task :expo-font:compileReleaseLibraryResources
+> Task :expo-linking:compileReleaseLibraryResources
+> Task :expo-font:parseReleaseLocalResources
+> Task :expo-file-system:parseReleaseLocalResources
+> Task :expo-font:generateReleaseRFile
+> Task :expo-file-system:generateReleaseRFile
+> Task :expo-linking:parseReleaseLocalResources
+> Task :expo-modules-core:compileReleaseLibraryResources
+> Task :expo-modules-core:parseReleaseLocalResources
+> Task :expo-linking:generateReleaseRFile
+> Task :expo-modules-core:generateReleaseRFile
+> Task :app:createBundleReleaseJsAndAssets
+Starting Metro Bundler
+> Task :expo-file-system:compileReleaseLibraryResources
+> Task :expo-secure-store:compileReleaseLibraryResources
+> Task :expo-tracking-transparency:compileReleaseLibraryResources
+> Task :expo-secure-store:parseReleaseLocalResources
+> Task :expo-splash-screen:compileReleaseLibraryResources
+> Task :expo-splash-screen:parseReleaseLocalResources
+> Task :expo-tracking-transparency:parseReleaseLocalResources
+> Task :expo-secure-store:generateReleaseRFile
+> Task :expo-tracking-transparency:generateReleaseRFile
+> Task :expo-splash-screen:generateReleaseRFile
+> Task :react-native-gesture-handler:compileReleaseLibraryResources
+> Task :react-native-google-mobile-ads:compileReleaseLibraryResources
+> Task :react-native-purchases:compileReleaseLibraryResources
+> Task :react-native-gesture-handler:parseReleaseLocalResources
+> Task :react-native-google-mobile-ads:parseReleaseLocalResources
+> Task :react-native-purchases:parseReleaseLocalResources
+> Task :react-native-purchases:generateReleaseRFile
+> Task :react-native-gesture-handler:generateReleaseRFile
+> Task :react-native-google-mobile-ads:generateReleaseRFile
+> Task :react-native-reanimated:compileReleaseLibraryResources
+> Task :react-native-safe-area-context:compileReleaseLibraryResources
+> Task :react-native-safe-area-context:parseReleaseLocalResources
+> Task :react-native-reanimated:parseReleaseLocalResources
+> Task :react-native-reanimated:generateReleaseRFile
+> Task :react-native-screens:compileReleaseLibraryResources
+> Task :react-native-safe-area-context:generateReleaseRFile
+> Task :expo:checkKotlinGradlePluginConfigurationErrors
+> Task :react-native-screens:parseReleaseLocalResources
+> Task :react-native-svg:compileReleaseLibraryResources
+> Task :react-native-screens:generateReleaseRFile
+> Task :expo-asset:checkKotlinGradlePluginConfigurationErrors
+> Task :expo:generateReleaseBuildConfig
+> Task :expo-modules-core:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-asset:generateReleaseBuildConfig
+> Task :expo-modules-core:generateReleaseBuildConfig
+> Task :react-native-svg:parseReleaseLocalResources
+> Task :react-native-svg:generateReleaseRFile
+> Task :expo-asset:javaPreCompileRelease
+> Task :expo-constants:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-file-system:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-file-system:generateReleaseBuildConfig
+> Task :expo-constants:generateReleaseBuildConfig
+> Task :expo-file-system:javaPreCompileRelease
+> Task :expo-constants:javaPreCompileRelease
+> Task :expo-linking:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-font:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-linking:generateReleaseBuildConfig
+> Task :expo-font:generateReleaseBuildConfig
+> Task :expo-linking:javaPreCompileRelease
+> Task :expo-secure-store:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-font:javaPreCompileRelease
+> Task :expo-splash-screen:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-secure-store:generateReleaseBuildConfig
+> Task :expo-secure-store:javaPreCompileRelease
+> Task :expo-tracking-transparency:checkKotlinGradlePluginConfigurationErrors
+> Task :expo-tracking-transparency:generateReleaseBuildConfig
+> Task :expo-splash-screen:generateReleaseBuildConfig
+> Task :expo-splash-screen:javaPreCompileRelease
+> Task :expo-tracking-transparency:javaPreCompileRelease
+> Task :react-native-safe-area-context:checkKotlinGradlePluginConfigurationErrors
+> Task :react-native-safe-area-context:generateReleaseBuildConfig
+> Task :expo:javaPreCompileRelease
+> Task :react-native-screens:checkKotlinGradlePluginConfigurationErrors
+> Task :react-native-screens:generateReleaseBuildConfig
+> Task :app:createBundleReleaseJsAndAssets
+Android Bundled 1875ms node_modules/expo-router/entry.js (1365 modules)
+Writing bundle output to: /home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle
+Writing sourcemap output to: /home/expo/workingdir/build/mobile/android/app/build/intermediates/sourcemaps/react/release/index.android.bundle.packager.map
+Copying 44 asset files
+Done writing bundle output
+Done writing sourcemap output
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:2373:20: warning: the variable "Promise" was not declared in function "promiseMethodWrapper"
+        return new Promise((resolve, reject) => {
+                   ^~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:2595:23: warning: the variable "DebuggerInternal" was not declared in function "__shouldPauseOnThrow"
+        return typeof DebuggerInternal !== 'undefined' && DebuggerInternal.sh...
+                      ^~~~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:3912:5: warning: the variable "setImmediate" was not declared in function "handleResolved"
+    setImmediate(function () {
+    ^~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:5260:94: warning: the variable "setTimeout" was not declared in anonymous arrow function " 237#"
+...).then(callback).catch(error => setTimeout(() => {
+                                   ^~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:7537:5: warning: the variable "Headers" was not declared in anonymous function " 310#"
+    Headers,
+    ^~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:7538:5: warning: the variable "Request" was not declared in anonymous function " 310#"
+    Request,
+    ^~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:7539:5: warning: the variable "Response" was not declared in anonymous function " 310#"
+    Response
+    ^~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:7696:24: warning: the variable "FileReader" was not declared in function "readBlobAsArrayBuffer"
+      var reader = new FileReader();
+                       ^~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:7747:36: warning: the variable "Blob" was not declared in anonymous function " 321#"
+        } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
+                                   ^~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:7749:40: warning: the variable "FormData" was not declared in anonymous function " 321#"
+        } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
+                                       ^~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:7751:44: warning: the variable "URLSearchParams" was not declared in anonymous function " 321#"
+...e if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body...
+                                 ^~~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:7870:26: warning: the variable "AbortController" was not declared in anonymous function " 327#"
+          var ctrl = new AbortController();
+                         ^~~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:8004:23: warning: the variable "XMLHttpRequest" was not declared in anonymous function " 331#"
+        var xhr = new XMLHttpRequest();
+                      ^~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:7549:71: warning: the variable "self" was not declared in anonymous function " 313#"
+...undefined' && globalThis || typeof self !== 'undefined' && self ||
+                                      ^~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:17100:31: warning: the variable "nativeFabricUIManager" was not declared in anonymous function " 644#"
+  var _nativeFabricUIManage = nativeFabricUIManager,
+                              ^~~~~~~~~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:17128:21: warning: the variable "clearTimeout" was not declared in anonymous function " 644#"
+    cancelTimeout = clearTimeout;
+                    ^~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:17141:51: warning: the variable "RN$enableMicrotasksInReact" was not declared in anonymous function " 644#"
+... "undefined" !== typeof RN$enableMicrotasksInReact && !!RN$enableMicrotask...
+                           ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:17142:47: warning: the variable "queueMicrotask" was not declared in anonymous function " 644#"
+...otask = "function" === typeof queueMicrotask ? queueMicrotask : scheduleTi...
+                                 ^~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:21563:30: warning: the variable "__REACT_DEVTOOLS_GLOBAL_HOOK__" was not declared in anonymous function " 644#"
+  if ("undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__) {
+                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:21701:26: warning: the variable "navigator" was not declared in anonymous function " 677#"
+  "undefined" !== typeof navigator && undefined !== navigator.scheduling && u...
+                         ^~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:21811:37: warning: the variable "MessageChannel" was not declared in anonymous function " 677#"
+  };else if ("undefined" !== typeof MessageChannel) {
+                                    ^~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:21826:34: warning: the variable "nativeRuntimeScheduler" was not declared in anonymous function " 677#"
+... = "undefined" !== typeof nativeRuntimeScheduler ? nativeRuntimeScheduler....
+                             ^~~~~~~~~~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:30683:16: warning: the variable "SharedArrayBuffer" was not declared in function "from"
+    if (typeof SharedArrayBuffer !== 'undefined' && (isInstance(value, Shared...
+               ^~~~~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:38562:34: warning: the variable "requestAnimationFrame" was not declared in function "start 9#"
+...    this._animationFrame = requestAnimationFrame(this.onUpdate.bind(this));
+                              ^~~~~~~~~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:53731:26: warning: the variable "SuppressedError" was not declared in anonymous function " 1652#"
+    "function" == typeof SuppressedError && SuppressedError;
+                         ^~~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:54016:34: warning: the variable "structuredClone" was not declared in function "be"
+        } : "function" == typeof structuredClone ? function (e) {
+                                 ^~~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:61565:16: warning: Direct call to eval(), but lexical scope is not supported.
+        return eval(body);
+^~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:64687:38: warning: the variable "document" was not declared in anonymous function " 2229#"
+...r useClientLayoutEffect = typeof document !== 'undefined' || typeof naviga...
+                                    ^~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:70074:9: warning: the variable "REACT_NAVIGATION_DEVTOOLS" was not declared in anonymous arrow function " 2578#"
+        REACT_NAVIGATION_DEVTOOLS.set(refContainer.current, {
+^~~~~~~~~~~~~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:75731:16: warning: the variable "requestIdleCallback" was not declared in anonymous arrow function " 2819#"
+      var id = requestIdleCallback(() => {
+               ^~~~~~~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:75734:20: warning: the variable "cancelIdleCallback" was not declared in anonymous arrow function " 2821#"
+      return () => cancelIdleCallback(id);
+                   ^~~~~~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:79237:11: warning: the variable "cancelAnimationFrame" was not declared in function "cleanup"
+          cancelAnimationFrame(this.splashScreenAnimationFrame);
+          ^~~~~~~~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:80417:16: warning: the variable "ReactNativeWebView" was not declared in function "emitDomEvent"
+    if (typeof ReactNativeWebView !== 'undefined') {
+               ^~~~~~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:90030:11: warning: the variable "_WORKLET" was not declared in function "assertEasingIsWorklet"
+      if (_WORKLET) {
+          ^~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:92275:12: warning: the variable "__reanimatedLoggerConfig" was not declared in function "replaceLoggerImplementation"
+        ...__reanimatedLoggerConfig,
+           ^~~~~~~~~~~~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:92876:26: warning: Direct call to eval(), but lexical scope is not supported.
+            workletFun = eval('(' + initData.code + '\n)');
+                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:92899:112: warning: the variable "_toString" was not declared in function "valueUnpacker"
+...recognized by value unpacker: "${_toString(objectToUnpack)}".`);
+                                    ^~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:110284:27: warning: the variable "HTMLElement" was not declared in function "findDescendantWithExitingAnimation"
+    if (!(node instanceof HTMLElement)) {
+                          ^~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:110310:24: warning: the variable "MutationObserver" was not declared in function "addHTMLMutationObserver"
+    var observer = new MutationObserver(mutationsList => {
+                       ^~~~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:110355:41: warning: the variable "getComputedStyle" was not declared in function "fixElementPosition"
+...entBorderTopValue = parseInt(getComputedStyle(parent).borderTopWidth);
+                                ^~~~~~~~~~~~~~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:114327:5: warning: the variable "jest" was not declared in arrow function "beforeTest"
+    jest.useFakeTimers();
+    ^~~~
+/home/expo/workingdir/build/mobile/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:114903:26: warning: the variable "_getAnimationTimestamp" was not declared in function "computeEasingProgress"
+      var elapsedTime = (_getAnimationTimestamp() - startingTimestamp) / 1000;
+                         ^~~~~~~~~~~~~~~~~~~~~~
+> Task :app:generateAutolinkingPackageList
+> Task :app:generateCodegenSchemaFromJavaScript SKIPPED
+> Task :app:generateCodegenArtifactsFromSchema SKIPPED
+> Task :app:preBuild
+> Task :app:preReleaseBuild
+> Task :app:generateReleaseResValues
+> Task :react-native-safe-area-context:compileReleaseKotlin
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaContextPackage.kt:27:11 'constructor ReactModuleInfo(String, String, Boolean, Boolean, Boolean, Boolean, Boolean)' is deprecated. use ReactModuleInfo(String, String, boolean, boolean, boolean, boolean)]
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaContextPackage.kt:33:27 'getter for hasConstants: Boolean' is deprecated. This property is unused and it's planning to be removed in a future version of
+        React Native. Please refrain from using it.
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaView.kt:59:23 'getter for uiImplementation: UIImplementation!' is deprecated. Deprecated in Java
+> Task :expo-modules-core:javaPreCompileRelease
+> Task :react-native-safe-area-context:javaPreCompileRelease
+> Task :app:mapReleaseSourceSetPaths
+> Task :app:generateReleaseResources
+> Task :expo-modules-core:compileReleaseKotlin
+> Task :react-native-screens:compileReleaseKotlin
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/CustomToolbar.kt:19:53 'FrameCallback' is deprecated. Use Choreographer.FrameCallback instead
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/CustomToolbar.kt:20:38 'FrameCallback' is deprecated. Use Choreographer.FrameCallback instead
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/RNScreensPackage.kt:64:17 'constructor ReactModuleInfo(String, String, Boolean, Boolean, Boolean, Boolean, Boolean)' is deprecated. use ReactModuleInfo(String, String, boolean, boolean, boolean, boolean)]
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:45:77 Unchecked cast: CoordinatorLayout.Behavior<(raw) View!>? to BottomSheetBehavior<Screen>
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenContainer.kt:33:53 'FrameCallback' is deprecated. Use Choreographer.FrameCallback instead
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenContainer.kt:34:38 'FrameCallback' is deprecated. Use Choreographer.FrameCallback instead
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenFooter.kt:252:9 Parameter 'changed' is never used
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenFooter.kt:253:9 Parameter 'left' is never used
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenFooter.kt:254:9 Parameter 'top' is never used
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenFooter.kt:255:9 Parameter 'right' is never used
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenFooter.kt:256:9 Parameter 'bottom' is never used
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:257:31 'setter for targetElevation: Float' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:260:13 'setHasOptionsMenu(Boolean): Unit' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:496:22 'onPrepareOptionsMenu(Menu): Unit' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:504:22 'onCreateOptionsMenu(Menu, MenuInflater): Unit' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfig.kt:100:38 'getter for systemWindowInsetTop: Int' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfigViewManager.kt:7:34 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfigViewManager.kt:209:9 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfigViewManager.kt:211:13 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfigViewManager.kt:213:13 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:7:34 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:375:48 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:376:49 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:377:45 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:378:52 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:379:48 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:380:51 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:381:56 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:382:57 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:383:51 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:55:42 'replaceSystemWindowInsets(Int, Int, Int, Int): WindowInsetsCompat' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:56:39 'getter for systemWindowInsetLeft: Int' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:58:39 'getter for systemWindowInsetRight: Int' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:59:39 'getter for systemWindowInsetBottom: Int' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:98:53 'getter for statusBarColor: Int' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:109:48 'getter for statusBarColor: Int' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:112:32 'setter for statusBarColor: Int' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:208:72 'getter for navigationBarColor: Int' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:214:16 'setter for navigationBarColor: Int' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/SearchBarManager.kt:5:34 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/SearchBarManager.kt:138:66 Elvis operator (?:) always returns the left operand of non-nullable type Boolean
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/SearchBarManager.kt:142:9 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/SearchBarManager.kt:144:13 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/SearchBarManager.kt:146:13 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/SearchBarManager.kt:148:13 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/SearchBarManager.kt:150:13 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/SearchBarManager.kt:152:13 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/SearchBarManager.kt:154:13 'MapBuilder' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/SearchBarView.kt:153:43 Parameter 'flag' is never used
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:7:34 'ReactFeatureFlags' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:25:13 'ReactFeatureFlags' is deprecated. Deprecated in Java
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/paper/java/com/swmansion/rnscreens/FabricEnabledHeaderConfigViewGroup.kt:17:25 Parameter 'wrapper' is never used
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/paper/java/com/swmansion/rnscreens/FabricEnabledViewGroup.kt:10:25 Parameter 'wrapper' is never used
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/paper/java/com/swmansion/rnscreens/FabricEnabledViewGroup.kt:13:9 Parameter 'width' is never used
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/paper/java/com/swmansion/rnscreens/FabricEnabledViewGroup.kt:14:9 Parameter 'height' is never used
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/paper/java/com/swmansion/rnscreens/FabricEnabledViewGroup.kt:15:9 Parameter 'headerHeight' is never used
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/paper/java/com/swmansion/rnscreens/NativeProxy.kt:7:36 Parameter 'fabricUIManager' is never used
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/paper/java/com/swmansion/rnscreens/NativeProxy.kt:11:13 Parameter 'tag' is never used
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/paper/java/com/swmansion/rnscreens/NativeProxy.kt:12:13 Parameter 'view' is never used
+w: file:///home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/paper/java/com/swmansion/rnscreens/NativeProxy.kt:15:33 Parameter 'tag' is never used
+> Task :app:mergeReleaseResources
+> Task :app:createReleaseCompatibleScreenManifests
+> Task :app:extractDeepLinksRelease
+> Task :react-native-safe-area-context:compileReleaseJavaWithJavac
+Note: /home/expo/workingdir/build/mobile/node_modules/react-native-safe-area-context/android/src/paper/java/com/th3rdwave/safeareacontext/NativeSafeAreaContextSpec.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+> Task :react-native-screens:javaPreCompileRelease
+> Task :react-native-safe-area-context:bundleLibRuntimeToDirRelease
+> Task :app:processReleaseMainManifest FAILED
+/home/expo/workingdir/build/mobile/android/app/src/main/AndroidManifest.xml:17:5-159 Warning:
+	Element meta-data#com.google.android.gms.ads.APPLICATION_ID at AndroidManifest.xml:17:5-159 duplicated with element declared at AndroidManifest.xml:16:5-129
+See https://developer.android.com/r/studio-ui/build/manifest-merger for more information about the manifest merger.
+/home/expo/workingdir/build/mobile/android/app/src/main/AndroidManifest.xml:16:73-127 Error:
+	Attribute meta-data#com.google.android.gms.ads.APPLICATION_ID@value value=(ca-app-pub-1580761947831808~4819164448) from AndroidManifest.xml:16:73-127
+	is also present at [:react-native-google-mobile-ads] AndroidManifest.xml:15:13-29 value=().
+	Suggestion: add 'tools:replace="android:value"' to <meta-data> element at AndroidManifest.xml:16:5-129 to override.
+/home/expo/workingdir/build/mobile/android/app/src/main/AndroidManifest.xml:18:85-105 Error:
+	Attribute meta-data#com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT@value value=(true) from AndroidManifest.xml:18:85-105
+	is also present at [:react-native-google-mobile-ads] AndroidManifest.xml:18:13-34 value=(false).
+	Suggestion: add 'tools:replace="android:value"' to <meta-data> element at AndroidManifest.xml:18:5-107 to override.
+> Task :react-native-screens:compileReleaseJavaWithJavac
+Note: /home/expo/workingdir/build/mobile/node_modules/react-native-screens/android/src/paper/java/com/swmansion/rnscreens/NativeScreensModuleSpec.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+FAILURE: Build failed with an exception.
+* What went wrong:
+Execution failed for task ':app:processReleaseMainManifest'.
+> Manifest merger failed with multiple errors, see logs
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+BUILD FAILED in 2m 49s
+221 actionable tasks: 221 executed
+Error: Gradle build failed with unknown error. See logs for the "Run gradlew" phase for more information.
+Fail job
+
+1s
+
+
+Build failed: Gradle build failed with unknown error. See logs for the "Run gradlew" phase for more information.

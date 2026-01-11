@@ -15,9 +15,6 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.housespades.app",
-      "config": {
-        "googleMobileAdsAppId": "ca-app-pub-1580761947831808~5230227983"
-      },
       "infoPlist": {
         "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you. You can still use the app with non-personalized ads if you decline.",
         "SKAdNetworkItems": [
@@ -49,9 +46,6 @@
         "backgroundColor": "#1a1a2e"
       },
       "package": "com.housespades.app",
-      "config": {
-        "googleMobileAdsAppId": "ca-app-pub-1580761947831808~4819164448"
-      },
       "permissions": [
         "com.google.android.gms.permission.AD_ID"
       ]
