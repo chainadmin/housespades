@@ -30,37 +30,35 @@ export function PlayerHand({
     return playableCards.some((c) => c.id === card.id);
   };
 
-  // Calculate overlap based on number of cards and screen width
-  const getCardOffset = (index: number, total: number): number => {
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-    const maxWidth = isMobile ? 320 : 800;
-    const cardWidth = isMobile ? 60 : 80;
-    const baseOffset = Math.min(isMobile ? 45 : 70, (maxWidth - cardWidth) / Math.max(total - 1, 1));
-    return index * baseOffset;
-  };
+  // Calculate overlap based on number of cards - more spacing on mobile for visibility
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+  const cardWidth = isMobile ? 56 : 80;
+  // Increased mobile spacing from 45 to 38 overlap (showing more of each card)
+  const cardSpacing = isMobile ? 38 : 55;
+  const totalWidth = (sortedCards.length - 1) * cardSpacing + cardWidth;
 
   return (
     <motion.div
-      className="relative flex justify-center items-end min-h-28 sm:min-h-36 py-2 sm:py-4 px-2 overflow-x-auto"
+      className="relative flex justify-start sm:justify-center items-end min-h-28 sm:min-h-36 py-2 sm:py-4 px-4 overflow-x-auto"
       data-testid="player-hand"
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
     >
       <div 
-        className="relative flex"
+        className="relative flex flex-shrink-0"
         style={{ 
-          width: `${getCardOffset(sortedCards.length - 1, sortedCards.length) + 80}px`,
+          width: `${totalWidth}px`,
           height: "120px",
         }}
       >
         {sortedCards.map((card, index) => {
-          const offset = getCardOffset(index, sortedCards.length);
+          const offset = index * cardSpacing;
           const isSelected = selectedCard?.id === card.id;
           const canPlay = isPlayable(card) && !disabled;
           
-          // Fan out effect - cards at edges rotate slightly
+          // Reduced fan rotation on mobile for cleaner look
           const centerIndex = (sortedCards.length - 1) / 2;
-          const rotation = (index - centerIndex) * 2;
+          const rotation = isMobile ? (index - centerIndex) * 1 : (index - centerIndex) * 2;
           
           return (
             <motion.div
@@ -84,7 +82,7 @@ export function PlayerHand({
             >
               <PlayingCard
                 card={card}
-                size="md"
+                size={isMobile ? "sm" : "md"}
                 onClick={() => canPlay && onCardClick?.(card)}
                 onDoubleClick={() => canPlay && onCardDoubleClick?.(card)}
                 disabled={!canPlay}
