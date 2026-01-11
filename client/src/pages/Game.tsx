@@ -32,6 +32,7 @@ export default function Game() {
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [showResults, setShowResults] = useState(false);
   const [winningTeamIndex, setWinningTeamIndex] = useState<number | null>(null);
+  const [isGameReady, setIsGameReady] = useState(false);
   
   const [localPlayerId, setLocalPlayerId] = useState("player-1");
   const gameStateRef = useRef<GameState | null>(null);
@@ -89,6 +90,14 @@ export default function Game() {
       wsStartGame(mode, pointGoal, players);
     }
   }, [isMultiplayer, isConnected, wsPlayerId, wsGameState, mode, pointGoal, playerName]);
+
+  // Set game ready after a brief delay for multiplayer when game state arrives
+  useEffect(() => {
+    if (isMultiplayer && wsGameState && !isGameReady) {
+      const timer = setTimeout(() => setIsGameReady(true), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [isMultiplayer, wsGameState, isGameReady]);
 
   const initializeLocalGame = () => {
     const deck = mode === "ace_high" ? generateStandardDeck() : generateJJDDDeck();
@@ -153,6 +162,10 @@ export default function Game() {
     setShowResults(false);
     setWinningTeamIndex(null);
     setSelectedCard(null);
+    
+    // Brief delay to allow cards to render before showing game
+    setIsGameReady(false);
+    setTimeout(() => setIsGameReady(true), 800);
   };
 
   const calculateBotBid = useCallback((hand: Card[]): number => {
@@ -495,26 +508,34 @@ export default function Game() {
     navigate("/");
   };
 
-  if (!gameState) {
+  if (!gameState || !isGameReady) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-          className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full"
+          className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full"
         />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center"
+        >
+          <p className="text-lg font-medium">Shuffling cards...</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            {isMultiplayer ? (
+              isConnected ? "Setting up game..." : "Connecting to server..."
+            ) : (
+              "Preparing your hand"
+            )}
+          </p>
+        </motion.div>
         {isMultiplayer && (
           <div className="flex items-center gap-2 text-muted-foreground">
             {isConnected ? (
-              <>
-                <Wifi className="h-4 w-4 text-green-500" />
-                <span>Connected - Setting up game...</span>
-              </>
+              <Wifi className="h-4 w-4 text-green-500" />
             ) : (
-              <>
-                <WifiOff className="h-4 w-4 text-red-500" />
-                <span>Connecting to server...</span>
-              </>
+              <WifiOff className="h-4 w-4 text-red-500" />
             )}
           </div>
         )}
@@ -524,11 +545,11 @@ export default function Game() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4">
-        <Button variant="ghost" size="icon" onClick={handleReturnToLobby} data-testid="button-back">
+      <header className="absolute top-0 left-0 right-0 z-40 flex items-center justify-between p-4 pointer-events-none">
+        <Button variant="ghost" size="icon" onClick={handleReturnToLobby} data-testid="button-back" className="pointer-events-auto bg-background/80 backdrop-blur-sm">
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 pointer-events-auto">
           {isMultiplayer && (
             <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-accent/50 text-xs">
               {isConnected ? (

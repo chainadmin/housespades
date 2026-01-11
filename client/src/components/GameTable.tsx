@@ -107,25 +107,29 @@ export function GameTable({
 
   return (
     <div className="relative w-full h-screen bg-gradient-to-b from-accent/30 to-background overflow-hidden" data-testid="game-table">
-      {/* Top bar with compact scores - absolute positioned */}
-      <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-2 sm:p-3 border-b bg-background/80 backdrop-blur-sm z-30">
-        <Scoreboard 
-          teams={gameState.teams}
-          players={gameState.players}
-          winningScore={gameState.winningScore}
-          roundNumber={gameState.roundNumber}
-          compact
-        />
+      {/* Top bar with compact scores - absolute positioned, offset left for back button */}
+      <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-2 sm:p-3 border-b bg-background/80 backdrop-blur-sm z-20">
+        <div className="ml-12 sm:ml-14">
+          <Scoreboard 
+            teams={gameState.teams}
+            players={gameState.players}
+            winningScore={gameState.winningScore}
+            roundNumber={gameState.roundNumber}
+            compact
+          />
+        </div>
         
-        {isMyTurn && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="px-3 py-1.5 sm:px-4 sm:py-2 bg-primary text-primary-foreground rounded-full text-xs sm:text-sm font-medium"
-          >
-            Your Turn!
-          </motion.div>
-        )}
+        <div className="mr-12 sm:mr-14">
+          {isMyTurn && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="px-3 py-1.5 sm:px-4 sm:py-2 bg-primary text-primary-foreground rounded-full text-xs sm:text-sm font-medium"
+            >
+              Your Turn!
+            </motion.div>
+          )}
+        </div>
       </div>
 
       {/* North player - top center edge */}
