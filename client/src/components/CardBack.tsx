@@ -32,9 +32,11 @@ export function CardBack({
   const cards = stacked ? Math.min(count, 5) : 1;
   const pos = currentStyle.backPosition;
   const dims = sizeDimensions[size];
-
-  const scaleX = pos.width * 4 / pos.width * dims.width / pos.width;
-  const scaleY = pos.height * 2 / pos.height * dims.height / pos.height;
+  
+  const scaleX = dims.width / pos.width;
+  const scaleY = dims.height / pos.height;
+  const sheetWidth = pos.width * currentStyle.columns;
+  const sheetHeight = pos.height * currentStyle.rows;
 
   return (
     <div className={cn("relative", className)}>
@@ -58,14 +60,13 @@ export function CardBack({
             className="w-full h-full bg-cover bg-no-repeat"
             style={{
               backgroundImage: `url(${currentStyle.spriteSheet})`,
-              backgroundPosition: `-${pos.x * dims.width / pos.width}px -${pos.y * dims.height / pos.height}px`,
-              backgroundSize: `${pos.width * 4 * dims.width / pos.width}px ${pos.height * 2 * dims.height / pos.height}px`,
+              backgroundPosition: `-${pos.x * scaleX}px -${pos.y * scaleY}px`,
+              backgroundSize: `${sheetWidth * scaleX}px ${sheetHeight * scaleY}px`,
             }}
           />
         </motion.div>
       ))}
       
-      {/* Card count badge */}
       {count > 1 && (
         <div className="absolute -top-2 -right-2 bg-secondary text-secondary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-sm z-10">
           {count}

@@ -37,6 +37,12 @@ export function PlayingCard({
     lg: "w-24 h-36 text-lg",
   };
 
+  const sizeDimensions = {
+    sm: { width: 56, height: 80 },
+    md: { width: 80, height: 112 },
+    lg: { width: 96, height: 144 },
+  };
+
   const valueSizeClasses = {
     sm: "text-lg",
     md: "text-xl",
@@ -51,6 +57,21 @@ export function PlayingCard({
 
   const hasCustomFront = currentStyle.hasCustomFront && currentStyle.frontPosition;
   const frontPos = currentStyle.frontPosition;
+  const dims = sizeDimensions[size];
+
+  let bgStyle = {};
+  if (hasCustomFront && frontPos) {
+    const scaleX = dims.width / frontPos.width;
+    const scaleY = dims.height / frontPos.height;
+    const sheetWidth = frontPos.width * currentStyle.columns;
+    const sheetHeight = frontPos.height * currentStyle.rows;
+    
+    bgStyle = {
+      backgroundImage: `url(${currentStyle.spriteSheet})`,
+      backgroundPosition: `-${frontPos.x * scaleX}px -${frontPos.y * scaleY}px`,
+      backgroundSize: `${sheetWidth * scaleX}px ${sheetHeight * scaleY}px`,
+    };
+  }
 
   return (
     <motion.button
@@ -75,21 +96,10 @@ export function PlayingCard({
         !hasCustomFront && "bg-white",
         className
       )}
+      style={hasCustomFront ? bgStyle : undefined}
       data-testid={`card-${card.id}`}
       aria-label={isJokerCard ? (card.value === "BJ" ? "Big Joker" : "Little Joker") : `${displayValue} of ${card.suit}`}
     >
-      {hasCustomFront && frontPos && (
-        <div 
-          className="absolute inset-0 bg-cover bg-no-repeat"
-          style={{
-            backgroundImage: `url(${currentStyle.spriteSheet})`,
-            backgroundPosition: `-${frontPos.x}px -${frontPos.y}px`,
-            backgroundSize: `${frontPos.width * 4}px ${frontPos.height * 2}px`,
-          }}
-        />
-      )}
-
-      {/* Top left corner */}
       <div className={cn(
         "absolute top-1 left-1.5 flex flex-col items-center leading-none z-10",
         suitColorClass,
@@ -99,7 +109,6 @@ export function PlayingCard({
         <span className={symbolSizeClasses[size]}>{suitSymbol}</span>
       </div>
 
-      {/* Center symbol (large) */}
       <div className={cn("absolute inset-0 flex items-center justify-center z-10", suitColorClass)}>
         <span className={cn(
           size === "sm" ? "text-4xl" : size === "md" ? "text-5xl" : "text-6xl",
@@ -109,7 +118,6 @@ export function PlayingCard({
         </span>
       </div>
 
-      {/* Bottom right corner (rotated) */}
       <div className={cn(
         "absolute bottom-1 right-1.5 flex flex-col items-center leading-none rotate-180 z-10",
         suitColorClass,
@@ -119,7 +127,6 @@ export function PlayingCard({
         <span className={symbolSizeClasses[size]}>{suitSymbol}</span>
       </div>
 
-      {/* Joker label */}
       {isJokerCard && (
         <div className="absolute inset-0 flex items-center justify-center z-10">
           <span className={cn(

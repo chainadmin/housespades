@@ -15,6 +15,11 @@ function CardStylePreview({ style, isSelected, onClick }: {
   const pos = style.backPosition;
   const previewWidth = 60;
   const previewHeight = 84;
+  
+  const scaleX = previewWidth / pos.width;
+  const scaleY = previewHeight / pos.height;
+  const sheetWidth = pos.width * style.columns;
+  const sheetHeight = pos.height * style.rows;
 
   return (
     <button
@@ -32,8 +37,8 @@ function CardStylePreview({ style, isSelected, onClick }: {
         className="w-full h-full bg-cover bg-no-repeat"
         style={{
           backgroundImage: `url(${style.spriteSheet})`,
-          backgroundPosition: `-${pos.x * previewWidth / pos.width}px -${pos.y * previewHeight / pos.height}px`,
-          backgroundSize: `${pos.width * 4 * previewWidth / pos.width}px ${pos.height * 2 * previewHeight / pos.height}px`,
+          backgroundPosition: `-${pos.x * scaleX}px -${pos.y * scaleY}px`,
+          backgroundSize: `${sheetWidth * scaleX}px ${sheetHeight * scaleY}px`,
         }}
       />
       {isSelected && (

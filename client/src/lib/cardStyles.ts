@@ -8,12 +8,14 @@ export interface CardStyle {
   backPosition: { x: number; y: number; width: number; height: number };
   frontPosition?: { x: number; y: number; width: number; height: number };
   hasCustomFront: boolean;
+  columns: number;
+  rows: number;
 }
 
-const CARD_WIDTH = 256;
-const CARD_HEIGHT = 358;
-const BASIC_CARD_WIDTH = 400;
-const BASIC_CARD_HEIGHT = 560;
+const ORNATE_CARD_WIDTH = 384;
+const ORNATE_CARD_HEIGHT = 512;
+const BASIC_CARD_WIDTH = 768;
+const BASIC_CARD_HEIGHT = 1024;
 
 export const CARD_STYLES: CardStyle[] = [
   {
@@ -23,65 +25,83 @@ export const CARD_STYLES: CardStyle[] = [
     backPosition: { x: 0, y: 0, width: BASIC_CARD_WIDTH, height: BASIC_CARD_HEIGHT },
     frontPosition: { x: BASIC_CARD_WIDTH, y: 0, width: BASIC_CARD_WIDTH, height: BASIC_CARD_HEIGHT },
     hasCustomFront: true,
+    columns: 2,
+    rows: 1,
   },
   {
     id: "green_spade",
     name: "Green Spade",
     spriteSheet: cardBacksFronts,
-    backPosition: { x: 0, y: 0, width: CARD_WIDTH, height: CARD_HEIGHT },
+    backPosition: { x: 0, y: 0, width: ORNATE_CARD_WIDTH, height: ORNATE_CARD_HEIGHT },
     hasCustomFront: false,
+    columns: 4,
+    rows: 2,
   },
   {
     id: "royal_crest",
     name: "Royal Crest",
     spriteSheet: cardBacksFronts,
-    backPosition: { x: CARD_WIDTH, y: 0, width: CARD_WIDTH, height: CARD_HEIGHT },
+    backPosition: { x: ORNATE_CARD_WIDTH, y: 0, width: ORNATE_CARD_WIDTH, height: ORNATE_CARD_HEIGHT },
     hasCustomFront: false,
+    columns: 4,
+    rows: 2,
   },
   {
     id: "cream_ornate",
     name: "Cream Ornate",
     spriteSheet: cardBacksFronts,
-    backPosition: { x: CARD_WIDTH * 2, y: 0, width: CARD_WIDTH, height: CARD_HEIGHT },
+    backPosition: { x: ORNATE_CARD_WIDTH * 2, y: 0, width: ORNATE_CARD_WIDTH, height: ORNATE_CARD_HEIGHT },
     hasCustomFront: true,
-    frontPosition: { x: CARD_WIDTH * 2, y: 0, width: CARD_WIDTH, height: CARD_HEIGHT },
+    frontPosition: { x: ORNATE_CARD_WIDTH * 2, y: 0, width: ORNATE_CARD_WIDTH, height: ORNATE_CARD_HEIGHT },
+    columns: 4,
+    rows: 2,
   },
   {
     id: "blue_starry",
     name: "Blue Starry",
     spriteSheet: cardBacksFronts,
-    backPosition: { x: CARD_WIDTH * 3, y: 0, width: CARD_WIDTH, height: CARD_HEIGHT },
+    backPosition: { x: ORNATE_CARD_WIDTH * 3, y: 0, width: ORNATE_CARD_WIDTH, height: ORNATE_CARD_HEIGHT },
     hasCustomFront: false,
+    columns: 4,
+    rows: 2,
   },
   {
     id: "purple_cosmic",
     name: "Purple Cosmic",
     spriteSheet: cardBacksFronts,
-    backPosition: { x: 0, y: CARD_HEIGHT, width: CARD_WIDTH, height: CARD_HEIGHT },
+    backPosition: { x: 0, y: ORNATE_CARD_HEIGHT, width: ORNATE_CARD_WIDTH, height: ORNATE_CARD_HEIGHT },
     hasCustomFront: false,
+    columns: 4,
+    rows: 2,
   },
   {
     id: "green_pentacle",
     name: "Green Pentacle",
     spriteSheet: cardBacksFronts,
-    backPosition: { x: CARD_WIDTH, y: CARD_HEIGHT, width: CARD_WIDTH, height: CARD_HEIGHT },
+    backPosition: { x: ORNATE_CARD_WIDTH, y: ORNATE_CARD_HEIGHT, width: ORNATE_CARD_WIDTH, height: ORNATE_CARD_HEIGHT },
     hasCustomFront: false,
+    columns: 4,
+    rows: 2,
   },
   {
     id: "green_cloudy",
     name: "Green Cloudy",
     spriteSheet: cardBacksFronts,
-    backPosition: { x: CARD_WIDTH * 2, y: CARD_HEIGHT, width: CARD_WIDTH, height: CARD_HEIGHT },
+    backPosition: { x: ORNATE_CARD_WIDTH * 2, y: ORNATE_CARD_HEIGHT, width: ORNATE_CARD_WIDTH, height: ORNATE_CARD_HEIGHT },
     hasCustomFront: true,
-    frontPosition: { x: CARD_WIDTH * 2, y: CARD_HEIGHT, width: CARD_WIDTH, height: CARD_HEIGHT },
+    frontPosition: { x: ORNATE_CARD_WIDTH * 2, y: ORNATE_CARD_HEIGHT, width: ORNATE_CARD_WIDTH, height: ORNATE_CARD_HEIGHT },
+    columns: 4,
+    rows: 2,
   },
   {
     id: "blue_sky",
     name: "Blue Sky",
     spriteSheet: cardBacksFronts,
-    backPosition: { x: CARD_WIDTH * 3, y: CARD_HEIGHT, width: CARD_WIDTH, height: CARD_HEIGHT },
+    backPosition: { x: ORNATE_CARD_WIDTH * 3, y: ORNATE_CARD_HEIGHT, width: ORNATE_CARD_WIDTH, height: ORNATE_CARD_HEIGHT },
     hasCustomFront: true,
-    frontPosition: { x: CARD_WIDTH * 3, y: CARD_HEIGHT, width: CARD_WIDTH, height: CARD_HEIGHT },
+    frontPosition: { x: ORNATE_CARD_WIDTH * 3, y: ORNATE_CARD_HEIGHT, width: ORNATE_CARD_WIDTH, height: ORNATE_CARD_HEIGHT },
+    columns: 4,
+    rows: 2,
   },
 ];
 
