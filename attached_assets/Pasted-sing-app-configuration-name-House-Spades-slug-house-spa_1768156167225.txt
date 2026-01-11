@@ -1,0 +1,79 @@
+sing app configuration:
+{
+  "name": "House Spades",
+  "slug": "house-spades",
+  "version": "1.0.0",
+  "orientation": "portrait",
+  "icon": "./assets/icon.png",
+  "userInterfaceStyle": "automatic",
+  "newArchEnabled": true,
+  "splash": {
+    "image": "./assets/splash.png",
+    "resizeMode": "contain",
+    "backgroundColor": "#1a1a2e"
+  },
+  "ios": {
+    "supportsTablet": true,
+    "bundleIdentifier": "com.housespades.app",
+    "infoPlist": {
+      "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you. You can still use the app with non-personalized ads if you decline.",
+      "SKAdNetworkItems": [
+        {
+          "SKAdNetworkIdentifier": "cstr6suwn9.skadnetwork"
+        },
+        {
+          "SKAdNetworkIdentifier": "4fzdc2evr5.skadnetwork"
+        },
+        {
+          "SKAdNetworkIdentifier": "2fnua5tdw4.skadnetwork"
+        }
+      ]
+    }
+  },
+  "android": {
+    "adaptiveIcon": {
+      "foregroundImage": "./assets/adaptive-icon.png",
+      "backgroundColor": "#1a1a2e"
+    },
+    "package": "com.housespades.app",
+    "permissions": [
+      "com.google.android.gms.permission.AD_ID"
+    ]
+  },
+  "web": {
+    "favicon": "./assets/favicon.png",
+    "bundler": "metro"
+  },
+  "scheme": "housespades",
+  "plugins": [
+    "expo-router",
+    "expo-secure-store",
+    [
+      "expo-tracking-transparency",
+      {
+        "userTrackingPermission": "This identifier will be used to deliver personalized ads to you."
+      }
+    ],
+    [
+      "react-native-google-mobile-ads",
+      {
+        "androidAppId": "ca-app-pub-1580761947831808~4819164448",
+        "iosAppId": "ca-app-pub-1580761947831808~5230227983"
+      }
+    ]
+  ],
+  "extra": {
+    "eas": {
+      "projectId": "your-eas-project-id"
+    },
+    "router": {
+      "origin": false
+    }
+  },
+  "sdkVersion": "52.0.0",
+  "platforms": [
+    "ios",
+    "android"
+  ]
+}
+Error: The value of the "extra.eas.projectId" field (your-eas-project-id) in the app config does not match the current project id (28f71604-478a-448b-ae73-00579715d806). Make sure you connected your GitHub repository to the correct Expo project. Learn more: https://expo.fyi/eas-config-mismatch.
