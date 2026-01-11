@@ -13,32 +13,31 @@ function CardStylePreview({ style, isSelected, onClick }: {
   onClick: () => void;
 }) {
   const pos = style.backPosition;
-  const previewWidth = 60;
-  const previewHeight = 84;
+  const col = pos.x / pos.width;
+  const row = pos.y / pos.height;
   
-  const scaleX = previewWidth / pos.width;
-  const scaleY = previewHeight / pos.height;
-  const sheetWidth = pos.width * style.columns;
-  const sheetHeight = pos.height * style.rows;
+  const bgSizeX = style.columns * 100;
+  const bgSizeY = style.rows * 100;
+  const bgPosX = style.columns > 1 ? (col / (style.columns - 1)) * 100 : 0;
+  const bgPosY = style.rows > 1 ? (row / (style.rows - 1)) * 100 : 0;
 
   return (
     <button
       onClick={onClick}
       className={cn(
-        "relative rounded-lg overflow-hidden border-2 transition-all",
+        "relative rounded-lg overflow-hidden border-2 transition-all w-[60px] h-[84px]",
         isSelected 
           ? "border-primary ring-2 ring-primary ring-offset-2" 
           : "border-gray-300 hover:border-gray-400"
       )}
-      style={{ width: previewWidth, height: previewHeight }}
       data-testid={`card-style-${style.id}`}
     >
       <div 
-        className="w-full h-full bg-cover bg-no-repeat"
+        className="w-full h-full"
         style={{
           backgroundImage: `url(${style.spriteSheet})`,
-          backgroundPosition: `-${pos.x * scaleX}px -${pos.y * scaleY}px`,
-          backgroundSize: `${sheetWidth * scaleX}px ${sheetHeight * scaleY}px`,
+          backgroundPosition: `${bgPosX}% ${bgPosY}%`,
+          backgroundSize: `${bgSizeX}% ${bgSizeY}%`,
         }}
       />
       {isSelected && (

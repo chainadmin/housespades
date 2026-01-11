@@ -1,5 +1,3 @@
-import { memo } from "react";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useCardStyle } from "@/hooks/useCardStyle";
 
@@ -10,7 +8,7 @@ interface CardBackProps {
   stacked?: boolean;
 }
 
-const CardBackInner = memo(function CardBackInner({ 
+export function CardBack({ 
   count = 1, 
   size = "md", 
   className,
@@ -24,29 +22,22 @@ const CardBackInner = memo(function CardBackInner({
     lg: "w-24 h-36",
   };
 
-  const sizeDimensions = {
-    sm: { width: 56, height: 80 },
-    md: { width: 80, height: 112 },
-    lg: { width: 96, height: 144 },
-  };
+  const pos = currentStyle.backPosition;
+  const col = pos.x / pos.width;
+  const row = pos.y / pos.height;
+  
+  const bgSizeX = currentStyle.columns * 100;
+  const bgSizeY = currentStyle.rows * 100;
+  const bgPosX = currentStyle.columns > 1 ? (col / (currentStyle.columns - 1)) * 100 : 0;
+  const bgPosY = currentStyle.rows > 1 ? (row / (currentStyle.rows - 1)) * 100 : 0;
 
   const cards = stacked ? Math.min(count, 5) : 1;
-  const pos = currentStyle.backPosition;
-  const dims = sizeDimensions[size];
-  
-  const scaleX = dims.width / pos.width;
-  const scaleY = dims.height / pos.height;
-  const sheetWidth = pos.width * currentStyle.columns;
-  const sheetHeight = pos.height * currentStyle.rows;
 
   return (
     <div className={cn("relative", className)}>
       {Array.from({ length: cards }).map((_, index) => (
-        <motion.div
+        <div
           key={index}
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: index * 0.05 }}
           className={cn(
             "rounded-lg shadow-md overflow-hidden border-2 border-gray-300",
             sizeClasses[size],
@@ -55,17 +46,11 @@ const CardBackInner = memo(function CardBackInner({
           style={{
             transform: stacked ? `translate(${index * 2}px, ${index * -1}px)` : undefined,
             zIndex: cards - index,
+            backgroundImage: `url(${currentStyle.spriteSheet})`,
+            backgroundPosition: `${bgPosX}% ${bgPosY}%`,
+            backgroundSize: `${bgSizeX}% ${bgSizeY}%`,
           }}
-        >
-          <div 
-            className="w-full h-full"
-            style={{
-              backgroundImage: `url(${currentStyle.spriteSheet})`,
-              backgroundPosition: `-${pos.x * scaleX}px -${pos.y * scaleY}px`,
-              backgroundSize: `${sheetWidth * scaleX}px ${sheetHeight * scaleY}px`,
-            }}
-          />
-        </motion.div>
+        />
       ))}
       
       {count > 1 && (
@@ -75,8 +60,4 @@ const CardBackInner = memo(function CardBackInner({
       )}
     </div>
   );
-});
-
-export function CardBack(props: CardBackProps) {
-  return <CardBackInner {...props} />;
 }

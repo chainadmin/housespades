@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import type { Card } from "@shared/schema";
 import { getSuitSymbol, getSuitColor, formatCardValue, isJoker } from "@/lib/gameUtils";
 import { cn } from "@/lib/utils";
@@ -48,25 +47,16 @@ export function PlayingCard({
   };
 
   return (
-    <motion.button
+    <button
       onClick={onClick}
       onDoubleClick={onDoubleClick}
       disabled={disabled}
-      whileHover={!disabled ? { y: -8, scale: 1.02 } : undefined}
-      whileTap={!disabled ? { scale: 0.98 } : undefined}
-      initial={{ opacity: 1, scale: 0.8 }}
-      animate={{ 
-        opacity: 1, 
-        scale: 1,
-        y: selected ? -12 : 0,
-      }}
-      transition={{ type: "spring", stiffness: 400, damping: 25 }}
       className={cn(
-        "relative flex flex-col items-center justify-between rounded-lg bg-white border-2 border-gray-300 shadow-md cursor-pointer select-none p-1.5",
+        "relative flex flex-col items-center justify-between rounded-lg bg-white border-2 border-gray-300 shadow-md cursor-pointer select-none p-1.5 transition-transform",
         sizeClasses[size],
-        disabled && "cursor-not-allowed grayscale-[30%]",
-        selected && "ring-2 ring-primary ring-offset-2",
-        !disabled && "hover:shadow-lg",
+        disabled && "cursor-not-allowed opacity-70",
+        selected && "ring-2 ring-primary ring-offset-2 -translate-y-3",
+        !disabled && "hover:shadow-lg hover:-translate-y-2",
         className
       )}
       data-testid={`card-${card.id}`}
@@ -94,7 +84,7 @@ export function PlayingCard({
       {isJokerCard && (
         <div className="absolute inset-0 flex items-center justify-center">
           <span className={cn(
-            "font-bold text-center rotate-0",
+            "font-bold text-center",
             card.value === "BJ" ? "text-red-500" : "text-gray-900",
             size === "sm" ? "text-[8px]" : size === "md" ? "text-[10px]" : "text-xs"
           )}>
@@ -102,6 +92,6 @@ export function PlayingCard({
           </span>
         </div>
       )}
-    </motion.button>
+    </button>
   );
 }

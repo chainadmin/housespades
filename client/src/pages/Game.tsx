@@ -1,215 +1,196 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useLocation, useSearch } from "wouter";
+import { useLocation } from "wouter";
 import { motion } from "framer-motion";
+import { ArrowLeft, Wifi, WifiOff } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { GameTable } from "@/components/GameTable";
 import { GameResultsModal } from "@/components/GameResultsModal";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Button } from "@/components/ui/button";
 import { useWebSocket } from "@/hooks/useWebSocket";
-import { useToast } from "@/hooks/use-toast";
-import type { GameState, Card, Player, Team, GameMode, PointGoal, Position } from "@shared/schema";
-import { getCardPower, isTrump, POINT_GOAL_VALUES } from "@shared/schema";
+import type { GameState, Card, Player, Team, Suit, GameMode, PointGoal } from "@shared/schema";
+import { getCardPower } from "@shared/schema";
 import { generateStandardDeck, generateJJDDDeck, shuffleArray, sortHand } from "@/lib/gameUtils";
-import { ArrowLeft, Wifi, WifiOff } from "lucide-react";
-
-const BOT_NAMES = ["SpadeMaster", "TrickTaker", "CardShark", "AceHunter"];
-const POSITIONS: Position[] = ["south", "west", "north", "east"];
 
 export default function Game() {
   const [, navigate] = useLocation();
-  const searchString = useSearch();
-  const params = new URLSearchParams(searchString);
-  const { toast } = useToast();
-  
-  const mode = (params.get("mode") as GameMode) || "ace_high";
-  const pointGoal = (params.get("points") as PointGoal) || "300";
-  const gameType = params.get("type") || "solo";
-  const playerName = params.get("name") || "You";
-  
+  const searchParams = new URLSearchParams(window.location.search);
+  const mode = (searchParams.get("mode") as GameMode) || "ace_high";
+  const pointGoal = (searchParams.get("points") as PointGoal) || "300";
+  const pointGoalNum = parseInt(pointGoal, 10);
+  const gameType = searchParams.get("type") || "solo";
+  const playerName = searchParams.get("name") || "Player";
+
   const isMultiplayer = gameType === "multiplayer";
-  
+
   const [localGameState, setLocalGameState] = useState<GameState | null>(null);
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [showResults, setShowResults] = useState(false);
-  const [winningTeamIndex, setWinningTeamIndex] = useState<number | null>(null);
-  
-  const [localPlayerId, setLocalPlayerId] = useState("player-1");
+  const [winningTeamIndex, setWinningTeamIndex] = useState<number>(-1);
+  const [playerId, setPlayerId] = useState<string>("player-1");
+
   const gameStateRef = useRef<GameState | null>(null);
-  
+
+  useEffect(() => {
+    gameStateRef.current = localGameState;
+  }, [localGameState]);
+
   const {
     connect,
-    disconnect,
     isConnected,
-    playerId: wsPlayerId,
     gameState: wsGameState,
-    startGame: wsStartGame,
-    placeBid: wsPlaceBid,
     playCard: wsPlayCard,
+    placeBid: wsPlaceBid,
     leaveLobby,
   } = useWebSocket({
-    onError: (message) => {
-      toast({
-        title: "Game Error",
-        description: message,
-        variant: "destructive",
-      });
-    },
-    onPlayerJoined: (id) => {
-      setLocalPlayerId(id);
+    autoConnect: isMultiplayer,
+    onGameStateUpdate: (state) => {
+      if (state.players) {
+        const me = state.players.find((p: Player) => p.name === playerName);
+        if (me) setPlayerId(me.id);
+      }
     },
   });
 
-  const gameState = isMultiplayer && wsGameState ? wsGameState : localGameState;
-  const playerId = isMultiplayer && wsPlayerId ? wsPlayerId : localPlayerId;
+  const gameState = isMultiplayer ? wsGameState : localGameState;
 
-  useEffect(() => {
-    gameStateRef.current = gameState;
-  }, [gameState]);
-
-  useEffect(() => {
-    if (isMultiplayer) {
-      connect();
-      return () => {
-        leaveLobby();
-        disconnect();
-      };
-    } else {
-      initializeLocalGame();
-    }
-  }, [isMultiplayer, mode, pointGoal]);
-
-  useEffect(() => {
-    if (isMultiplayer && isConnected && wsPlayerId && !wsGameState) {
-      const players = [
-        { id: wsPlayerId, name: playerName, isBot: false },
-        { id: "bot-1", name: BOT_NAMES[0], isBot: true },
-        { id: "bot-2", name: BOT_NAMES[1], isBot: true },
-        { id: "bot-3", name: BOT_NAMES[2], isBot: true },
-      ];
-      wsStartGame(mode, pointGoal, players);
-    }
-  }, [isMultiplayer, isConnected, wsPlayerId, wsGameState, mode, pointGoal, playerName]);
-
-  const initializeLocalGame = () => {
+  const initializeLocalGame = useCallback(() => {
     const deck = mode === "ace_high" ? generateStandardDeck() : generateJJDDDeck();
-    const shuffledDeck = shuffleArray(deck);
-    
-    const players: Player[] = POSITIONS.map((position, index) => ({
-      id: index === 0 ? localPlayerId : `bot-${index}`,
-      name: index === 0 ? playerName : BOT_NAMES[index - 1],
-      isBot: index !== 0,
-      position,
-      hand: [],
-      bid: null,
-      tricks: 0,
-      isReady: true,
-    }));
+    const shuffled = shuffleArray(deck);
 
-    const cardsPerPlayer = 13;
-    players.forEach((player, index) => {
-      player.hand = shuffledDeck.slice(index * cardsPerPlayer, (index + 1) * cardsPerPlayer);
-      player.hand = sortHand(player.hand, mode);
-    });
+    const botNames = ["Bot Alice", "Bot Bob", "Bot Carol"];
+    const players: Player[] = [
+      {
+        id: "player-1",
+        name: playerName,
+        position: "south",
+        hand: sortHand(shuffled.slice(0, 13), mode),
+        bid: null,
+        tricks: 0,
+        isBot: false,
+        isReady: true,
+      },
+      {
+        id: "bot-1",
+        name: botNames[0],
+        position: "west",
+        hand: sortHand(shuffled.slice(13, 26), mode),
+        bid: null,
+        tricks: 0,
+        isBot: true,
+        isReady: true,
+      },
+      {
+        id: "bot-2",
+        name: botNames[1],
+        position: "north",
+        hand: sortHand(shuffled.slice(26, 39), mode),
+        bid: null,
+        tricks: 0,
+        isBot: true,
+        isReady: true,
+      },
+      {
+        id: "bot-3",
+        name: botNames[2],
+        position: "east",
+        hand: sortHand(shuffled.slice(39, 52), mode),
+        bid: null,
+        tricks: 0,
+        isBot: true,
+        isReady: true,
+      },
+    ];
 
     const teams: Team[] = [
       {
         id: "team-1",
-        players: [players[0].id, players[2].id],
+        players: ["player-1", "bot-2"],
         score: 0,
         bags: 0,
-        totalBid: null,
         tricksWon: 0,
+        totalBid: null,
       },
       {
         id: "team-2",
-        players: [players[1].id, players[3].id],
+        players: ["bot-1", "bot-3"],
         score: 0,
         bags: 0,
-        totalBid: null,
         tricksWon: 0,
+        totalBid: null,
       },
     ];
 
-    const initialState: GameState = {
+    const newGameState: GameState = {
       id: `game-${Date.now()}`,
       mode,
       pointGoal,
       phase: "bidding",
       players,
       teams,
-      currentTrick: {
-        cards: [],
-        leadSuit: null,
-        winnerId: null,
-      },
       currentPlayerIndex: 0,
-      dealerIndex: 0,
+      dealerIndex: 3,
+      currentTrick: { cards: [], leadSuit: null, winnerId: null },
       roundNumber: 1,
+      winningScore: pointGoalNum,
       spadesBroken: false,
-      winningScore: POINT_GOAL_VALUES[pointGoal],
     };
 
-    setLocalGameState(initialState);
+    setLocalGameState(newGameState);
+    setPlayerId("player-1");
     setShowResults(false);
-    setWinningTeamIndex(null);
-    setSelectedCard(null);
-  };
+    setWinningTeamIndex(-1);
+  }, [mode, pointGoal, pointGoalNum, playerName]);
+
+  useEffect(() => {
+    if (!isMultiplayer) {
+      initializeLocalGame();
+    }
+  }, [isMultiplayer, initializeLocalGame]);
 
   const calculateBotBid = useCallback((hand: Card[]): number => {
     let bid = 0;
     
+    const spades = hand.filter((c) => c.suit === "spades");
+    bid += Math.floor(spades.length / 3);
+    
     hand.forEach((card) => {
       if (card.value === "A") bid += 1;
       if (card.value === "K") bid += 0.5;
-      if (card.value === "Q") bid += 0.25;
-      if (card.suit === "spades") bid += 0.5;
-      if (card.value === "BJ") bid += 2;
-      if (card.value === "LJ") bid += 1.5;
-      if (card.suit === "spades" && card.value === "2") bid += 1.5;
+      if (card.value === "BJ" || card.value === "LJ") bid += 1.5;
     });
     
-    const spadeCount = hand.filter((c) => c.suit === "spades" || c.value === "LJ" || c.value === "BJ").length;
-    bid += Math.max(0, spadeCount - 2) * 0.5;
-    
-    return Math.max(1, Math.min(6, Math.round(bid)));
+    bid = Math.max(1, Math.min(13, Math.round(bid)));
+    return bid;
   }, []);
 
-  const selectBotCard = useCallback((state: GameState, botIndex: number): Card => {
+  const selectBotCard = useCallback((state: GameState, botIndex: number): Card | null => {
     const bot = state.players[botIndex];
+    if (!bot || bot.hand.length === 0) return null;
+
+    const leadSuit = state.currentTrick.leadSuit;
     const hand = bot.hand;
-    const trick = state.currentTrick;
-    const leadSuit = trick.leadSuit;
-    
-    let playable = hand;
-    if (leadSuit) {
-      const suitCards = hand.filter((c) => c.suit === leadSuit);
-      if (suitCards.length > 0) playable = suitCards;
-    } else if (!state.spadesBroken) {
-      const nonSpades = hand.filter((c) => !isTrump(c, state.mode));
-      if (nonSpades.length > 0) playable = nonSpades;
-    }
-    
-    const sorted = [...playable].sort((a, b) => 
-      getCardPower(a, state.mode, leadSuit) - getCardPower(b, state.mode, leadSuit)
-    );
-    
+
     if (!leadSuit) {
-      return sorted[Math.floor(sorted.length / 2)];
+      if (!state.spadesBroken) {
+        const nonSpades = hand.filter((c) => c.suit !== "spades");
+        if (nonSpades.length > 0) {
+          return nonSpades[Math.floor(Math.random() * nonSpades.length)];
+        }
+      }
+      return hand[Math.floor(Math.random() * hand.length)];
     }
-    
-    const currentWinningPower = trick.cards.reduce((max, { card }) => {
-      return Math.max(max, getCardPower(card, state.mode, leadSuit));
-    }, 0);
-    
-    const winningCards = sorted.filter(
-      (c) => getCardPower(c, state.mode, leadSuit) > currentWinningPower
-    );
-    
-    if (winningCards.length > 0 && Math.random() > 0.3) {
-      return winningCards[0];
+
+    const suitCards = hand.filter((c) => c.suit === leadSuit);
+    if (suitCards.length > 0) {
+      return suitCards[Math.floor(Math.random() * suitCards.length)];
     }
-    
-    return sorted[0];
+
+    const spades = hand.filter((c) => c.suit === "spades");
+    if (spades.length > 0 && Math.random() > 0.3) {
+      return spades[0];
+    }
+
+    return hand[Math.floor(Math.random() * hand.length)];
   }, []);
 
   const handleBid = useCallback((bid: number) => {
@@ -217,21 +198,17 @@ export default function Game() {
       wsPlaceBid(bid);
       return;
     }
-    
-    if (!localGameState) return;
-    
+
     setLocalGameState((prev) => {
       if (!prev) return prev;
-      
-      const newPlayers = prev.players.map((p, i) => 
+
+      const newPlayers = prev.players.map((p, i) =>
         i === prev.currentPlayerIndex ? { ...p, bid } : p
       );
-      
+
       const allBid = newPlayers.every((p) => p.bid !== null);
-      
+
       let newTeams = prev.teams;
-      let newPhase = prev.phase;
-      
       if (allBid) {
         newTeams = prev.teams.map((team) => {
           const teamBid = team.players.reduce((sum, pid) => {
@@ -240,76 +217,68 @@ export default function Game() {
           }, 0);
           return { ...team, totalBid: teamBid };
         });
-        newPhase = "playing";
       }
-      
+
       return {
         ...prev,
         players: newPlayers,
         teams: newTeams,
-        phase: newPhase,
-        currentPlayerIndex: allBid ? (prev.dealerIndex + 1) % 4 : (prev.currentPlayerIndex + 1) % 4,
+        currentPlayerIndex: allBid ? 0 : (prev.currentPlayerIndex + 1) % 4,
+        phase: allBid ? "playing" : "bidding",
       };
     });
-  }, [isMultiplayer, localGameState, wsPlaceBid]);
+  }, [isMultiplayer, wsPlaceBid]);
 
   const handlePlayCard = useCallback((card: Card) => {
     if (isMultiplayer) {
       wsPlayCard(card.id);
       return;
     }
-    
-    if (!localGameState) return;
-    
+
     setLocalGameState((prev) => {
-      if (!prev) return prev;
+      if (!prev || prev.phase !== "playing") return prev;
       
       const currentPlayer = prev.players[prev.currentPlayerIndex];
       if (!currentPlayer) return prev;
       
-      const newPlayers = prev.players.map((p, i) => {
-        if (i === prev.currentPlayerIndex) {
-          return {
-            ...p,
-            hand: p.hand.filter((c) => c.id !== card.id),
-          };
-        }
-        return p;
-      });
+      const hasCard = currentPlayer.hand.some((c) => c.id === card.id);
+      if (!hasCard) return prev;
       
+      const newPlayers = prev.players.map((p, i) =>
+        i === prev.currentPlayerIndex
+          ? { ...p, hand: p.hand.filter((c) => c.id !== card.id) }
+          : p
+      );
+      
+      const leadSuit = prev.currentTrick.leadSuit || card.suit;
       const newTrickCards = [
         ...prev.currentTrick.cards,
         { playerId: currentPlayer.id, card },
       ];
       
-      const leadSuit = prev.currentTrick.leadSuit || card.suit;
-      
       let spadesBroken = prev.spadesBroken;
-      if (isTrump(card, prev.mode)) {
+      if (card.suit === "spades") {
         spadesBroken = true;
       }
       
       if (newTrickCards.length === 4) {
         let winningIndex = 0;
-        let highestPower = 0;
+        let winningPower = -1;
         
-        newTrickCards.forEach(({ card: c }, index) => {
-          const power = getCardPower(c, prev.mode, leadSuit);
-          if (power > highestPower) {
-            highestPower = power;
-            winningIndex = index;
+        newTrickCards.forEach((tc, i) => {
+          const power = getCardPower(tc.card, prev.mode, leadSuit as Suit);
+          if (power > winningPower) {
+            winningPower = power;
+            winningIndex = i;
           }
         });
         
         const winnerId = newTrickCards[winningIndex].playerId;
-        const winnerPlayerIndex = newPlayers.findIndex((p) => p.id === winnerId);
+        const winnerPlayerIndex = prev.players.findIndex((p) => p.id === winnerId);
         
-        const updatedPlayers = newPlayers.map((p) => {
-          if (p.id === winnerId) {
-            return { ...p, tricks: p.tricks + 1 };
-          }
-          return p;
-        });
+        const updatedPlayers = newPlayers.map((p) =>
+          p.id === winnerId ? { ...p, tricks: p.tricks + 1 } : p
+        );
         
         const updatedTeams = prev.teams.map((team) => {
           if (team.players.includes(winnerId)) {
@@ -318,60 +287,47 @@ export default function Game() {
           return team;
         });
         
-        const cardsRemaining = updatedPlayers.reduce((sum, p) => sum + p.hand.length, 0);
+        const roundOver = updatedPlayers.every((p) => p.hand.length === 0);
         
-        if (cardsRemaining === 0) {
+        if (roundOver) {
           const finalTeams = updatedTeams.map((team) => {
-            const tricksWon = team.tricksWon;
-            let points = 0;
+            const teamBid = team.totalBid || 0;
+            const teamTricks = team.tricksWon;
+            let roundScore = 0;
             let newBags = team.bags;
             
-            const teamPlayers = team.players.map((pid) => updatedPlayers.find((p) => p.id === pid)!);
-            let nilBonus = 0;
-            
-            teamPlayers.forEach((player) => {
-              if (player.bid === 0) {
-                if (player.tricks === 0) {
-                  nilBonus += 100;
-                } else {
-                  nilBonus -= 100;
-                  newBags += player.tricks;
-                }
+            if (teamTricks >= teamBid) {
+              roundScore = teamBid * 10;
+              const overtricks = teamTricks - teamBid;
+              roundScore += overtricks;
+              newBags += overtricks;
+              
+              if (newBags >= 10) {
+                roundScore -= 100;
+                newBags -= 10;
               }
-            });
-            
-            const regularBid = teamPlayers.reduce((sum, p) => sum + (p.bid === 0 ? 0 : (p.bid || 0)), 0);
-            const regularTricks = tricksWon - teamPlayers.reduce((sum, p) => sum + (p.bid === 0 ? p.tricks : 0), 0);
-            
-            if (regularBid > 0) {
-              if (regularTricks >= regularBid) {
-                const overtricks = regularTricks - regularBid;
-                points = regularBid * 10 + overtricks;
-                newBags += overtricks;
-              } else {
-                points = -regularBid * 10;
-              }
+            } else {
+              roundScore = -teamBid * 10;
             }
             
-            if (newBags >= 10) {
-              points -= 100;
-              newBags = newBags % 10;
-            }
-            
-            points += nilBonus;
-            
-            return { ...team, score: team.score + points, bags: newBags, tricksWon: 0, totalBid: null };
+            return {
+              ...team,
+              score: team.score + roundScore,
+              bags: newBags,
+              tricksWon: 0,
+              totalBid: null,
+            };
           });
           
-          const winnerIdx = finalTeams.findIndex((t) => t.score >= prev.winningScore);
-          if (winnerIdx !== -1) {
+          const gameOver = finalTeams.some((t) => t.score >= prev.winningScore);
+          
+          if (gameOver) {
             return {
               ...prev,
-              players: updatedPlayers.map((p) => ({ ...p, bid: null, tricks: 0 })),
+              players: updatedPlayers,
               teams: finalTeams,
-              currentTrick: { cards: [], leadSuit: null, winnerId },
+              currentTrick: { cards: newTrickCards, leadSuit, winnerId },
               phase: "game_over" as const,
-              currentPlayerIndex: winnerPlayerIndex,
             };
           }
           
@@ -425,7 +381,7 @@ export default function Game() {
         spadesBroken,
       };
     });
-  }, [isMultiplayer, localGameState, wsPlayCard]);
+  }, [isMultiplayer, wsPlayCard]);
 
   const handleBidRef = useRef(handleBid);
   const handlePlayCardRef = useRef(handlePlayCard);
@@ -476,7 +432,7 @@ export default function Game() {
       setWinningTeamIndex(winnerIdx);
       setTimeout(() => setShowResults(true), 1000);
     }
-  }, [gameState?.phase]);
+  }, [gameState?.phase, gameState?.teams, gameState?.winningScore]);
 
   const handlePlayAgain = () => {
     if (isMultiplayer) {
@@ -523,12 +479,13 @@ export default function Game() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between p-4 pointer-events-none">
-        <Button variant="ghost" size="icon" onClick={handleReturnToLobby} data-testid="button-back" className="pointer-events-auto">
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Fixed header with back button and controls */}
+      <header className="flex items-center justify-between p-3 border-b bg-background/95 backdrop-blur-sm z-50 shrink-0">
+        <Button variant="ghost" size="icon" onClick={handleReturnToLobby} data-testid="button-back">
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <div className="flex items-center gap-2 pointer-events-auto">
+        <div className="flex items-center gap-2">
           {isMultiplayer && (
             <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-accent/50 text-xs">
               {isConnected ? (
@@ -548,14 +505,17 @@ export default function Game() {
         </div>
       </header>
 
-      <GameTable
-        gameState={gameState}
-        playerId={playerId}
-        onPlayCard={handlePlayCard}
-        onBid={handleBid}
-        selectedCard={selectedCard}
-        onSelectCard={setSelectedCard}
-      />
+      {/* Game table takes remaining space */}
+      <div className="flex-1 relative overflow-hidden">
+        <GameTable
+          gameState={gameState}
+          playerId={playerId}
+          onPlayCard={handlePlayCard}
+          onBid={handleBid}
+          selectedCard={selectedCard}
+          onSelectCard={setSelectedCard}
+        />
+      </div>
 
       <GameResultsModal
         isOpen={showResults}
