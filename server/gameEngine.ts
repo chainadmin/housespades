@@ -147,6 +147,17 @@ export class GameEngine {
     };
   }
 
+  // Helper to check if a card acts as a spade (for play restrictions)
+  static actsAsSpade(card: Card, mode: GameMode): boolean {
+    if (card.suit === "spades") return true;
+    if (mode === "joker_joker_deuce_deuce") {
+      // In JJDD mode, 2♦, jokers all act as spades for play restrictions
+      if (card.value === "LJ" || card.value === "BJ") return true;
+      if (card.suit === "diamonds" && card.value === "2") return true;
+    }
+    return false;
+  }
+
   // Get playable cards for a player
   static getPlayableCards(state: GameState, playerIndex: number): Card[] {
     const player = state.players[playerIndex];
@@ -156,16 +167,31 @@ export class GameEngine {
     const leadSuit = state.currentTrick.leadSuit;
 
     if (!leadSuit) {
-      // Leading - can play anything if spades broken, or non-spades otherwise
+      // Leading - can play anything if spades broken, or non-trumps otherwise
       if (!state.spadesBroken) {
-        const nonSpades = hand.filter((c) => !isTrump(c, state.mode));
-        if (nonSpades.length > 0) return nonSpades;
+        // Filter out all cards that act as spades (including 2♦ in JJDD mode)
+        const nonTrumps = hand.filter((c) => !this.actsAsSpade(c, state.mode));
+        if (nonTrumps.length > 0) return nonTrumps;
       }
       return hand;
     }
 
-    // Must follow suit if possible
-    const suitCards = hand.filter((c) => c.suit === leadSuit);
+    // If spades lead, can play any trump (spades, 2♦, jokers in JJDD)
+    if (leadSuit === "spades") {
+      const trumpCards = hand.filter((c) => this.actsAsSpade(c, state.mode));
+      if (trumpCards.length > 0) return trumpCards;
+      // No trumps, can play anything
+      return hand;
+    }
+
+    // Non-spade suit leads - must follow suit if possible (2♦ doesn't count as diamonds!)
+    const suitCards = hand.filter((c) => {
+      // In JJDD mode, 2♦ acts as a spade, not a diamond
+      if (state.mode === "joker_joker_deuce_deuce" && c.suit === "diamonds" && c.value === "2") {
+        return false;
+      }
+      return c.suit === leadSuit;
+    });
     if (suitCards.length > 0) return suitCards;
 
     // Can't follow suit, can play anything

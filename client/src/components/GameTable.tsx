@@ -60,6 +60,17 @@ export function GameTable({
     return teamIndex === 0 ? "primary" as const : "secondary" as const;
   };
 
+  // Helper to check if a card acts as a spade (for play restrictions)
+  const actsAsSpade = (card: Card): boolean => {
+    if (card.suit === "spades") return true;
+    if (gameState.mode === "joker_joker_deuce_deuce") {
+      // In JJDD mode, 2♦, jokers all act as spades for play restrictions
+      if (card.value === "LJ" || card.value === "BJ") return true;
+      if (card.suit === "diamonds" && card.value === "2") return true;
+    }
+    return false;
+  };
+
   // Calculate playable cards
   const getPlayableCards = (): Card[] => {
     if (!currentPlayer || !isPlayingPhase || !isMyTurn) return [];
@@ -67,20 +78,35 @@ export function GameTable({
     const hand = currentPlayer.hand;
     const leadSuit = gameState.currentTrick.leadSuit;
     
-    // If no lead suit, can play anything (but spades only if broken or only have spades)
+    // If no lead suit (leading), can play anything but trumps only if broken or only have trumps
     if (!leadSuit) {
       if (!gameState.spadesBroken) {
-        const nonSpades = hand.filter((c) => !isTrump(c, gameState.mode));
-        if (nonSpades.length > 0) return nonSpades;
+        // Filter out all cards that act as spades (including 2♦ in JJDD mode)
+        const nonTrumps = hand.filter((c) => !actsAsSpade(c));
+        if (nonTrumps.length > 0) return nonTrumps;
       }
       return hand;
     }
     
-    // Must follow suit if possible
-    const suitCards = hand.filter((c) => c.suit === leadSuit);
+    // If spades lead, can play any trump (spades, 2♦, jokers in JJDD)
+    if (leadSuit === "spades") {
+      const trumpCards = hand.filter((c) => actsAsSpade(c));
+      if (trumpCards.length > 0) return trumpCards;
+      // No trumps, can play anything
+      return hand;
+    }
+    
+    // Non-spade suit leads - must follow suit if possible (2♦ doesn't count as diamonds!)
+    const suitCards = hand.filter((c) => {
+      // In JJDD mode, 2♦ acts as a spade, not a diamond
+      if (gameState.mode === "joker_joker_deuce_deuce" && c.suit === "diamonds" && c.value === "2") {
+        return false;
+      }
+      return c.suit === leadSuit;
+    });
     if (suitCards.length > 0) return suitCards;
     
-    // Can't follow suit, can play anything
+    // Can't follow suit, can play anything (including cutting with trumps)
     return hand;
   };
 
