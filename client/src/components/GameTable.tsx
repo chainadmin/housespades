@@ -5,6 +5,7 @@ import { TrickArea } from "./TrickArea";
 import { PlayerHand } from "./PlayerHand";
 import { BiddingPanel } from "./BiddingPanel";
 import { Scoreboard } from "./Scoreboard";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { getCardPower, isTrump } from "@shared/schema";
 
@@ -210,6 +211,21 @@ export function GameTable({
       {currentPlayer && (
         <div className="absolute bottom-0 left-0 right-0 border-t bg-card/80 backdrop-blur-sm z-30">
           <div className="max-w-4xl mx-auto">
+            {/* Player's bid and tricks display */}
+            <div className="flex justify-center items-center gap-4 pt-2 pb-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">You</span>
+                {currentPlayer.bid !== null && (
+                  <Badge variant="outline" className="text-xs">
+                    Bid: {currentPlayer.bid}
+                  </Badge>
+                )}
+                <Badge variant="secondary" className="text-xs">
+                  Tricks: {currentPlayer.tricks}
+                </Badge>
+              </div>
+            </div>
+            
             <PlayerHand
               cards={currentPlayer.hand}
               mode={gameState.mode}
