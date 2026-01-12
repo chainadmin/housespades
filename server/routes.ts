@@ -33,8 +33,9 @@ export async function registerRoutes(
       }
 
       const { username, email, password } = parsed.data;
+      const normalizedEmail = email.toLowerCase();
 
-      const existingEmail = await storage.getUserByEmail(email);
+      const existingEmail = await storage.getUserByEmail(normalizedEmail);
       if (existingEmail) {
         return res.status(400).json({ error: "Email already registered" });
       }
@@ -45,7 +46,7 @@ export async function registerRoutes(
       }
 
       const passwordHash = await bcrypt.hash(password, 10);
-      const user = await storage.createUser({ username, email, passwordHash });
+      const user = await storage.createUser({ username, email: normalizedEmail, passwordHash });
 
       req.session.userId = user.id;
 
@@ -72,7 +73,7 @@ export async function registerRoutes(
 
       const { email, password } = parsed.data;
 
-      const user = await storage.getUserByEmail(email);
+      const user = await storage.getUserByEmail(email.toLowerCase());
       if (!user) {
         return res.status(401).json({ error: "Invalid email or password" });
       }
@@ -105,7 +106,7 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Email required" });
       }
 
-      const user = await storage.getUserByEmail(email);
+      const user = await storage.getUserByEmail(email.toLowerCase());
       if (!user) {
         // Return same message for security (don't reveal if email exists)
         return res.json({ message: "If email exists, reset link sent" });
