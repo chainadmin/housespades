@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
+import { API_BASE_URL } from '../config/api';
 
 interface UserProfile {
   id: string;
@@ -27,7 +28,9 @@ export default function ProfileScreen() {
 
   const fetchProfile = async () => {
     try {
-      const response = await fetch('/api/user/profile');
+      const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setProfile(data);
@@ -41,7 +44,10 @@ export default function ProfileScreen() {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetch(`${API_BASE_URL}/api/auth/logout`, { 
+        method: 'POST',
+        credentials: 'include',
+      });
       router.replace('/auth/login');
     } catch (err) {
       console.error('Logout failed:', err);

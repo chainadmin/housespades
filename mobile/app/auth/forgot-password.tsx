@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
+import { API_BASE_URL } from '../../config/api';
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
@@ -23,10 +24,11 @@ export default function ForgotPasswordScreen() {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/forgot-password', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
+        credentials: 'include',
       });
 
       if (!response.ok) {
