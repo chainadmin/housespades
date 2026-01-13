@@ -161,6 +161,14 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
 
 ## Recent Changes (January 2026)
 
+### Game Logic Synchronization (Latest)
+- Added shared game functions to `shared/schema.ts`: `actsAsSpade()`, `generateStandardDeck()`, `generateJJDDDeck()`, `shuffleArray()`, `sortHand()`, `getPlayableCards()`, `getCardPower()`, `isTrump()`
+- Mobile `gameUtils.ts` uses same logic with dual-format support for joker suits ('spades' for server, 'joker' for legacy)
+- `PlayerHand.tsx` now uses `getPlayableCards()` instead of inline logic
+- Bot AI in `game.tsx` uses `getPlayableCards()` for consistent JJDD trump rules
+- JJDD mode: Jokers (BJ, LJ), 2♠, and 2♦ all count as spades for following-suit purposes
+- Jokers created with `suit: "spades"` in JJDD deck generation to match server
+
 ### App Store Readiness (Latest)
 - Added Privacy Policy page at `/privacy` with email collection, matchmaking, ads disclosures
 - Added Terms of Service page at `/terms` with gameplay rules, IAP, user conduct

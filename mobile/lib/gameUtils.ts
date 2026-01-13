@@ -57,8 +57,10 @@ export function shuffleArray<T>(array: T[]): T[] {
 }
 
 // Check if a card is a trump in JJDD mode (for sorting purposes)
+// Note: Handles both joker suit formats for compatibility
 function isTrumpInJJDD(card: Card): boolean {
   if (card.suit === 'spades') return true;
+  if (card.suit === 'joker') return true;
   if (card.value === 'LJ' || card.value === 'BJ') return true;
   if (card.suit === 'diamonds' && card.value === '2') return true;
   return false;
@@ -115,8 +117,11 @@ export function sortHand(hand: Card[], mode: GameMode): Card[] {
 
 // Check if a card acts as a spade for following-suit purposes
 // In JJDD mode: jokers (LJ, BJ) and 2♦ all count as spades
+// Note: Handles both joker suit formats (suit: 'spades' or suit: 'joker') for compatibility
 export function actsAsSpade(card: Card, mode: GameMode): boolean {
   if (card.suit === 'spades') return true;
+  // Handle legacy joker suit format from mobile
+  if (card.suit === 'joker') return true;
   if (mode === 'joker_joker_deuce_deuce') {
     if (card.value === 'LJ' || card.value === 'BJ') return true;
     if (card.suit === 'diamonds' && card.value === '2') return true;
@@ -125,8 +130,10 @@ export function actsAsSpade(card: Card, mode: GameMode): boolean {
 }
 
 // Check if a card is a trump in the given mode
+// Note: Handles both joker suit formats for compatibility
 export function isTrump(card: Card, mode: GameMode): boolean {
   if (card.suit === 'spades') return true;
+  if (card.suit === 'joker') return true;
   if (mode === 'joker_joker_deuce_deuce') {
     if (card.value === 'LJ' || card.value === 'BJ') return true;
     if (card.suit === 'diamonds' && card.value === '2') return true;
@@ -174,8 +181,9 @@ export function getPlayableCards(
 }
 
 // Card power rankings for each mode
+// Note: Handles both joker suit formats for compatibility
 export function getCardPower(card: Card, mode: GameMode, leadSuit: Suit | null): number {
-  const isSpade = card.suit === 'spades';
+  const isSpade = card.suit === 'spades' || card.suit === 'joker';
   const isLeadSuit = card.suit === leadSuit;
   
   if (mode === 'ace_high') {
@@ -193,12 +201,12 @@ export function getCardPower(card: Card, mode: GameMode, leadSuit: Suit | null):
     if (card.value === 'LJ') return 199; // Little Joker (second highest)
     
     // 2 of Spades beats 2 of Diamonds
-    if (isSpade && card.value === '2') return 198; // 2♠ (third highest)
+    if (card.suit === 'spades' && card.value === '2') return 198; // 2♠ (third highest)
     
     // 2 of Diamonds is special trump (beats all regular spades)
     if (card.suit === 'diamonds' && card.value === '2') return 197; // 2♦ (fourth highest)
     
-    // Regular spades (3-A)
+    // Regular spades (3-A) and jokers with suit 'joker'
     if (isSpade) {
       const spadeOrder = ['3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
       return 100 + spadeOrder.indexOf(card.value);
