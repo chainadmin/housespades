@@ -1,47 +1,8 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, Shield, Zap } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { User } from "@shared/schema";
+import { Shield, Zap, Sparkles, Clock } from "lucide-react";
 
 export default function Shop() {
-  const { toast } = useToast();
-
-  const { data: user } = useQuery<User>({
-    queryKey: ["/api/auth/me"],
-  });
-
-  const purchaseMutation = useMutation({
-    mutationFn: async () => {
-      const res = await apiRequest("POST", "/api/purchase/remove-ads");
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
-      toast({
-        title: "Purchase Successful!",
-        description: "Ads have been removed from your account.",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Purchase Failed",
-        description: "Please try again later.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handlePurchase = () => {
-    toast({
-      title: "In-App Purchase",
-      description: "This will use Google Play or iOS App Store billing when running in the mobile app.",
-    });
-  };
-
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-md mx-auto space-y-6">
@@ -50,19 +11,23 @@ export default function Shop() {
           <p className="text-muted-foreground mt-1">Enhance your experience</p>
         </div>
 
-        <Card data-testid="card-remove-ads">
+        <Card className="relative overflow-hidden" data-testid="card-remove-ads">
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
+            <Badge variant="secondary" className="text-lg px-4 py-2 mb-2">
+              <Clock className="h-4 w-4 mr-2" />
+              Coming Soon
+            </Badge>
+            <p className="text-muted-foreground text-sm text-center px-4">
+              In-app purchases will be available in a future update
+            </p>
+          </div>
+          
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5 text-primary" />
                 Remove Ads
               </CardTitle>
-              {user?.removeAds && (
-                <Badge variant="secondary" className="bg-green-500/20 text-green-500">
-                  <Check className="h-3 w-3 mr-1" />
-                  Owned
-                </Badge>
-              )}
             </div>
             <CardDescription>
               Enjoy an ad-free gaming experience forever
@@ -80,28 +45,9 @@ export default function Shop() {
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Sparkles className="h-4 w-4 text-purple-500" />
-                <span>One-time purchase, forever benefit</span>
+                <span>One-time purchase - $5.99</span>
               </div>
             </div>
-
-            {user?.removeAds ? (
-              <Button disabled className="w-full" data-testid="button-already-purchased">
-                <Check className="h-4 w-4 mr-2" />
-                Already Purchased
-              </Button>
-            ) : (
-              <Button 
-                className="w-full" 
-                onClick={handlePurchase}
-                data-testid="button-purchase-remove-ads"
-              >
-                Purchase for $5.99
-              </Button>
-            )}
-
-            <p className="text-xs text-center text-muted-foreground">
-              Payment processed via Google Play or iOS App Store
-            </p>
           </CardContent>
         </Card>
 

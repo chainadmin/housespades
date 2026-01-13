@@ -51,7 +51,7 @@ export default function Privacy() {
             <h2 className="text-xl font-semibold mb-3">4. Advertising</h2>
             <p className="mb-3">House Spades displays advertisements to support free gameplay. We work with advertising partners who may collect device identifiers to show relevant ads.</p>
             <p>On iOS devices, we will request your permission before tracking your activity for personalized ads (App Tracking Transparency). You can decline and still use the app with non-personalized ads.</p>
-            <p className="mt-3">You can remove all advertisements by purchasing the "Remove Ads" option for $5.99 in our shop.</p>
+            <p className="mt-3">A "Remove Ads" option ($5.99) will be available in the shop in a future update.</p>
           </section>
 
           <section>
