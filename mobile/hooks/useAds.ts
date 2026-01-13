@@ -22,7 +22,7 @@ export const BANNER_AD_UNIT_ID = __DEV__
       android: 'ca-app-pub-1580761947831808/2983516207',
     }) || TestIds.BANNER;
 
-const GAMES_BEFORE_AD = 2;
+const GAMES_BEFORE_AD = 1;
 
 interface UseAdsReturn {
   showInterstitialAd: () => Promise<boolean>;
@@ -30,6 +30,7 @@ interface UseAdsReturn {
   isAdLoading: boolean;
   shouldShowAd: boolean;
   recordGameCompleted: () => void;
+  recordGameAbandoned: () => void;
   gamesPlayed: number;
   bannerAdUnitId: string;
   hasRemoveAds: boolean;
@@ -114,6 +115,11 @@ export function useAds(): UseAdsReturn {
     setGamesPlayed((prev) => prev + 1);
   }, []);
 
+  const recordGameAbandoned = useCallback(async () => {
+    if (hasRemoveAds) return;
+    await showInterstitialAd();
+  }, [hasRemoveAds, showInterstitialAd]);
+
   const shouldShowAd = !hasRemoveAds && gamesPlayed > 0 && gamesPlayed % GAMES_BEFORE_AD === 0;
 
   return {
@@ -122,6 +128,7 @@ export function useAds(): UseAdsReturn {
     isAdLoading,
     shouldShowAd,
     recordGameCompleted,
+    recordGameAbandoned,
     gamesPlayed,
     bannerAdUnitId: BANNER_AD_UNIT_ID,
     hasRemoveAds,

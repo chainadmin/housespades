@@ -30,7 +30,7 @@ export default function GameScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ mode: GameMode; points: PointGoal; type: string; gameId?: string }>();
   const colors = useColors();
-  const { showInterstitialAd, recordGameCompleted, shouldShowAd, hasRemoveAds, isTrackingAllowed } = useAds();
+  const { showInterstitialAd, recordGameCompleted, recordGameAbandoned, shouldShowAd, hasRemoveAds, isTrackingAllowed } = useAds();
   
   const mode = params.mode || 'ace_high';
   const pointGoal = params.points || '300';
@@ -427,7 +427,15 @@ export default function GameScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity 
+          onPress={async () => {
+            if (gameState.phase !== 'game_over' && gameState.phase !== 'waiting') {
+              await recordGameAbandoned();
+            }
+            router.back();
+          }} 
+          style={styles.backButton}
+        >
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Scoreboard teams={gameState.teams} players={gameState.players} winningScore={gameState.winningScore} />

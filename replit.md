@@ -181,7 +181,7 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
 - App Tracking Transparency (ATT) for iOS ad personalization consent
 - Google Mobile Ads (AdMob) with banner and interstitial ads:
   - Banner ads on game screen
-  - Interstitial ads after every 2 completed games
+  - Interstitial ads after every 1 completed game OR when backing out mid-game
   - iOS Banner: `ca-app-pub-1580761947831808/4571752434`
   - iOS Interstitial: `ca-app-pub-1580761947831808/8594757928`
   - Android Banner: `ca-app-pub-1580761947831808/2983516207`
