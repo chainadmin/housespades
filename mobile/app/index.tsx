@@ -28,10 +28,10 @@ export default function HomeScreen() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
-    checkAuth();
+    fetchUserProfile();
   }, []);
 
-  const checkAuth = async () => {
+  const fetchUserProfile = async () => {
     try {
       const response = await fetch(apiUrl('/api/user/profile'), {
         credentials: 'include',
@@ -39,16 +39,11 @@ export default function HomeScreen() {
       if (response.ok) {
         const data = await response.json();
         setUser(data);
-      } else {
-        // Not authenticated - redirect to login
-        router.replace('/auth/login');
-        return;
       }
+      // Don't redirect here - _layout.tsx handles auth routing
     } catch (err) {
-      console.log('Not authenticated');
-      // Not authenticated - redirect to login
-      router.replace('/auth/login');
-      return;
+      console.log('Error fetching profile:', err);
+      // Don't redirect here - _layout.tsx handles auth routing
     } finally {
       setIsCheckingAuth(false);
     }
@@ -74,9 +69,24 @@ export default function HomeScreen() {
     );
   }
 
-  // If not authenticated after check, don't render (redirect happening)
+  // If user data not loaded yet, show loading (layout handles auth redirect)
   if (!user) {
-    return null;
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center' }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Image source={logoImage} style={{ width: 128, height: 128, marginBottom: 24 }} resizeMode="contain" />
+          <Text style={{ fontSize: 32, fontWeight: 'bold', color: colors.text }}>House Spades</Text>
+          <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 24 }} />
+        </View>
+        <View style={{ paddingBottom: 40, alignItems: 'center' }}>
+          <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 8 }}>Powered by</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Image source={chainLogo} style={{ width: 32, height: 32, borderRadius: 4 }} resizeMode="cover" />
+            <Text style={{ fontSize: 14, fontWeight: '500', color: colors.textSecondary }}>Chain Software Group</Text>
+          </View>
+        </View>
+      </SafeAreaView>
+    );
   }
 
   const handlePlaySolo = () => {
