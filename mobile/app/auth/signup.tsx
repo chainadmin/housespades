@@ -4,7 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
-import { API_BASE_URL } from '../../config/api';
 
 export default function SignupScreen() {
   const router = useRouter();
@@ -37,11 +36,10 @@ export default function SignupScreen() {
     setError('');
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+      const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password }),
-        credentials: 'include',
       });
 
       if (!response.ok) {
