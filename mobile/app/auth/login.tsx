@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
+import { apiUrl } from '@/config/api';
+import * as SecureStore from 'expo-secure-store';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -24,15 +26,22 @@ export default function LoginScreen() {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(apiUrl('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
+        credentials: 'include',
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.message || 'Login failed');
+      }
+
+      // Store user data
+      if (data.user) {
+        await SecureStore.setItemAsync('user', JSON.stringify(data.user));
       }
 
       router.replace('/');
@@ -57,6 +66,9 @@ export default function LoginScreen() {
           </TouchableOpacity>
 
           <View style={styles.header}>
+            <View style={styles.logoContainer}>
+              <Text style={styles.logoText}>♠</Text>
+            </View>
             <Text style={styles.title}>Welcome Back</Text>
             <Text style={styles.subtitle}>Sign in to continue playing</Text>
           </View>
@@ -145,10 +157,24 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       marginBottom: 24,
     },
     header: {
+      alignItems: 'center',
       marginBottom: 32,
     },
+    logoContainer: {
+      width: 80,
+      height: 80,
+      borderRadius: 20,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 16,
+    },
+    logoText: {
+      fontSize: 40,
+      color: colors.primaryForeground,
+    },
     title: {
-      fontSize: 32,
+      fontSize: 28,
       fontWeight: 'bold',
       color: colors.text,
       marginBottom: 8,
@@ -160,7 +186,7 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
     errorContainer: {
       backgroundColor: 'rgba(239, 68, 68, 0.1)',
       padding: 12,
-      borderRadius: 8,
+      borderRadius: 12,
       marginBottom: 16,
     },
     errorText: {

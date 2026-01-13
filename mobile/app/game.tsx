@@ -5,6 +5,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity, Text } from 'react-native';
 import { useColors } from '@/hooks/useColorScheme';
+import { useWebSocket } from '@/hooks/useWebSocket';
 import { 
   GameState, Card, Player, Team, Trick, 
   GameMode, PointGoal, Position,
@@ -27,36 +28,66 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export default function GameScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ mode: GameMode; points: PointGoal; type: string }>();
+  const params = useLocalSearchParams<{ mode: GameMode; points: PointGoal; type: string; gameId?: string }>();
   const colors = useColors();
   const { showInterstitialAd, recordGameCompleted, shouldShowAd, hasRemoveAds, isTrackingAllowed } = useAds();
   
   const mode = params.mode || 'ace_high';
   const pointGoal = params.points || '300';
+  const isMultiplayer = params.type === 'multiplayer' || params.type === 'online';
   
-  const [gameState, setGameState] = useState<GameState | null>(null);
+  const [localGameState, setLocalGameState] = useState<GameState | null>(null);
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   
-  const playerId = 'player-1';
+  const localPlayerId = 'player-1';
   const botThinkingRef = useRef(false);
   const gameStateRef = useRef<GameState | null>(null);
   const previousPhaseRef = useRef<string | null>(null);
   const gameCompletedRef = useRef(false);
+
+  // WebSocket for multiplayer
+  const {
+    connect,
+    disconnect,
+    isConnected,
+    playerId: wsPlayerId,
+    gameState: wsGameState,
+    placeBid: wsPlaceBid,
+    playCard: wsPlayCard,
+    leaveLobby,
+    startGame: wsStartGame,
+  } = useWebSocket({
+    onError: (message) => {
+      console.error('WebSocket error:', message);
+    },
+  });
+
+  // Use WebSocket state for multiplayer, local state for solo
+  const gameState = isMultiplayer && wsGameState ? wsGameState as unknown as GameState : localGameState;
+  const playerId = isMultiplayer && wsPlayerId ? wsPlayerId : localPlayerId;
 
   useEffect(() => {
     gameStateRef.current = gameState;
   }, [gameState]);
 
   useEffect(() => {
-    initializeGame();
-  }, [mode, pointGoal]);
+    if (isMultiplayer) {
+      connect();
+      return () => {
+        leaveLobby();
+        disconnect();
+      };
+    } else {
+      initializeLocalGame();
+    }
+  }, [isMultiplayer, mode, pointGoal]);
 
-  const initializeGame = () => {
+  const initializeLocalGame = () => {
     const deck = mode === 'ace_high' ? generateStandardDeck() : generateJJDDDeck();
     const shuffledDeck = shuffleArray(deck);
     
     const players: Player[] = POSITIONS.map((position, index) => ({
-      id: index === 0 ? playerId : `bot-${index}`,
+      id: index === 0 ? localPlayerId : `bot-${index}`,
       name: index === 0 ? 'You' : BOT_NAMES[index - 1],
       isBot: index !== 0,
       position,
@@ -76,7 +107,7 @@ export default function GameScreen() {
       { id: 1, name: 'Opponents', players: [players[1].id, players[3].id], score: 0, bags: 0, tricksWon: 0, totalBid: null },
     ];
 
-    setGameState({
+    setLocalGameState({
       id: `game-${Date.now()}`,
       mode,
       phase: 'bidding',
@@ -127,9 +158,14 @@ export default function GameScreen() {
   }, []);
 
   const handleBid = useCallback((bid: number) => {
-    if (!gameState) return;
+    if (isMultiplayer) {
+      wsPlaceBid(bid);
+      return;
+    }
+
+    if (!localGameState) return;
     
-    setGameState((prev) => {
+    setLocalGameState((prev) => {
       if (!prev) return prev;
       
       const newPlayers = prev.players.map((p, i) => 
@@ -160,12 +196,17 @@ export default function GameScreen() {
         currentPlayerIndex: allBid ? 0 : (prev.currentPlayerIndex + 1) % 4,
       };
     });
-  }, [gameState]);
+  }, [localGameState, isMultiplayer, wsPlaceBid]);
 
   const handlePlayCard = useCallback((card: Card) => {
-    if (!gameState) return;
+    if (isMultiplayer) {
+      wsPlayCard(card.id);
+      return;
+    }
+
+    if (!localGameState) return;
     
-    setGameState((prev) => {
+    setLocalGameState((prev) => {
       if (!prev) return prev;
       
       const currentPlayer = prev.players[prev.currentPlayerIndex];
@@ -269,7 +310,7 @@ export default function GameScreen() {
         }
         
         setTimeout(() => {
-          setGameState((state) => {
+          setLocalGameState((state) => {
             if (!state) return state;
             return { ...state, currentTrick: { cards: [], leadSuit: null, winnerId: null }, currentPlayerIndex: winnerPlayerIndex };
           });
@@ -282,7 +323,7 @@ export default function GameScreen() {
     });
     
     setSelectedCard(null);
-  }, [gameState]);
+  }, [localGameState, isMultiplayer, wsPlayCard]);
 
   const handleBidRef = useRef(handleBid);
   const handlePlayCardRef = useRef(handlePlayCard);
@@ -312,7 +353,9 @@ export default function GameScreen() {
     previousPhaseRef.current = currentPhase || null;
   }, [gameState?.phase, shouldShowAd]);
 
+  // Bot AI for solo mode
   useEffect(() => {
+    if (isMultiplayer) return;
     if (!gameState || botThinkingRef.current) return;
     if (gameState.phase !== 'bidding' && gameState.phase !== 'playing') return;
     
@@ -344,26 +387,35 @@ export default function GameScreen() {
     }, 600 + Math.random() * 400);
     
     return () => clearTimeout(timer);
-  }, [gameState?.currentPlayerIndex, gameState?.phase, calculateBotBid, selectBotCard]);
+  }, [gameState?.currentPlayerIndex, gameState?.phase, calculateBotBid, selectBotCard, isMultiplayer]);
 
   if (!gameState) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-        <Text style={{ color: colors.text }}>Loading...</Text>
+        <View style={styles.loadingContainer}>
+          <Text style={{ color: colors.text, fontSize: 18 }}>
+            {isMultiplayer ? 'Connecting to game...' : 'Loading...'}
+          </Text>
+          {isMultiplayer && !isConnected && (
+            <Text style={{ color: colors.textSecondary, fontSize: 14, marginTop: 8 }}>
+              Establishing connection...
+            </Text>
+          )}
+        </View>
       </SafeAreaView>
     );
   }
 
   const currentPlayer = gameState.players[gameState.currentPlayerIndex];
   const isMyTurn = currentPlayer?.id === playerId;
-  const myPlayer = gameState.players.find((p) => p.id === playerId);
+  const myPlayer = gameState.players.find((p) => p.id === playerId) || gameState.players.find((p) => p.position === 'south');
   const partner = gameState.players.find((p) => p.position === 'north');
   const westPlayer = gameState.players.find((p) => p.position === 'west');
   const eastPlayer = gameState.players.find((p) => p.position === 'east');
 
   const getTeamColor = (player: Player) => {
     const teamIndex = gameState.teams.findIndex((t) => t.players.includes(player.id));
-    return teamIndex === 0 ? '#4f46e5' : '#f59e0b';
+    return teamIndex === 0 ? colors.primary : colors.accent;
   };
 
   return (
@@ -373,6 +425,18 @@ export default function GameScreen() {
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Scoreboard teams={gameState.teams} players={gameState.players} winningScore={gameState.winningScore} />
+        {isMultiplayer && (
+          <View style={[styles.connectionStatus, { backgroundColor: isConnected ? '#22c55e20' : '#ef444420' }]}>
+            <Ionicons 
+              name={isConnected ? 'wifi' : 'wifi-outline'} 
+              size={14} 
+              color={isConnected ? colors.success : colors.error} 
+            />
+            <Text style={{ color: isConnected ? colors.success : colors.error, fontSize: 11 }}>
+              {isConnected ? 'Live' : 'Offline'}
+            </Text>
+          </View>
+        )}
       </View>
 
       <View style={styles.gameArea}>
@@ -436,6 +500,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -444,6 +513,15 @@ const styles = StyleSheet.create({
   },
   backButton: {
     padding: 8,
+  },
+  connectionStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginLeft: 'auto',
   },
   gameArea: {
     flex: 1,

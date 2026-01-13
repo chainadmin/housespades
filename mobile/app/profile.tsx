@@ -4,6 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
+import { apiUrl } from '@/config/api';
+import * as SecureStore from 'expo-secure-store';
 
 interface UserProfile {
   id: string;
@@ -12,7 +14,6 @@ interface UserProfile {
   rating: number;
   gamesPlayed: number;
   gamesWon: number;
-  rank: string;
 }
 
 export default function ProfileScreen() {
@@ -27,7 +28,9 @@ export default function ProfileScreen() {
 
   const fetchProfile = async () => {
     try {
-      const response = await fetch('/api/user/profile');
+      const response = await fetch(apiUrl('/api/user/profile'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setProfile(data);
@@ -41,7 +44,11 @@ export default function ProfileScreen() {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetch(apiUrl('/api/auth/logout'), { 
+        method: 'POST',
+        credentials: 'include',
+      });
+      await SecureStore.deleteItemAsync('user');
       router.replace('/auth/login');
     } catch (err) {
       console.error('Logout failed:', err);
@@ -78,12 +85,14 @@ export default function ProfileScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.guestContainer}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButtonTop}>
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
           
           <View style={styles.guestContent}>
-            <Ionicons name="person-circle-outline" size={80} color={colors.textSecondary} />
+            <View style={styles.guestIconContainer}>
+              <Ionicons name="person-circle-outline" size={80} color={colors.primary} />
+            </View>
             <Text style={styles.guestTitle}>Not Signed In</Text>
             <Text style={styles.guestText}>Sign in to track your progress and compete with others</Text>
             
@@ -91,8 +100,8 @@ export default function ProfileScreen() {
               <Text style={styles.loginButtonText}>Sign In</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.signupButton} onPress={() => router.push('/auth/signup')}>
-              <Text style={styles.signupButtonText}>Create Account</Text>
+            <TouchableOpacity style={styles.signupOutlineButton} onPress={() => router.push('/auth/signup')}>
+              <Text style={styles.signupOutlineButtonText}>Create Account</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -108,7 +117,7 @@ export default function ProfileScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 32 }}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButtonTop}>
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Profile</Text>
@@ -116,7 +125,7 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.profileSection}>
-          <View style={[styles.avatar, { backgroundColor: getRankColor(profile.rating) }]}>
+          <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
             <Text style={styles.avatarText}>{profile.username.charAt(0).toUpperCase()}</Text>
           </View>
           <Text style={styles.username}>{profile.username}</Text>
@@ -198,37 +207,44 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       justifyContent: 'center',
       gap: 16,
     },
+    guestIconContainer: {
+      marginBottom: 8,
+    },
     guestTitle: {
       fontSize: 24,
       fontWeight: 'bold',
       color: colors.text,
-      marginTop: 16,
     },
     guestText: {
       fontSize: 16,
       color: colors.textSecondary,
       textAlign: 'center',
       marginBottom: 16,
+      paddingHorizontal: 32,
     },
     loginButton: {
       backgroundColor: colors.primary,
       borderRadius: 12,
       paddingHorizontal: 48,
       paddingVertical: 14,
+      width: '100%',
+      alignItems: 'center',
     },
     loginButtonText: {
       color: colors.primaryForeground,
       fontSize: 16,
       fontWeight: '600',
     },
-    signupButton: {
+    signupOutlineButton: {
       borderRadius: 12,
       paddingHorizontal: 48,
       paddingVertical: 14,
       borderWidth: 2,
       borderColor: colors.primary,
+      width: '100%',
+      alignItems: 'center',
     },
-    signupButtonText: {
+    signupOutlineButtonText: {
       color: colors.primary,
       fontSize: 16,
       fontWeight: '600',
@@ -239,7 +255,7 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       justifyContent: 'space-between',
       padding: 16,
     },
-    backButton: {
+    backButtonTop: {
       padding: 8,
     },
     headerTitle: {

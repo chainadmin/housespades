@@ -4,6 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
+import { apiUrl } from '@/config/api';
+import * as SecureStore from 'expo-secure-store';
 
 export default function SignupScreen() {
   const router = useRouter();
@@ -36,15 +38,22 @@ export default function SignupScreen() {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch(apiUrl('/api/auth/register'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password }),
+        credentials: 'include',
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.message || 'Registration failed');
+      }
+
+      // Store user data
+      if (data.user) {
+        await SecureStore.setItemAsync('user', JSON.stringify(data.user));
       }
 
       router.replace('/');
@@ -69,6 +78,9 @@ export default function SignupScreen() {
           </TouchableOpacity>
 
           <View style={styles.header}>
+            <View style={styles.logoContainer}>
+              <Text style={styles.logoText}>♠</Text>
+            </View>
             <Text style={styles.title}>Create Account</Text>
             <Text style={styles.subtitle}>Join House Spades today</Text>
           </View>
@@ -176,10 +188,24 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       marginBottom: 24,
     },
     header: {
+      alignItems: 'center',
       marginBottom: 32,
     },
+    logoContainer: {
+      width: 80,
+      height: 80,
+      borderRadius: 20,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 16,
+    },
+    logoText: {
+      fontSize: 40,
+      color: colors.primaryForeground,
+    },
     title: {
-      fontSize: 32,
+      fontSize: 28,
       fontWeight: 'bold',
       color: colors.text,
       marginBottom: 8,
@@ -191,7 +217,7 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
     errorContainer: {
       backgroundColor: 'rgba(239, 68, 68, 0.1)',
       padding: 12,
-      borderRadius: 8,
+      borderRadius: 12,
       marginBottom: 16,
     },
     errorText: {

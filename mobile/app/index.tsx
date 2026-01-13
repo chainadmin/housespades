@@ -1,33 +1,75 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
 import { GameMode, PointGoal } from '@/constants/game';
+import { apiUrl } from '@/config/api';
+import * as SecureStore from 'expo-secure-store';
+
+interface User {
+  id: string;
+  username: string;
+  rating: number;
+  gamesPlayed: number;
+  gamesWon: number;
+}
 
 export default function HomeScreen() {
   const router = useRouter();
   const colors = useColors();
   const [selectedMode, setSelectedMode] = useState<GameMode>('ace_high');
   const [selectedPoints, setSelectedPoints] = useState<PointGoal>('300');
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    try {
+      const response = await fetch(apiUrl('/api/user/profile'), {
+        credentials: 'include',
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data);
+      }
+    } catch (err) {
+      console.log('Not authenticated');
+    }
+  };
 
   const handlePlaySolo = () => {
     router.push(`/game?mode=${selectedMode}&points=${selectedPoints}&type=solo`);
   };
 
   const handlePlayOnline = () => {
+    if (!user) {
+      router.push('/auth/login');
+      return;
+    }
     router.push(`/matchmaking?mode=${selectedMode}&points=${selectedPoints}`);
   };
+
+  const winRate = user && user.gamesPlayed > 0 
+    ? Math.round((user.gamesWon / user.gamesPlayed) * 100) 
+    : 0;
 
   const styles = createStyles(colors);
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>House Spades</Text>
-          <Text style={styles.subtitle}>The Ultimate Card Game</Text>
+          <View style={styles.logoRow}>
+            <View style={styles.logoContainer}>
+              <Text style={styles.logoText}>♠</Text>
+            </View>
+            <Text style={styles.title}>House Spades</Text>
+          </View>
           
           <View style={styles.headerButtons}>
             <TouchableOpacity
@@ -39,8 +81,70 @@ export default function HomeScreen() {
           </View>
         </View>
 
+        {/* User stats bar */}
+        {user && (
+          <View style={styles.statsBar}>
+            <View style={styles.statItem}>
+              <Ionicons name="trophy-outline" size={16} color={colors.primary} />
+              <Text style={styles.statText}>{user.gamesWon} Wins</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Ionicons name="trending-up-outline" size={16} color={colors.primary} />
+              <Text style={styles.statText}>{winRate}%</Text>
+            </View>
+            <View style={styles.ratingBadge}>
+              <Ionicons name="person-outline" size={12} color={colors.primary} />
+              <Text style={styles.ratingText}>{user.rating}</Text>
+            </View>
+          </View>
+        )}
+
+        {/* Welcome */}
+        <View style={styles.welcomeSection}>
+          <Text style={styles.welcomeTitle}>Welcome{user ? `, ${user.username}` : ''}</Text>
+          <Text style={styles.welcomeSubtitle}>Choose your game mode and point goal, then jump into a game.</Text>
+        </View>
+
+        {/* Play options */}
+        <View style={styles.playOptions}>
+          <TouchableOpacity style={styles.playCard} onPress={handlePlaySolo}>
+            <View style={[styles.playCardIcon, { backgroundColor: `${colors.primary}15` }]}>
+              <Ionicons name="game-controller" size={24} color={colors.primary} />
+            </View>
+            <View style={styles.playCardContent}>
+              <Text style={styles.playCardTitle}>Play vs Bots</Text>
+              <Text style={styles.playCardDescription}>Practice against AI opponents</Text>
+            </View>
+            <TouchableOpacity style={styles.playCardButton} onPress={handlePlaySolo}>
+              <Text style={styles.playCardButtonText}>Start Solo Game</Text>
+            </TouchableOpacity>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.playCard} onPress={handlePlayOnline}>
+            <View style={[styles.playCardIcon, { backgroundColor: `${colors.accent}15` }]}>
+              <Ionicons name="people" size={24} color={colors.accent} />
+            </View>
+            <View style={styles.playCardContent}>
+              <Text style={styles.playCardTitle}>Find Match</Text>
+              <Text style={styles.playCardDescription}>Play with others online</Text>
+            </View>
+            <TouchableOpacity style={[styles.playCardButton, styles.playCardButtonOutline]} onPress={handlePlayOnline}>
+              <Text style={styles.playCardButtonOutlineText}>Find Opponents</Text>
+            </TouchableOpacity>
+          </TouchableOpacity>
+        </View>
+
+        {/* Game mode selection */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Game Mode</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Select Game Mode</Text>
+            <View style={styles.modeBadge}>
+              <Text style={styles.modeBadgeText}>
+                {selectedMode === 'ace_high' ? 'Classic' : 'Custom Rules'}
+              </Text>
+            </View>
+          </View>
+          
           <View style={styles.modeContainer}>
             <TouchableOpacity
               style={[
@@ -49,7 +153,7 @@ export default function HomeScreen() {
               ]}
               onPress={() => setSelectedMode('ace_high')}
             >
-              <Text style={styles.modeIcon}>♠️</Text>
+              <Text style={styles.modeIcon}>♠</Text>
               <Text style={[styles.modeTitle, selectedMode === 'ace_high' && styles.modeTitleSelected]}>
                 Ace High
               </Text>
@@ -63,7 +167,7 @@ export default function HomeScreen() {
               ]}
               onPress={() => setSelectedMode('joker_joker_deuce_deuce')}
             >
-              <Text style={styles.modeIcon}>🃏</Text>
+              <Text style={styles.modeIcon}>★</Text>
               <Text style={[styles.modeTitle, selectedMode === 'joker_joker_deuce_deuce' && styles.modeTitleSelected]}>
                 Joker Joker Deuce Deuce
               </Text>
@@ -72,8 +176,9 @@ export default function HomeScreen() {
           </View>
         </View>
 
+        {/* Point goal selection */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Points to Win</Text>
+          <Text style={styles.sectionTitle}>Point Goal</Text>
           <View style={styles.pointsContainer}>
             {(['100', '300', '500'] as PointGoal[]).map((points) => (
               <TouchableOpacity
@@ -95,16 +200,23 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        <View style={styles.playButtons}>
-          <TouchableOpacity style={styles.playButton} onPress={handlePlaySolo}>
-            <Ionicons name="game-controller" size={24} color={colors.primaryForeground} />
-            <Text style={styles.playButtonText}>Play vs Bots</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.playButtonSecondary} onPress={handlePlayOnline}>
-            <Ionicons name="people" size={24} color={colors.primary} />
-            <Text style={styles.playButtonSecondaryText}>Play Online</Text>
-          </TouchableOpacity>
+        {/* How to play */}
+        <View style={[styles.howToPlayCard, { backgroundColor: colors.card }]}>
+          <Text style={styles.howToPlayTitle}>How to Play Spades</Text>
+          <View style={styles.howToPlayContent}>
+            <Text style={styles.howToPlayText}>
+              <Text style={styles.howToPlayBold}>Objective:</Text> Work with your partner to win at least as many books as you bid. First team to reach the point goal wins.
+            </Text>
+            <Text style={styles.howToPlayText}>
+              <Text style={styles.howToPlayBold}>Bidding:</Text> Each player bids how many books they think they can win. Team bids are combined.
+            </Text>
+            <Text style={styles.howToPlayText}>
+              <Text style={styles.howToPlayBold}>Playing:</Text> Follow the lead suit if possible. Spades are always trump and beat other suits.
+            </Text>
+            <Text style={styles.howToPlayText}>
+              <Text style={styles.howToPlayBold}>Scoring:</Text> Make your bid = 10 points per book bid + 1 point per extra book. Fail = lose 10 points per book bid.
+            </Text>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -119,38 +231,170 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
     },
     scrollContent: {
       padding: 20,
+      paddingBottom: 40,
     },
     header: {
+      flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: 32,
-      position: 'relative',
+      justifyContent: 'space-between',
+      marginBottom: 16,
+    },
+    logoRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    logoContainer: {
+      width: 40,
+      height: 40,
+      borderRadius: 10,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    logoText: {
+      fontSize: 22,
+      color: colors.primaryForeground,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: colors.text,
     },
     headerButtons: {
-      position: 'absolute',
-      right: 0,
-      top: 0,
+      flexDirection: 'row',
+      gap: 8,
     },
     iconButton: {
       padding: 8,
     },
-    title: {
-      fontSize: 36,
+    statsBar: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 16,
+      marginBottom: 24,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      backgroundColor: colors.card,
+      borderRadius: 12,
+    },
+    statItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+    },
+    statText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
+    ratingBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      backgroundColor: colors.muted,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    ratingText: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.text,
+    },
+    welcomeSection: {
+      marginBottom: 24,
+    },
+    welcomeTitle: {
+      fontSize: 28,
       fontWeight: 'bold',
       color: colors.text,
       marginBottom: 8,
     },
-    subtitle: {
+    welcomeSubtitle: {
       fontSize: 16,
       color: colors.textSecondary,
+      lineHeight: 24,
+    },
+    playOptions: {
+      gap: 16,
+      marginBottom: 32,
+    },
+    playCard: {
+      backgroundColor: colors.card,
+      borderRadius: 16,
+      padding: 20,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    playCardIcon: {
+      width: 48,
+      height: 48,
+      borderRadius: 12,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 12,
+    },
+    playCardContent: {
+      marginBottom: 16,
+    },
+    playCardTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 4,
+    },
+    playCardDescription: {
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
+    playCardButton: {
+      backgroundColor: colors.primary,
+      borderRadius: 10,
+      paddingVertical: 12,
+      alignItems: 'center',
+    },
+    playCardButtonText: {
+      color: colors.primaryForeground,
+      fontSize: 15,
+      fontWeight: '600',
+    },
+    playCardButtonOutline: {
+      backgroundColor: 'transparent',
+      borderWidth: 2,
+      borderColor: colors.primary,
+    },
+    playCardButtonOutlineText: {
+      color: colors.primary,
+      fontSize: 15,
+      fontWeight: '600',
     },
     section: {
       marginBottom: 24,
+    },
+    sectionHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: 12,
     },
     sectionTitle: {
       fontSize: 18,
       fontWeight: '600',
       color: colors.text,
-      marginBottom: 12,
+    },
+    modeBadge: {
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      backgroundColor: colors.muted,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    modeBadgeText: {
+      fontSize: 12,
+      color: colors.textSecondary,
     },
     modeContainer: {
       gap: 12,
@@ -164,14 +408,14 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
     },
     modeCardSelected: {
       borderColor: colors.primary,
-      backgroundColor: colors.surface,
     },
     modeIcon: {
-      fontSize: 32,
+      fontSize: 28,
       marginBottom: 8,
+      color: colors.text,
     },
     modeTitle: {
-      fontSize: 18,
+      fontSize: 17,
       fontWeight: '600',
       color: colors.text,
       marginBottom: 4,
@@ -198,7 +442,6 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
     },
     pointsButtonSelected: {
       borderColor: colors.primary,
-      backgroundColor: colors.surface,
     },
     pointsText: {
       fontSize: 24,
@@ -208,38 +451,28 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
     pointsTextSelected: {
       color: colors.primary,
     },
-    playButtons: {
-      gap: 12,
-      marginTop: 16,
+    howToPlayCard: {
+      borderRadius: 16,
+      padding: 20,
+      borderWidth: 1,
+      borderColor: colors.border,
     },
-    playButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: colors.primary,
-      borderRadius: 12,
-      padding: 16,
-      gap: 12,
-    },
-    playButtonText: {
-      fontSize: 18,
+    howToPlayTitle: {
+      fontSize: 17,
       fontWeight: '600',
-      color: colors.primaryForeground,
+      color: colors.text,
+      marginBottom: 16,
     },
-    playButtonSecondary: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: colors.card,
-      borderRadius: 12,
-      padding: 16,
+    howToPlayContent: {
       gap: 12,
-      borderWidth: 2,
-      borderColor: colors.primary,
     },
-    playButtonSecondaryText: {
-      fontSize: 18,
+    howToPlayText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      lineHeight: 20,
+    },
+    howToPlayBold: {
       fontWeight: '600',
-      color: colors.primary,
+      color: colors.text,
     },
   });

@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
+import { apiUrl } from '@/config/api';
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function ForgotPasswordScreen() {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/forgot-password', {
+      const response = await fetch(apiUrl('/api/auth/forgot-password'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -138,7 +139,7 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       marginBottom: 32,
     },
     title: {
-      fontSize: 32,
+      fontSize: 28,
       fontWeight: 'bold',
       color: colors.text,
       marginBottom: 8,
@@ -151,7 +152,7 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
     errorContainer: {
       backgroundColor: 'rgba(239, 68, 68, 0.1)',
       padding: 12,
-      borderRadius: 8,
+      borderRadius: 12,
       marginBottom: 16,
     },
     errorText: {
@@ -205,7 +206,7 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       width: 80,
       height: 80,
       borderRadius: 40,
-      backgroundColor: 'rgba(79, 70, 229, 0.1)',
+      backgroundColor: 'rgba(34, 197, 94, 0.1)',
       alignItems: 'center',
       justifyContent: 'center',
       marginBottom: 24,

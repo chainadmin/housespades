@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -12,6 +12,7 @@ import Animated, {
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
 import { GameMode, PointGoal } from '@/constants/game';
+import { apiUrl } from '@/config/api';
 
 export default function MatchmakingScreen() {
   const router = useRouter();
@@ -19,8 +20,12 @@ export default function MatchmakingScreen() {
   const colors = useColors();
   
   const [playersFound, setPlayersFound] = useState(1);
-  const [status, setStatus] = useState('Searching for players...');
+  const [status, setStatus] = useState('Joining matchmaking queue...');
   const rotation = useSharedValue(0);
+  
+  // Use ref for polling control to avoid stale closure issues
+  const inQueueRef = useRef(false);
+  const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     rotation.value = withRepeat(
@@ -31,29 +36,101 @@ export default function MatchmakingScreen() {
   }, []);
 
   useEffect(() => {
-    const timers: NodeJS.Timeout[] = [];
+    joinMatchmaking();
 
-    timers.push(setTimeout(() => {
-      setPlayersFound(2);
-      setStatus('Found 1 opponent...');
-    }, 2000));
-
-    timers.push(setTimeout(() => {
-      setPlayersFound(3);
-      setStatus('Found 2 opponents...');
-    }, 3500));
-
-    timers.push(setTimeout(() => {
-      setPlayersFound(4);
-      setStatus('Match found! Starting game...');
-    }, 5000));
-
-    timers.push(setTimeout(() => {
-      router.replace(`/game?mode=${params.mode}&points=${params.points}&type=online`);
-    }, 6000));
-
-    return () => timers.forEach(clearTimeout);
+    return () => {
+      leaveMatchmaking();
+    };
   }, [params.mode, params.points]);
+
+  const joinMatchmaking = async () => {
+    try {
+      const response = await fetch(apiUrl('/api/matchmaking/join'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          gameMode: params.mode,
+          pointGoal: params.points,
+        }),
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        inQueueRef.current = true;
+        setStatus('Searching for players...');
+        startPolling();
+      } else {
+        const data = await response.json();
+        setStatus(data.message || 'Failed to join queue');
+      }
+    } catch (err) {
+      console.error('Failed to join matchmaking:', err);
+      setStatus('Connection error. Please try again.');
+    }
+  };
+
+  const startPolling = () => {
+    const checkStatus = async () => {
+      if (!inQueueRef.current) return;
+
+      try {
+        const response = await fetch(apiUrl('/api/matchmaking/status'), {
+          credentials: 'include',
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          
+          if (data.matched && data.gameId) {
+            inQueueRef.current = false;
+            setStatus('Match found! Starting game...');
+            setPlayersFound(4);
+            setTimeout(() => {
+              router.replace(`/game?mode=${params.mode}&points=${params.points}&type=multiplayer&gameId=${data.gameId}`);
+            }, 1000);
+            return;
+          }
+          
+          if (data.playersInQueue !== undefined) {
+            setPlayersFound(Math.min(data.playersInQueue, 4));
+            setStatus(`${data.playersInQueue} player${data.playersInQueue !== 1 ? 's' : ''} in queue...`);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to check status:', err);
+      }
+      
+      // Continue polling if still in queue
+      if (inQueueRef.current) {
+        pollingTimeoutRef.current = setTimeout(checkStatus, 2000);
+      }
+    };
+    
+    checkStatus();
+  };
+
+  const leaveMatchmaking = async () => {
+    inQueueRef.current = false;
+    
+    if (pollingTimeoutRef.current) {
+      clearTimeout(pollingTimeoutRef.current);
+      pollingTimeoutRef.current = null;
+    }
+    
+    try {
+      await fetch(apiUrl('/api/matchmaking/leave'), {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (err) {
+      console.error('Failed to leave matchmaking:', err);
+    }
+  };
+
+  const handleCancel = () => {
+    leaveMatchmaking();
+    router.back();
+  };
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${rotation.value}deg` }],
@@ -63,7 +140,7 @@ export default function MatchmakingScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+      <TouchableOpacity style={styles.backButton} onPress={handleCancel}>
         <Ionicons name="close" size={28} color={colors.text} />
       </TouchableOpacity>
 
@@ -81,7 +158,7 @@ export default function MatchmakingScreen() {
               key={index} 
               style={[
                 styles.playerSlot,
-                { backgroundColor: index < playersFound ? colors.primary : colors.surface },
+                { backgroundColor: index < playersFound ? colors.primary : colors.muted },
               ]}
             >
               <Ionicons 
@@ -105,7 +182,7 @@ export default function MatchmakingScreen() {
         </View>
       </View>
 
-      <TouchableOpacity style={styles.cancelButton} onPress={() => router.back()}>
+      <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
         <Text style={styles.cancelText}>Cancel</Text>
       </TouchableOpacity>
     </SafeAreaView>
@@ -193,6 +270,8 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       borderRadius: 12,
       padding: 16,
       alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.border,
     },
     cancelText: {
       fontSize: 16,
