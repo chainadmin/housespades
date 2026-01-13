@@ -82,13 +82,14 @@ export default function RootLayout() {
             backgroundColor: colorScheme === 'dark' ? '#121212' : '#ffffff',
           }}>
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-              <Image source={logoImage} style={{ width: 120, height: 120 }} resizeMode="contain" />
+              <Image source={logoImage} style={{ width: 128, height: 128, marginBottom: 24 }} resizeMode="contain" />
+              <Text style={{ fontSize: 32, fontWeight: 'bold', color: colors.text }}>House Spades</Text>
               <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 24 }} />
             </View>
             <View style={{ paddingBottom: 40, alignItems: 'center' }}>
               <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 8 }}>Powered by</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <Image source={chainLogo} style={{ width: 24, height: 24, borderRadius: 4 }} resizeMode="cover" />
+                <Image source={chainLogo} style={{ width: 32, height: 32, borderRadius: 4 }} resizeMode="cover" />
                 <Text style={{ fontSize: 14, fontWeight: '500', color: colors.textSecondary }}>Chain Software Group</Text>
               </View>
             </View>

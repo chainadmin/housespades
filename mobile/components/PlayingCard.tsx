@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   cardDisabled: {
-    opacity: 0.6,
+    opacity: 1,
   },
   cardSelected: {
     borderWidth: 2,
