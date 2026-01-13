@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Stack, useRouter, useSegments, SplashScreen } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -17,7 +17,8 @@ export default function RootLayout() {
   const router = useRouter();
   const segments = useSegments();
   const [isReady, setIsReady] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const navigationDone = useRef(false);
 
   useEffect(() => {
     checkAuth();
@@ -39,24 +40,37 @@ export default function RootLayout() {
       setIsAuthenticated(false);
     } finally {
       setIsReady(true);
-      SplashScreen.hideAsync();
     }
   };
 
+  // Handle navigation based on auth state
   useEffect(() => {
-    if (!isReady) return;
+    if (!isReady || isAuthenticated === null) return;
 
     const inAuthGroup = segments[0] === 'auth';
+    const currentPath = '/' + segments.join('/');
 
-    // Only redirect if we're in the wrong place for current auth state
-    if (!isAuthenticated && !inAuthGroup) {
-      router.replace('/auth/login');
-    } else if (isAuthenticated && inAuthGroup) {
-      router.replace('/');
-    }
-  }, [isAuthenticated, isReady]);
+    const performNavigation = async () => {
+      if (!isAuthenticated && !inAuthGroup) {
+        // Not authenticated and not on auth screens - go to login
+        await router.replace('/auth/login');
+      } else if (isAuthenticated && inAuthGroup) {
+        // Authenticated but on auth screens - go to home
+        await router.replace('/');
+      }
+      
+      // Hide splash after initial navigation is complete
+      if (!navigationDone.current) {
+        navigationDone.current = true;
+        await SplashScreen.hideAsync();
+      }
+    };
 
-  if (!isReady) {
+    performNavigation();
+  }, [isAuthenticated, segments.join('/'), isReady]);
+
+  // Show splash while checking auth
+  if (!isReady || isAuthenticated === null) {
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
         <SafeAreaProvider>
