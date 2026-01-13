@@ -7,6 +7,8 @@ import { useColors } from '@/hooks/useColorScheme';
 import { apiUrl } from '@/config/api';
 import * as SecureStore from 'expo-secure-store';
 
+const logoImage = require('@/assets/house-card-logo.png');
+
 export default function LoginScreen() {
   const router = useRouter();
   const colors = useColors();
@@ -39,7 +41,6 @@ export default function LoginScreen() {
         throw new Error(data.message || 'Login failed');
       }
 
-      // Store user data
       if (data.user) {
         await SecureStore.setItemAsync('user', JSON.stringify(data.user));
       }
@@ -61,69 +62,70 @@ export default function LoginScreen() {
         style={styles.keyboardView}
       >
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color={colors.text} />
-          </TouchableOpacity>
-
           <View style={styles.header}>
-            <View style={styles.logoContainer}>
-              <Text style={styles.logoText}>♠</Text>
-            </View>
-            <Text style={styles.title}>Welcome Back</Text>
-            <Text style={styles.subtitle}>Sign in to continue playing</Text>
+            <Image source={logoImage} style={styles.logo} resizeMode="contain" />
+            <Text style={styles.title}>House Spades</Text>
+            <Text style={styles.subtitle}>Sign in to play</Text>
           </View>
 
-          {error ? (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{error}</Text>
-            </View>
-          ) : null}
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Welcome back</Text>
+            <Text style={styles.cardDescription}>Enter your credentials to continue</Text>
 
-          <View style={styles.form}>
-            <View style={styles.inputContainer}>
-              <Ionicons name="mail-outline" size={20} color={colors.textSecondary} style={styles.inputIcon} />
-              <TextInput
-                style={styles.input}
-                placeholder="Email"
-                placeholderTextColor={colors.textTertiary}
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
+            {error ? (
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>{error}</Text>
+              </View>
+            ) : null}
 
-            <View style={styles.inputContainer}>
-              <Ionicons name="lock-closed-outline" size={20} color={colors.textSecondary} style={styles.inputIcon} />
-              <TextInput
-                style={styles.input}
-                placeholder="Password"
-                placeholderTextColor={colors.textTertiary}
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-              />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeButton}>
-                <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color={colors.textSecondary} />
+            <View style={styles.form}>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Email</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter your email"
+                  placeholderTextColor={colors.textTertiary}
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Password</Text>
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    style={styles.passwordInput}
+                    placeholder="Enter your password"
+                    placeholderTextColor={colors.textTertiary}
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!showPassword}
+                  />
+                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeButton}>
+                    <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color={colors.textSecondary} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <Link href="/auth/forgot-password" asChild>
+                <TouchableOpacity>
+                  <Text style={styles.forgotPassword}>Forgot Password?</Text>
+                </TouchableOpacity>
+              </Link>
+
+              <TouchableOpacity 
+                style={[styles.loginButton, loading && styles.loginButtonDisabled]} 
+                onPress={handleLogin}
+                disabled={loading}
+              >
+                <Text style={styles.loginButtonText}>
+                  {loading ? 'Signing in...' : 'Sign In'}
+                </Text>
               </TouchableOpacity>
             </View>
-
-            <Link href="/auth/forgot-password" asChild>
-              <TouchableOpacity>
-                <Text style={styles.forgotPassword}>Forgot Password?</Text>
-              </TouchableOpacity>
-            </Link>
-
-            <TouchableOpacity 
-              style={[styles.loginButton, loading && styles.loginButtonDisabled]} 
-              onPress={handleLogin}
-              disabled={loading}
-            >
-              <Text style={styles.loginButtonText}>
-                {loading ? 'Signing in...' : 'Sign In'}
-              </Text>
-            </TouchableOpacity>
           </View>
 
           <View style={styles.footer}>
@@ -133,6 +135,12 @@ export default function LoginScreen() {
                 <Text style={styles.signupLink}>Sign Up</Text>
               </TouchableOpacity>
             </Link>
+          </View>
+
+          <View style={styles.legalLinks}>
+            <Text style={styles.legalText}>Privacy Policy</Text>
+            <Text style={styles.legalDivider}>|</Text>
+            <Text style={styles.legalText}>Terms of Service</Text>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -152,29 +160,20 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
     scrollContent: {
       flexGrow: 1,
       padding: 24,
-    },
-    backButton: {
-      marginBottom: 24,
+      justifyContent: 'center',
     },
     header: {
       alignItems: 'center',
       marginBottom: 32,
     },
-    logoContainer: {
-      width: 80,
-      height: 80,
-      borderRadius: 20,
-      backgroundColor: colors.primary,
-      alignItems: 'center',
-      justifyContent: 'center',
+    logo: {
+      width: 96,
+      height: 96,
       marginBottom: 16,
-    },
-    logoText: {
-      fontSize: 40,
-      color: colors.primaryForeground,
+      opacity: 0.6,
     },
     title: {
-      fontSize: 28,
+      fontSize: 30,
       fontWeight: 'bold',
       color: colors.text,
       marginBottom: 8,
@@ -182,6 +181,24 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
     subtitle: {
       fontSize: 16,
       color: colors.textSecondary,
+    },
+    card: {
+      backgroundColor: colors.card,
+      borderRadius: 16,
+      padding: 24,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    cardTitle: {
+      fontSize: 20,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 4,
+    },
+    cardDescription: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginBottom: 20,
     },
     errorContainer: {
       backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -196,26 +213,41 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
     form: {
       gap: 16,
     },
-    inputContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: colors.card,
-      borderRadius: 12,
+    inputGroup: {
+      gap: 6,
+    },
+    label: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: colors.text,
+    },
+    input: {
+      backgroundColor: colors.background,
+      borderRadius: 10,
       borderWidth: 1,
       borderColor: colors.border,
       paddingHorizontal: 16,
+      height: 48,
+      fontSize: 16,
+      color: colors.text,
     },
-    inputIcon: {
-      marginRight: 12,
+    passwordContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.background,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: colors.border,
     },
-    input: {
+    passwordInput: {
       flex: 1,
-      height: 52,
+      paddingHorizontal: 16,
+      height: 48,
       fontSize: 16,
       color: colors.text,
     },
     eyeButton: {
-      padding: 8,
+      padding: 12,
     },
     forgotPassword: {
       color: colors.primary,
@@ -225,8 +257,8 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
     },
     loginButton: {
       backgroundColor: colors.primary,
-      borderRadius: 12,
-      height: 52,
+      borderRadius: 10,
+      height: 48,
       alignItems: 'center',
       justifyContent: 'center',
       marginTop: 8,
@@ -242,8 +274,7 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
     footer: {
       flexDirection: 'row',
       justifyContent: 'center',
-      marginTop: 'auto',
-      paddingTop: 24,
+      marginTop: 24,
     },
     footerText: {
       color: colors.textSecondary,
@@ -253,5 +284,20 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       color: colors.primary,
       fontSize: 14,
       fontWeight: '600',
+    },
+    legalLinks: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginTop: 32,
+      gap: 8,
+    },
+    legalText: {
+      fontSize: 12,
+      color: colors.textTertiary,
+    },
+    legalDivider: {
+      fontSize: 12,
+      color: colors.textTertiary,
     },
   });

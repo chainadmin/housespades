@@ -1,7 +1,6 @@
-import { View, StyleSheet, ScrollView, Dimensions } from 'react-native';
-import { Card, GameState, Suit } from '@/constants/game';
+import { View, StyleSheet, Dimensions } from 'react-native';
+import { Card, GameState } from '@/constants/game';
 import { PlayingCard } from './PlayingCard';
-import { isTrump } from '@/lib/gameUtils';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -51,51 +50,62 @@ export function PlayerHand({
     }
   };
 
-  const cardWidth = Math.min(60, (SCREEN_WIDTH - 40) / Math.max(hand.length, 1));
-  const overlap = Math.max(0, cardWidth - 25);
+  const cardCount = hand.length;
+  const padding = 16;
+  const availableWidth = SCREEN_WIDTH - (padding * 2);
+  
+  // Card dimensions for small size (matching PlayingCard.tsx)
+  const baseCardWidth = Math.min(60, SCREEN_WIDTH / 7);
+  const cardWidth = baseCardWidth * 0.7;
+  
+  // Calculate overlap to fit all cards within available width
+  // Total = cardWidth + (count-1) * visible
+  // visible = (available - cardWidth) / (count - 1)
+  let visiblePerCard = cardCount > 1 
+    ? (availableWidth - cardWidth) / (cardCount - 1)
+    : cardWidth;
+  
+  // Clamp: at least 12px visible, at most full card width (no gaps)
+  visiblePerCard = Math.max(12, Math.min(visiblePerCard, cardWidth));
+  const overlap = cardWidth - visiblePerCard;
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        <View style={styles.handContainer}>
-          {hand.map((card, index) => (
-            <View
-              key={card.id}
-              style={[
-                styles.cardWrapper,
-                { marginLeft: index === 0 ? 0 : -overlap },
-                { zIndex: index },
-              ]}
-            >
-              <PlayingCard
-                card={card}
-                onPress={() => handleCardPress(card)}
-                disabled={!canPlayCard(card)}
-                selected={selectedCard?.id === card.id}
-                size="medium"
-              />
-            </View>
-          ))}
-        </View>
-      </ScrollView>
+      <View style={[styles.handContainer, { paddingHorizontal: padding }]}>
+        {hand.map((card, index) => (
+          <View
+            key={card.id}
+            style={[
+              styles.cardWrapper,
+              { 
+                marginLeft: index === 0 ? 0 : -overlap,
+                zIndex: index,
+              },
+            ]}
+          >
+            <PlayingCard
+              card={card}
+              onPress={() => handleCardPress(card)}
+              disabled={!canPlayCard(card)}
+              selected={selectedCard?.id === card.id}
+              size="small"
+            />
+          </View>
+        ))}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    width: '100%',
     paddingVertical: 8,
-  },
-  scrollContent: {
-    paddingHorizontal: 16,
   },
   handContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
+    justifyContent: 'center',
   },
   cardWrapper: {
     elevation: 1,

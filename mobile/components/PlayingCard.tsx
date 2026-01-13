@@ -110,9 +110,9 @@ export function PlayingCard({
   );
 }
 
-export function CardBack({ size = 'medium' }: { size?: 'small' | 'medium' | 'large' }) {
+export function CardBack({ size = 'medium' }: { size?: 'tiny' | 'small' | 'medium' | 'large' }) {
   const colors = useColors();
-  const sizeMultiplier = size === 'small' ? 0.7 : size === 'large' ? 1.3 : 1;
+  const sizeMultiplier = size === 'tiny' ? 0.5 : size === 'small' ? 0.7 : size === 'large' ? 1.3 : 1;
   const width = CARD_WIDTH * sizeMultiplier;
   const height = CARD_HEIGHT * sizeMultiplier;
 

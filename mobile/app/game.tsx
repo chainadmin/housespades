@@ -386,7 +386,10 @@ export default function GameScreen() {
       botThinkingRef.current = false;
     }, 600 + Math.random() * 400);
     
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      botThinkingRef.current = false;
+    };
   }, [gameState?.currentPlayerIndex, gameState?.phase, calculateBotBid, selectBotCard, isMultiplayer]);
 
   if (!gameState) {
@@ -537,10 +540,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   westPlayer: {
-    width: 100,
+    minWidth: 70,
   },
   eastPlayer: {
-    width: 100,
+    minWidth: 70,
   },
   centerArea: {
     flex: 1,

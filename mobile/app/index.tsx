@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,6 +7,8 @@ import { useColors } from '@/hooks/useColorScheme';
 import { GameMode, PointGoal } from '@/constants/game';
 import { apiUrl } from '@/config/api';
 import * as SecureStore from 'expo-secure-store';
+
+const logoImage = require('@/assets/house-card-logo.png');
 
 interface User {
   id: string;
@@ -65,9 +67,7 @@ export default function HomeScreen() {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.logoRow}>
-            <View style={styles.logoContainer}>
-              <Text style={styles.logoText}>♠</Text>
-            </View>
+            <Image source={logoImage} style={styles.logoImage} resizeMode="contain" />
             <Text style={styles.title}>House Spades</Text>
           </View>
           
@@ -244,17 +244,10 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       alignItems: 'center',
       gap: 12,
     },
-    logoContainer: {
+    logoImage: {
       width: 40,
       height: 40,
       borderRadius: 10,
-      backgroundColor: colors.primary,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    logoText: {
-      fontSize: 22,
-      color: colors.primaryForeground,
     },
     title: {
       fontSize: 24,

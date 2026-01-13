@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
 import { apiUrl } from '@/config/api';
 import * as SecureStore from 'expo-secure-store';
+
+const logoImage = require('@/assets/house-card-logo.png');
 
 export default function SignupScreen() {
   const router = useRouter();
@@ -78,9 +80,7 @@ export default function SignupScreen() {
           </TouchableOpacity>
 
           <View style={styles.header}>
-            <View style={styles.logoContainer}>
-              <Text style={styles.logoText}>♠</Text>
-            </View>
+            <Image source={logoImage} style={styles.logo} resizeMode="contain" />
             <Text style={styles.title}>Create Account</Text>
             <Text style={styles.subtitle}>Join House Spades today</Text>
           </View>
@@ -191,18 +191,11 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       alignItems: 'center',
       marginBottom: 32,
     },
-    logoContainer: {
+    logo: {
       width: 80,
       height: 80,
-      borderRadius: 20,
-      backgroundColor: colors.primary,
-      alignItems: 'center',
-      justifyContent: 'center',
       marginBottom: 16,
-    },
-    logoText: {
-      fontSize: 40,
-      color: colors.primaryForeground,
+      opacity: 0.6,
     },
     title: {
       fontSize: 28,
