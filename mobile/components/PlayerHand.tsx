@@ -26,17 +26,26 @@ export function PlayerHand({
 
     const leadSuit = gameState.currentTrick.leadSuit;
     
+    // Leading (no cards played yet)
     if (!leadSuit) {
+      // Jokers can always lead
+      if (card.suit === 'joker') return true;
+      
+      // Spades can only lead if spades broken OR you have only spades/jokers
       if (card.suit === 'spades' && !gameState.spadesBroken) {
-        const hasOnlySpades = hand.every((c) => c.suit === 'spades' || c.suit === 'joker');
-        return hasOnlySpades;
+        const hasOnlyTrumps = hand.every((c) => c.suit === 'spades' || c.suit === 'joker');
+        return hasOnlyTrumps;
       }
       return true;
     }
 
+    // Following - must follow suit if possible
     if (card.suit === leadSuit) return true;
 
-    const hasLeadSuit = hand.some((c) => c.suit === leadSuit);
+    // Check if player has any cards of the lead suit (excluding jokers)
+    const hasLeadSuit = hand.some((c) => c.suit === leadSuit && c.suit !== 'joker');
+    
+    // If you don't have the lead suit, you can play anything (including jokers as trump)
     return !hasLeadSuit;
   };
 

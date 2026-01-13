@@ -225,7 +225,8 @@ export default function GameScreen() {
       });
       
       const newTrickCards = [...prev.currentTrick.cards, { playerId: currentPlayer.id, card }];
-      const leadSuit = prev.currentTrick.leadSuit || card.suit;
+      // When a joker leads, treat it as spades lead (jokers are trump)
+      const leadSuit = prev.currentTrick.leadSuit || (card.suit === 'joker' ? 'spades' : card.suit);
       
       let spadesBroken = prev.spadesBroken;
       if (isTrump(card, prev.mode)) spadesBroken = true;
