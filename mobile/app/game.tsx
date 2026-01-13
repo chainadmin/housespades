@@ -106,14 +106,20 @@ export default function GameScreen() {
       { id: 1, name: 'Opponents', players: [players[1].id, players[3].id], score: 0, bags: 0, tricksWon: 0, totalBid: null },
     ];
 
+    // Random starter for first round (0-3)
+    const randomStarter = Math.floor(Math.random() * 4);
+    // Dealer is clockwise behind the starter
+    const dealerIndex = (randomStarter + 3) % 4;
+
     setLocalGameState({
       id: `game-${Date.now()}`,
       mode,
       phase: 'bidding',
       players,
       teams,
-      currentPlayerIndex: 0,
-      dealerIndex: 3,
+      currentPlayerIndex: randomStarter,
+      dealerIndex: dealerIndex,
+      roundStarterIndex: randomStarter,
       currentTrick: { cards: [], leadSuit: null, winnerId: null },
       spadesBroken: false,
       roundNumber: 1,
@@ -295,14 +301,20 @@ export default function GameScreen() {
             tricks: 0,
           }));
           
+          // Rotate starter clockwise from previous round's starter
+          const prevStarter = prev.roundStarterIndex ?? 0;
+          const nextStarter = (prevStarter + 1) % 4;
+          const nextDealer = (nextStarter + 3) % 4;
+          
           return {
             ...prev,
             players: newDealtPlayers,
             teams: finalTeams,
             currentTrick: { cards: [], leadSuit: null, winnerId: null },
             phase: 'bidding',
-            currentPlayerIndex: (prev.dealerIndex + 1) % 4,
-            dealerIndex: (prev.dealerIndex + 1) % 4,
+            currentPlayerIndex: nextStarter,
+            dealerIndex: nextDealer,
+            roundStarterIndex: nextStarter,
             roundNumber: prev.roundNumber + 1,
             spadesBroken: false,
           };

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,6 +9,7 @@ import { apiUrl } from '@/config/api';
 import * as SecureStore from 'expo-secure-store';
 
 const logoImage = require('@/assets/house-card-logo.png');
+const chainLogo = require('@/assets/chain-software-group-logo.png');
 
 interface User {
   id: string;
@@ -24,6 +25,7 @@ export default function HomeScreen() {
   const [selectedMode, setSelectedMode] = useState<GameMode>('ace_high');
   const [selectedPoints, setSelectedPoints] = useState<PointGoal>('300');
   const [user, setUser] = useState<User | null>(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
     checkAuth();
@@ -37,11 +39,45 @@ export default function HomeScreen() {
       if (response.ok) {
         const data = await response.json();
         setUser(data);
+      } else {
+        // Not authenticated - redirect to login
+        router.replace('/auth/login');
+        return;
       }
     } catch (err) {
       console.log('Not authenticated');
+      // Not authenticated - redirect to login
+      router.replace('/auth/login');
+      return;
+    } finally {
+      setIsCheckingAuth(false);
     }
   };
+
+  // Show loading while checking auth
+  if (isCheckingAuth) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center' }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Image source={logoImage} style={{ width: 128, height: 128, marginBottom: 24 }} resizeMode="contain" />
+          <Text style={{ fontSize: 32, fontWeight: 'bold', color: colors.text }}>House Spades</Text>
+          <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 24 }} />
+        </View>
+        <View style={{ paddingBottom: 40, alignItems: 'center' }}>
+          <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 8 }}>Powered by</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Image source={chainLogo} style={{ width: 32, height: 32, borderRadius: 4 }} resizeMode="cover" />
+            <Text style={{ fontSize: 14, fontWeight: '500', color: colors.textSecondary }}>Chain Software Group</Text>
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // If not authenticated after check, don't render (redirect happening)
+  if (!user) {
+    return null;
+  }
 
   const handlePlaySolo = () => {
     router.push(`/game?mode=${selectedMode}&points=${selectedPoints}&type=solo`);

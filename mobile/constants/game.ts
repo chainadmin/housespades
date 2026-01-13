@@ -51,6 +51,7 @@ export interface GameState {
   teams: Team[];
   currentPlayerIndex: number;
   dealerIndex: number;
+  roundStarterIndex?: number;
   currentTrick: Trick;
   spadesBroken: boolean;
   roundNumber: number;
