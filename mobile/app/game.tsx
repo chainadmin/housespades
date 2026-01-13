@@ -13,7 +13,7 @@ import {
 } from '@/constants/game';
 import { 
   generateStandardDeck, generateJJDDDeck, shuffleArray, sortHand,
-  getCardPower, isTrump 
+  getCardPower, isTrump, getPlayableCards, actsAsSpade
 } from '@/lib/gameUtils';
 import { PlayingCard } from '@/components/PlayingCard';
 import { PlayerHand } from '@/components/PlayerHand';
@@ -127,10 +127,14 @@ export default function GameScreen() {
     });
   };
 
-  const calculateBotBid = useCallback((hand: Card[]): number => {
+  const calculateBotBid = useCallback((hand: Card[], gameMode: GameMode): number => {
     let bid = 0;
     hand.forEach((card) => {
-      if (card.suit === 'joker') bid += 1;
+      // Jokers are now suit 'spades' with value 'BJ' or 'LJ'
+      if (card.value === 'BJ') bid += 1.5;
+      else if (card.value === 'LJ') bid += 1.2;
+      else if (card.suit === 'spades' && card.value === '2' && gameMode === 'joker_joker_deuce_deuce') bid += 1;
+      else if (card.suit === 'diamonds' && card.value === '2' && gameMode === 'joker_joker_deuce_deuce') bid += 1;
       else if (card.suit === 'spades' && card.numericValue >= 12) bid += 1;
       else if (card.numericValue === 14) bid += 0.8;
       else if (card.numericValue === 13) bid += 0.5;
@@ -141,25 +145,18 @@ export default function GameScreen() {
   const selectBotCard = useCallback((state: GameState, playerIndex: number): Card => {
     const player = state.players[playerIndex];
     const hand = player.hand;
-    const leadSuit = state.currentTrick.leadSuit;
-
-    if (!leadSuit) {
-      if (!state.spadesBroken) {
-        const nonSpades = hand.filter((c) => c.suit !== 'spades' && c.suit !== 'joker');
-        if (nonSpades.length > 0) return nonSpades[Math.floor(Math.random() * nonSpades.length)];
-      }
-      return hand[Math.floor(Math.random() * hand.length)];
+    
+    // Use the shared getPlayableCards function - same logic as server
+    const playableCards = getPlayableCards(hand, state.currentTrick.leadSuit, state.spadesBroken, state.mode);
+    
+    if (playableCards.length === 0) {
+      // Fallback - shouldn't happen
+      return hand[0];
     }
-
-    const matchingSuit = hand.filter((c) => c.suit === leadSuit);
-    if (matchingSuit.length > 0) {
-      return matchingSuit[Math.floor(Math.random() * matchingSuit.length)];
-    }
-
-    const trumps = hand.filter((c) => isTrump(c, state.mode));
-    if (trumps.length > 0) return trumps[0];
-
-    return hand[0];
+    
+    // Simple bot strategy: pick a random playable card
+    // Could be improved with smarter AI later
+    return playableCards[Math.floor(Math.random() * playableCards.length)];
   }, []);
 
   const handleBid = useCallback((bid: number) => {
@@ -389,7 +386,7 @@ export default function GameScreen() {
       if (!botPlayer || !botPlayer.isBot) return;
       
       if (state.phase === 'bidding') {
-        handleBidRef.current(calculateBotBid(botPlayer.hand));
+        handleBidRef.current(calculateBotBid(botPlayer.hand, state.mode));
       } else if (state.phase === 'playing') {
         handlePlayCardRef.current(selectBotCard(state, state.currentPlayerIndex));
       }

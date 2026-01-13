@@ -1,6 +1,7 @@
 import { View, StyleSheet, Dimensions } from 'react-native';
 import { Card, GameState } from '@/constants/game';
 import { PlayingCard } from './PlayingCard';
+import { getPlayableCards } from '@/lib/gameUtils';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -21,32 +22,15 @@ export function PlayerHand({
   onPlayCard,
   isMyTurn,
 }: PlayerHandProps) {
+  // Use the shared getPlayableCards function to determine which cards can be played
+  // This ensures mobile uses the exact same rules as the server
+  const playableCards = isMyTurn && gameState.phase === 'playing'
+    ? getPlayableCards(hand, gameState.currentTrick.leadSuit, gameState.spadesBroken, gameState.mode)
+    : [];
+  
   const canPlayCard = (card: Card): boolean => {
     if (!isMyTurn || gameState.phase !== 'playing') return false;
-
-    const leadSuit = gameState.currentTrick.leadSuit;
-    
-    // Leading (no cards played yet)
-    if (!leadSuit) {
-      // Jokers can always lead
-      if (card.suit === 'joker') return true;
-      
-      // Spades can only lead if spades broken OR you have only spades/jokers
-      if (card.suit === 'spades' && !gameState.spadesBroken) {
-        const hasOnlyTrumps = hand.every((c) => c.suit === 'spades' || c.suit === 'joker');
-        return hasOnlyTrumps;
-      }
-      return true;
-    }
-
-    // Following - must follow suit if possible
-    if (card.suit === leadSuit) return true;
-
-    // Check if player has any cards of the lead suit (excluding jokers)
-    const hasLeadSuit = hand.some((c) => c.suit === leadSuit && c.suit !== 'joker');
-    
-    // If you don't have the lead suit, you can play anything (including jokers as trump)
-    return !hasLeadSuit;
+    return playableCards.some((c) => c.id === card.id);
   };
 
   const handleCardPress = (card: Card) => {
