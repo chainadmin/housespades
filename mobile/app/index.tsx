@@ -9,7 +9,7 @@ import { apiUrl } from '@/config/api';
 import * as SecureStore from 'expo-secure-store';
 
 const logoImage = require('@/assets/house-card-logo.png');
-const chainLogo = require('@/assets/chain-software-group-logo.png');
+const chainLogo = require('@/assets/chain-logo.jpg');
 
 interface User {
   id: string;
