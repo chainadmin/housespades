@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   sideContainer: {
     padding: 6,
     borderRadius: 8,
-    minWidth: 60,
+    minWidth: 70,
   },
   eastAlign: {
     alignItems: 'flex-end',
@@ -160,8 +160,9 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   bidSmall: {
-    fontSize: 9,
-    marginTop: 1,
+    fontSize: 10,
+    fontWeight: '600',
+    marginTop: 2,
   },
   cardsRow: {
     flexDirection: 'row',

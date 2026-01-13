@@ -40,7 +40,6 @@ export default function GameScreen() {
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   
   const localPlayerId = 'player-1';
-  const botThinkingRef = useRef(false);
   const gameStateRef = useRef<GameState | null>(null);
   const previousPhaseRef = useRef<string | null>(null);
   const gameCompletedRef = useRef(false);
@@ -356,40 +355,28 @@ export default function GameScreen() {
   // Bot AI for solo mode
   useEffect(() => {
     if (isMultiplayer) return;
-    if (!gameState || botThinkingRef.current) return;
+    if (!gameState) return;
     if (gameState.phase !== 'bidding' && gameState.phase !== 'playing') return;
     
     const currentPlayer = gameState.players[gameState.currentPlayerIndex];
     if (!currentPlayer || !currentPlayer.isBot) return;
     
-    botThinkingRef.current = true;
-    
+    // Schedule bot action with a delay
     const timer = setTimeout(() => {
       const state = gameStateRef.current;
-      if (!state) {
-        botThinkingRef.current = false;
-        return;
-      }
+      if (!state) return;
       
       const botPlayer = state.players[state.currentPlayerIndex];
-      if (!botPlayer || !botPlayer.isBot) {
-        botThinkingRef.current = false;
-        return;
-      }
+      if (!botPlayer || !botPlayer.isBot) return;
       
       if (state.phase === 'bidding') {
         handleBidRef.current(calculateBotBid(botPlayer.hand));
       } else if (state.phase === 'playing') {
         handlePlayCardRef.current(selectBotCard(state, state.currentPlayerIndex));
       }
-      
-      botThinkingRef.current = false;
     }, 600 + Math.random() * 400);
     
-    return () => {
-      clearTimeout(timer);
-      botThinkingRef.current = false;
-    };
+    return () => clearTimeout(timer);
   }, [gameState?.currentPlayerIndex, gameState?.phase, calculateBotBid, selectBotCard, isMultiplayer]);
 
   if (!gameState) {
@@ -540,10 +527,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   westPlayer: {
-    minWidth: 70,
+    minWidth: 75,
+    zIndex: 1,
   },
   eastPlayer: {
-    minWidth: 70,
+    minWidth: 75,
+    zIndex: 1,
   },
   centerArea: {
     flex: 1,
