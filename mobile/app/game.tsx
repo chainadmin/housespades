@@ -358,6 +358,9 @@ export default function GameScreen() {
     if (!gameState) return;
     if (gameState.phase !== 'bidding' && gameState.phase !== 'playing') return;
     
+    // Don't act if trick is complete (waiting for animation/clear)
+    if (gameState.phase === 'playing' && gameState.currentTrick.cards.length === 4) return;
+    
     const currentPlayer = gameState.players[gameState.currentPlayerIndex];
     if (!currentPlayer || !currentPlayer.isBot) return;
     
@@ -365,6 +368,9 @@ export default function GameScreen() {
     const timer = setTimeout(() => {
       const state = gameStateRef.current;
       if (!state) return;
+      
+      // Re-check conditions with fresh state
+      if (state.phase === 'playing' && state.currentTrick.cards.length === 4) return;
       
       const botPlayer = state.players[state.currentPlayerIndex];
       if (!botPlayer || !botPlayer.isBot) return;
@@ -377,7 +383,7 @@ export default function GameScreen() {
     }, 600 + Math.random() * 400);
     
     return () => clearTimeout(timer);
-  }, [gameState?.currentPlayerIndex, gameState?.phase, calculateBotBid, selectBotCard, isMultiplayer]);
+  }, [gameState?.currentPlayerIndex, gameState?.phase, gameState?.currentTrick.cards.length, calculateBotBid, selectBotCard, isMultiplayer]);
 
   if (!gameState) {
     return (

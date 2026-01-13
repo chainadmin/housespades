@@ -3,13 +3,14 @@ import { Stack, useRouter, useSegments, SplashScreen } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { View, ActivityIndicator, Image } from 'react-native';
+import { View, ActivityIndicator, Image, Text } from 'react-native';
 import { useColorScheme, useColors } from '@/hooks/useColorScheme';
 import { apiUrl } from '@/config/api';
 
 SplashScreen.preventAutoHideAsync();
 
 const logoImage = require('@/assets/house-card-logo.png');
+const chainLogo = require('@/assets/chain-logo.jpg');
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -80,8 +81,17 @@ export default function RootLayout() {
             justifyContent: 'center',
             backgroundColor: colorScheme === 'dark' ? '#121212' : '#ffffff',
           }}>
-            <Image source={logoImage} style={{ width: 100, height: 100, opacity: 0.6 }} resizeMode="contain" />
-            <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 24 }} />
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+              <Image source={logoImage} style={{ width: 120, height: 120 }} resizeMode="contain" />
+              <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 24 }} />
+            </View>
+            <View style={{ paddingBottom: 40, alignItems: 'center' }}>
+              <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 8 }}>Powered by</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <Image source={chainLogo} style={{ width: 24, height: 24, borderRadius: 4 }} resizeMode="cover" />
+                <Text style={{ fontSize: 14, fontWeight: '500', color: colors.textSecondary }}>Chain Software Group</Text>
+              </View>
+            </View>
           </View>
           <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
         </SafeAreaProvider>
