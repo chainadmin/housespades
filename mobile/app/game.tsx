@@ -198,7 +198,7 @@ export default function GameScreen() {
         players: newPlayers,
         teams: newTeams,
         phase: newPhase,
-        currentPlayerIndex: allBid ? 0 : (prev.currentPlayerIndex + 1) % 4,
+        currentPlayerIndex: allBid ? (prev.roundStarterIndex ?? 0) : (prev.currentPlayerIndex + 1) % 4,
       };
     });
   }, [localGameState, isMultiplayer, wsPlaceBid]);
