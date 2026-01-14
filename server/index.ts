@@ -1,11 +1,12 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
-import MemoryStore from "memorystore";
+import connectPgSimple from "connect-pg-simple";
 import cors from "cors";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 import { migrate } from "./migrate";
+import { pool } from "./db";
 
 const app = express();
 const httpServer = createServer(app);
@@ -22,7 +23,8 @@ declare module "express-session" {
   }
 }
 
-const MemoryStoreSession = MemoryStore(session);
+// Use PostgreSQL for session storage - sessions persist across container restarts
+const PgSession = connectPgSimple(session);
 
 // CORS configuration for mobile app and web
 // In production: restrict to known origins
@@ -61,8 +63,10 @@ app.use(
     secret: process.env.SESSION_SECRET || "house-spades-dev-secret",
     resave: false,
     saveUninitialized: false,
-    store: new MemoryStoreSession({
-      checkPeriod: 86400000,
+    store: new PgSession({
+      pool: pool,
+      tableName: 'session', // Table name for sessions
+      createTableIfMissing: true, // Auto-create table if it doesn't exist
     }),
     cookie: {
       secure: process.env.NODE_ENV === "production",

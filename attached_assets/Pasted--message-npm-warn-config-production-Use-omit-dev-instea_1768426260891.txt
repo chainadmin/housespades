@@ -1,0 +1,18 @@
+{"message":"npm warn config production Use `--omit=dev` instead.","attributes":{"level":"error"},"timestamp":"2026-01-14T21:27:32.079240344Z"}
+{"message":"","attributes":{"level":"info"},"timestamp":"2026-01-14T21:27:32.079246715Z"}
+{"message":"> rest-express@1.0.0 start","attributes":{"level":"info"},"timestamp":"2026-01-14T21:27:32.079254480Z"}
+{"message":"> NODE_ENV=production node dist/index.cjs","attributes":{"level":"info"},"timestamp":"2026-01-14T21:27:32.079260466Z"}
+{"message":"","attributes":{"level":"info"},"timestamp":"2026-01-14T21:27:32.079266346Z"}
+{"message":"Running database migration...","attributes":{"level":"info"},"timestamp":"2026-01-14T21:27:32.079272335Z"}
+{"message":"Database migration complete","attributes":{"level":"info"},"timestamp":"2026-01-14T21:27:32.079279733Z"}
+{"message":"9:27:30 PM [express] serving on port 8080","attributes":{"level":"info"},"timestamp":"2026-01-14T21:27:32.079286291Z"}
+{"message":"Stopping Container","attributes":{"level":"info"},"timestamp":"2026-01-14T21:27:36.000000000Z"}
+{"message":"npm error path /app","attributes":{"level":"error"},"timestamp":"2026-01-14T21:27:38.306108151Z"}
+{"message":"npm error command sh -c NODE_ENV=production node dist/index.cjs","attributes":{"level":"error"},"timestamp":"2026-01-14T21:27:38.306111105Z"}
+{"message":"npm error command failed","attributes":{"level":"error"},"timestamp":"2026-01-14T21:27:38.306116894Z"}
+{"message":"npm error A complete log of this run can be found in: /root/.npm/_logs/2026-01-14T20_41_53_474Z-debug-0.log","attributes":{"level":"error"},"timestamp":"2026-01-14T21:27:38.306119606Z"}
+{"message":"npm error signal SIGTERM","attributes":{"level":"error"},"timestamp":"2026-01-14T21:27:38.306124168Z"}
+{"message":"9:29:47 PM [express] GET /api/user/profile 401 in 4ms :: {\"error\":\"Not authenticated\"}","attributes":{"level":"info"},"timestamp":"2026-01-14T21:29:54.873307883Z"}
+{"message":"9:30:15 PM [express] POST /api/auth/login 200 in 238ms :: {\"id\":1,\"username\":\"Jacobbi2025\",\"email\":\"jacobbimccant@gmail.com\",\"rating\":1000,\"gamesPlayed\":0,\"gamesWon\":0,\"sessionCookie\":\"connect.sid=s%3Am-unUu58Mzziqvxq35SukdyFs40Z_ZDG.LmtXCcriVty4H%2B4ZOpo5645%2BAwpXCdYWop40RD9EBa8\"}","attributes":{"level":"info"},"timestamp":"2026-01-14T21:30:15.697593360Z"}
+{"message":"9:30:15 PM [express] GET /api/user/profile 401 in 0ms :: {\"error\":\"Not authenticated\"}","attributes":{"level":"info"},"timestamp":"2026-01-14T21:30:16.886013566Z"}
+{"message":"9:30:32 PM [express] GET /api/user/profile 401 in 1ms :: {\"error\":\"Not authenticated\"}","attributes":{"level":"info"},"timestamp":"2026-01-14T21:30:36.289759512Z"}

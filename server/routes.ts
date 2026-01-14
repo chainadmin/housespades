@@ -66,17 +66,26 @@ export async function registerRoutes(
 
       req.session.userId = user.id;
 
-      // Generate signed session cookie for mobile apps
-      const sessionCookie = generateSignedSessionCookie(req.sessionID);
+      // CRITICAL: Save session to store BEFORE responding
+      // This ensures the session exists when mobile app makes the next request
+      req.session.save((err) => {
+        if (err) {
+          console.error("Session save error:", err);
+          return res.status(500).json({ error: "Failed to create session" });
+        }
 
-      res.json({
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        rating: user.rating,
-        gamesPlayed: user.gamesPlayed,
-        gamesWon: user.gamesWon,
-        sessionCookie, // Full signed cookie for mobile apps
+        // Generate signed session cookie for mobile apps
+        const sessionCookie = generateSignedSessionCookie(req.sessionID);
+
+        res.json({
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          rating: user.rating,
+          gamesPlayed: user.gamesPlayed,
+          gamesWon: user.gamesWon,
+          sessionCookie, // Full signed cookie for mobile apps
+        });
       });
     } catch (error) {
       console.error("Registration error:", error);
@@ -105,17 +114,26 @@ export async function registerRoutes(
 
       req.session.userId = user.id;
 
-      // Generate signed session cookie for mobile apps
-      const sessionCookie = generateSignedSessionCookie(req.sessionID);
+      // CRITICAL: Save session to store BEFORE responding
+      // This ensures the session exists when mobile app makes the next request
+      req.session.save((err) => {
+        if (err) {
+          console.error("Session save error:", err);
+          return res.status(500).json({ error: "Failed to create session" });
+        }
 
-      res.json({
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        rating: user.rating,
-        gamesPlayed: user.gamesPlayed,
-        gamesWon: user.gamesWon,
-        sessionCookie, // Full signed cookie for mobile apps
+        // Generate signed session cookie for mobile apps
+        const sessionCookie = generateSignedSessionCookie(req.sessionID);
+
+        res.json({
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          rating: user.rating,
+          gamesPlayed: user.gamesPlayed,
+          gamesWon: user.gamesWon,
+          sessionCookie, // Full signed cookie for mobile apps
+        });
       });
     } catch (error) {
       console.error("Login error:", error);
