@@ -40,6 +40,7 @@ export default function SignupScreen() {
     setError('');
 
     try {
+      console.log('[Signup] Attempting registration for:', email);
       const response = await fetch(apiUrl('/api/auth/register'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -47,10 +48,12 @@ export default function SignupScreen() {
         credentials: 'include',
       });
 
+      console.log('[Signup] Response status:', response.status);
       const data = await response.json();
+      console.log('[Signup] Response data keys:', Object.keys(data));
 
       if (!response.ok) {
-        throw new Error(data.message || 'Registration failed');
+        throw new Error(data.error || data.message || 'Registration failed');
       }
 
       // Try to get session from headers first, fallback to response body

@@ -28,6 +28,7 @@ export default function LoginScreen() {
     setError('');
 
     try {
+      console.log('[Login] Attempting login for:', email);
       const response = await fetch(apiUrl('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -35,10 +36,12 @@ export default function LoginScreen() {
         credentials: 'include',
       });
 
+      console.log('[Login] Response status:', response.status);
       const data = await response.json();
+      console.log('[Login] Response data keys:', Object.keys(data));
 
       if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
+        throw new Error(data.error || data.message || 'Login failed');
       }
 
       // Try to get session from headers first, fallback to response body
