@@ -20,7 +20,7 @@ function notifyAuthStateChange(isAuthenticated: boolean) {
 }
 
 export interface User {
-  id: string;
+  id: number;
   username: string;
   email: string;
   rating: number;
