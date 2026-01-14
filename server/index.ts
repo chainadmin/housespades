@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import MemoryStore from "memorystore";
+import cors from "cors";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
@@ -23,6 +24,33 @@ declare module "express-session" {
 
 const MemoryStoreSession = MemoryStore(session);
 
+// CORS configuration for mobile app and web
+// Mobile apps send requests with null/undefined origin
+const allowedOrigins = [
+  'https://housespades-production.up.railway.app',
+  'https://housespades.com',
+  'http://localhost:5000',
+  'http://localhost:3000',
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, Postman)
+    // Mobile apps don't send an Origin header like browsers do
+    if (!origin) {
+      return callback(null, true);
+    }
+    // Allow listed origins
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    // Block other origins
+    callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true, // Allow cookies to be sent
+  exposedHeaders: ['set-cookie'], // Expose Set-Cookie header for mobile apps
+}));
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "house-spades-dev-secret",
@@ -35,7 +63,7 @@ app.use(
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      sameSite: "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // "none" required for cross-origin mobile requests
     },
   })
 );
