@@ -161,7 +161,15 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
 
 ## Recent Changes (January 2026)
 
-### Game Logic Synchronization (Latest)
+### Mobile Auth Architecture (Latest)
+- Event-based auth state management with `subscribeToAuthState()` and `notifyAuthStateChange()`
+- `clearAuth()` emits false → RootLayout updates immediately → navigation to login
+- `storeUser()` emits true → RootLayout updates immediately → navigation to home
+- `authenticatedFetch()` throws `AuthError` on 401 to halt stale execution
+- Session cookies stored in SecureStore (React Native doesn't auto-persist cookies like browsers)
+- App version 2.0.11 (build 13)
+
+### Game Logic Synchronization
 - Added shared game functions to `shared/schema.ts`: `actsAsSpade()`, `generateStandardDeck()`, `generateJJDDDeck()`, `shuffleArray()`, `sortHand()`, `getPlayableCards()`, `getCardPower()`, `isTrump()`
 - Mobile `gameUtils.ts` uses same logic with dual-format support for joker suits ('spades' for server, 'joker' for legacy)
 - `PlayerHand.tsx` now uses `getPlayableCards()` instead of inline logic
