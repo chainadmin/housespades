@@ -207,7 +207,8 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/auth/me", async (req, res) => {
+  // Helper function for getting current user data
+  const getCurrentUser = async (req: any, res: any) => {
     try {
       const userId = req.session.userId;
       if (!userId) {
@@ -230,10 +231,14 @@ export async function registerRoutes(
         removeAds: user.removeAds,
       });
     } catch (error) {
-      console.error("Get me error:", error);
+      console.error("Get user error:", error);
       res.status(500).json({ error: "Failed to get user" });
     }
-  });
+  };
+
+  // Both endpoints use the same logic for getting current user
+  app.get("/api/auth/me", getCurrentUser);
+  app.get("/api/user/profile", getCurrentUser);
 
   app.post("/api/auth/logout", (req, res) => {
     req.session.destroy((err) => {
