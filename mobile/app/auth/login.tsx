@@ -5,7 +5,7 @@ import { useRouter, Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
 import { apiUrl } from '@/config/api';
-import * as SecureStore from 'expo-secure-store';
+import { storeSessionCookie, storeUser, extractSessionCookie } from '@/lib/auth';
 
 const logoImage = require('@/assets/house-card-logo.png');
 
@@ -41,8 +41,13 @@ export default function LoginScreen() {
         throw new Error(data.message || 'Login failed');
       }
 
+      const sessionCookie = extractSessionCookie(response);
+      if (sessionCookie) {
+        await storeSessionCookie(sessionCookie);
+      }
+
       if (data.user) {
-        await SecureStore.setItemAsync('user', JSON.stringify(data.user));
+        await storeUser(data.user);
       }
 
       router.replace('/');

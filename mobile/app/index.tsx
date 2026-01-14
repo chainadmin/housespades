@@ -5,19 +5,11 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
 import { GameMode, PointGoal } from '@/constants/game';
-import { apiUrl } from '@/config/api';
-import * as SecureStore from 'expo-secure-store';
+import { authenticatedFetch, getStoredUser, User } from '@/lib/auth';
 
 const logoImage = require('@/assets/house-card-logo.png');
 const chainLogo = require('@/assets/chain-logo.jpg');
 
-interface User {
-  id: string;
-  username: string;
-  rating: number;
-  gamesPlayed: number;
-  gamesWon: number;
-}
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -33,17 +25,18 @@ export default function HomeScreen() {
 
   const fetchUserProfile = async () => {
     try {
-      const response = await fetch(apiUrl('/api/user/profile'), {
-        credentials: 'include',
-      });
+      const storedUser = await getStoredUser();
+      if (storedUser) {
+        setUser(storedUser);
+      }
+      
+      const response = await authenticatedFetch('/api/user/profile');
       if (response.ok) {
         const data = await response.json();
         setUser(data);
       }
-      // Don't redirect here - _layout.tsx handles auth routing
     } catch (err) {
       console.log('Error fetching profile:', err);
-      // Don't redirect here - _layout.tsx handles auth routing
     } finally {
       setIsCheckingAuth(false);
     }

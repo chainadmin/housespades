@@ -5,7 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { View, ActivityIndicator, Image, Text } from 'react-native';
 import { useColorScheme, useColors } from '@/hooks/useColorScheme';
-import { apiUrl } from '@/config/api';
+import { checkAuthStatus, subscribeToAuthState } from '@/lib/auth';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -22,22 +22,23 @@ export default function RootLayout() {
   const navigationDone = useRef(false);
 
   useEffect(() => {
-    checkAuth();
+    performAuthCheck();
+    
+    // Subscribe to auth state changes (e.g., when 401 triggers clearAuth)
+    const unsubscribe = subscribeToAuthState((authenticated) => {
+      setIsAuthenticated(authenticated);
+    });
+    
+    return unsubscribe;
   }, []);
 
-  const checkAuth = async () => {
+  const performAuthCheck = async () => {
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-      
-      const response = await fetch(apiUrl('/api/user/profile'), {
-        credentials: 'include',
-        signal: controller.signal,
-      });
-      
-      clearTimeout(timeoutId);
-      setIsAuthenticated(response.ok);
+      // Always check auth status - handles both stored user and cookie scenarios
+      const { isAuthenticated: apiAuth } = await checkAuthStatus();
+      setIsAuthenticated(apiAuth);
     } catch (err) {
+      console.log('Auth check error:', err);
       setIsAuthenticated(false);
     } finally {
       setIsReady(true);

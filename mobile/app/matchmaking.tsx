@@ -12,7 +12,7 @@ import Animated, {
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
 import { GameMode, PointGoal } from '@/constants/game';
-import { apiUrl } from '@/config/api';
+import { authenticatedFetch } from '@/lib/auth';
 
 export default function MatchmakingScreen() {
   const router = useRouter();
@@ -45,14 +45,13 @@ export default function MatchmakingScreen() {
 
   const joinMatchmaking = async () => {
     try {
-      const response = await fetch(apiUrl('/api/matchmaking/join'), {
+      const response = await authenticatedFetch('/api/matchmaking/join', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           gameMode: params.mode,
           pointGoal: params.points,
         }),
-        credentials: 'include',
       });
 
       if (response.ok) {
@@ -74,9 +73,7 @@ export default function MatchmakingScreen() {
       if (!inQueueRef.current) return;
 
       try {
-        const response = await fetch(apiUrl('/api/matchmaking/status'), {
-          credentials: 'include',
-        });
+        const response = await authenticatedFetch('/api/matchmaking/status');
         
         if (response.ok) {
           const data = await response.json();
@@ -118,10 +115,7 @@ export default function MatchmakingScreen() {
     }
     
     try {
-      await fetch(apiUrl('/api/matchmaking/leave'), {
-        method: 'POST',
-        credentials: 'include',
-      });
+      await authenticatedFetch('/api/matchmaking/leave', { method: 'POST' });
     } catch (err) {
       console.error('Failed to leave matchmaking:', err);
     }

@@ -4,8 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
-import { apiUrl } from '@/config/api';
-import * as SecureStore from 'expo-secure-store';
+import { authenticatedFetch, clearAuth, getStoredUser, User } from '@/lib/auth';
 
 interface UserProfile {
   id: string;
@@ -28,9 +27,12 @@ export default function ProfileScreen() {
 
   const fetchProfile = async () => {
     try {
-      const response = await fetch(apiUrl('/api/user/profile'), {
-        credentials: 'include',
-      });
+      const storedUser = await getStoredUser();
+      if (storedUser) {
+        setProfile(storedUser as UserProfile);
+      }
+      
+      const response = await authenticatedFetch('/api/user/profile');
       if (response.ok) {
         const data = await response.json();
         setProfile(data);
@@ -44,11 +46,8 @@ export default function ProfileScreen() {
 
   const handleLogout = async () => {
     try {
-      await fetch(apiUrl('/api/auth/logout'), { 
-        method: 'POST',
-        credentials: 'include',
-      });
-      await SecureStore.deleteItemAsync('user');
+      await authenticatedFetch('/api/auth/logout', { method: 'POST' });
+      await clearAuth();
       router.replace('/auth/login');
     } catch (err) {
       console.error('Logout failed:', err);
