@@ -1,0 +1,16 @@
+{"message":"npm warn config production Use `--omit=dev` instead.","attributes":{"level":"error"},"timestamp":"2026-01-14T20:34:55.786924325Z"}
+{"message":"","attributes":{"level":"info"},"timestamp":"2026-01-14T20:34:55.786936548Z"}
+{"message":"> rest-express@1.0.0 start","attributes":{"level":"info"},"timestamp":"2026-01-14T20:34:55.786945264Z"}
+{"message":"> NODE_ENV=production node dist/index.cjs","attributes":{"level":"info"},"timestamp":"2026-01-14T20:34:55.786952367Z"}
+{"message":"","attributes":{"level":"info"},"timestamp":"2026-01-14T20:34:55.786958450Z"}
+{"message":"Running database migration...","attributes":{"level":"info"},"timestamp":"2026-01-14T20:34:55.786966218Z"}
+{"message":"Database migration complete","attributes":{"level":"info"},"timestamp":"2026-01-14T20:34:55.786972958Z"}
+{"message":"8:34:55 PM [express] serving on port 8080","attributes":{"level":"info"},"timestamp":"2026-01-14T20:34:55.786979730Z"}
+{"message":"Stopping Container","attributes":{"level":"info"},"timestamp":"2026-01-14T20:34:58.000000000Z"}
+{"message":"npm error path /app","attributes":{"level":"error"},"timestamp":"2026-01-14T20:35:06.075798281Z"}
+{"message":"npm error command failed","attributes":{"level":"error"},"timestamp":"2026-01-14T20:35:06.075812864Z"}
+{"message":"npm error signal SIGTERM","attributes":{"level":"error"},"timestamp":"2026-01-14T20:35:06.075820408Z"}
+{"message":"npm error command sh -c NODE_ENV=production node dist/index.cjs","attributes":{"level":"error"},"timestamp":"2026-01-14T20:35:06.075828064Z"}
+{"message":"npm error A complete log of this run can be found in: /root/.npm/_logs/2026-01-14T20_20_24_669Z-debug-0.log","attributes":{"level":"error"},"timestamp":"2026-01-14T20:35:06.075835605Z"}
+{"message":"8:36:07 PM [express] POST /api/auth/login 200 in 159ms :: {\"id\":1,\"username\":\"Jacobbi2025\",\"email\":\"jacobbimccant@gmail.com\",\"rating\":1000,\"gamesPlayed\":0,\"gamesWon\":0,\"sessionCookie\":\"connect.sid=s%3A4KIESDn8pJ8Bqk-pnxTRdrvg_HJrT6KG.G0DmCcd6PWtF1MkO8Rt%2FAphrGxkX%2BACfsb43Mo41cPw\"}","attributes":{"level":"info"},"timestamp":"2026-01-14T20:36:15.211351654Z"}
+{"message":"8:36:08 PM [express] GET /api/user/profile 304 in 5ms","attributes":{"level":"info"},"timestamp":"2026-01-14T20:36:15.211360269Z"}
