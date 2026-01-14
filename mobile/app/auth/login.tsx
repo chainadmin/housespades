@@ -41,14 +41,26 @@ export default function LoginScreen() {
         throw new Error(data.message || 'Login failed');
       }
 
-      const sessionCookie = extractSessionCookie(response);
+      // Try to get session from headers first, fallback to response body
+      let sessionCookie = extractSessionCookie(response);
+      if (!sessionCookie && data.sessionCookie) {
+        // Extract just the cookie value (connect.sid=xxx) from full Set-Cookie header
+        const match = data.sessionCookie.match(/connect\.sid=[^;]+/);
+        sessionCookie = match ? match[0] : null;
+      }
       if (sessionCookie) {
         await storeSessionCookie(sessionCookie);
       }
 
-      if (data.user) {
-        await storeUser(data.user);
-      }
+      // Store user data (response has user fields at root level)
+      await storeUser({
+        id: data.id,
+        username: data.username,
+        email: data.email,
+        rating: data.rating,
+        gamesPlayed: data.gamesPlayed,
+        gamesWon: data.gamesWon,
+      });
 
       router.replace('/');
     } catch (err: any) {

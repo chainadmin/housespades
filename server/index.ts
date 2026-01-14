@@ -25,7 +25,8 @@ declare module "express-session" {
 const MemoryStoreSession = MemoryStore(session);
 
 // CORS configuration for mobile app and web
-// Mobile apps send requests with null/undefined origin
+// In production: restrict to known origins
+// In development: allow all origins for easier testing
 const allowedOrigins = [
   'https://housespades-production.up.railway.app',
   'https://housespades.com',
@@ -40,11 +41,15 @@ app.use(cors({
     if (!origin) {
       return callback(null, true);
     }
-    // Allow listed origins
+    // In development, allow all origins
+    if (process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+    // In production, allow listed origins
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    // Block other origins
+    // Block other origins in production
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true, // Allow cookies to be sent

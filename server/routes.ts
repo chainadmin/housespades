@@ -50,13 +50,31 @@ export async function registerRoutes(
 
       req.session.userId = user.id;
 
-      res.json({
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        rating: user.rating,
-        gamesPlayed: user.gamesPlayed,
-        gamesWon: user.gamesWon,
+      // Save session first to generate the signed cookie
+      req.session.save((err) => {
+        if (err) {
+          console.error("Session save error:", err);
+          return res.status(500).json({ error: "Failed to create session" });
+        }
+
+        // Get the Set-Cookie header value for mobile apps
+        const setCookieHeader = res.getHeader('set-cookie');
+        let sessionCookie: string | undefined;
+        if (Array.isArray(setCookieHeader)) {
+          sessionCookie = setCookieHeader.find(c => c.startsWith('connect.sid='));
+        } else if (typeof setCookieHeader === 'string') {
+          sessionCookie = setCookieHeader.startsWith('connect.sid=') ? setCookieHeader : undefined;
+        }
+
+        res.json({
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          rating: user.rating,
+          gamesPlayed: user.gamesPlayed,
+          gamesWon: user.gamesWon,
+          sessionCookie, // Full signed cookie for mobile apps
+        });
       });
     } catch (error) {
       console.error("Registration error:", error);
@@ -85,13 +103,31 @@ export async function registerRoutes(
 
       req.session.userId = user.id;
 
-      res.json({
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        rating: user.rating,
-        gamesPlayed: user.gamesPlayed,
-        gamesWon: user.gamesWon,
+      // Save session first to generate the signed cookie
+      req.session.save((err) => {
+        if (err) {
+          console.error("Session save error:", err);
+          return res.status(500).json({ error: "Failed to create session" });
+        }
+
+        // Get the Set-Cookie header value for mobile apps
+        const setCookieHeader = res.getHeader('set-cookie');
+        let sessionCookie: string | undefined;
+        if (Array.isArray(setCookieHeader)) {
+          sessionCookie = setCookieHeader.find(c => c.startsWith('connect.sid='));
+        } else if (typeof setCookieHeader === 'string') {
+          sessionCookie = setCookieHeader.startsWith('connect.sid=') ? setCookieHeader : undefined;
+        }
+
+        res.json({
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          rating: user.rating,
+          gamesPlayed: user.gamesPlayed,
+          gamesWon: user.gamesWon,
+          sessionCookie, // Full signed cookie for mobile apps
+        });
       });
     } catch (error) {
       console.error("Login error:", error);

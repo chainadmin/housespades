@@ -143,6 +143,7 @@ export async function checkAuthStatus(): Promise<{ isAuthenticated: boolean; use
 }
 
 export function extractSessionCookie(response: Response): string | null {
+  // Try to get from headers first (works in some environments)
   const setCookieHeader = response.headers.get('set-cookie');
   if (setCookieHeader) {
     const match = setCookieHeader.match(/connect\.sid=[^;]+/);
@@ -152,3 +153,4 @@ export function extractSessionCookie(response: Response): string | null {
   }
   return null;
 }
+
