@@ -6,6 +6,22 @@ import { matchmaking } from "./matchmaking";
 import { sendPasswordResetEmail } from "./email";
 import bcrypt from "bcrypt";
 import { z } from "zod";
+import { sign as signCookie } from "cookie-signature";
+
+// Helper to generate signed session cookie for mobile apps
+// Must match express-session's cookie format exactly
+function generateSignedSessionCookie(sessionId: string): string {
+  const secret = process.env.SESSION_SECRET;
+  if (!secret) {
+    console.error("SESSION_SECRET not set - session cookies will not work");
+    return "";
+  }
+  // cookie-signature.sign() returns "sessionId.signature"
+  // express-session expects the cookie value to be: s:sessionId.signature (URL encoded)
+  const signedValue = signCookie(sessionId, secret);
+  // The cookie value must be URL encoded, with "s:" prefix indicating it's signed
+  return `connect.sid=${encodeURIComponent("s:" + signedValue)}`;
+}
 
 const registerSchema = z.object({
   username: z.string().min(3).max(20),
@@ -50,31 +66,17 @@ export async function registerRoutes(
 
       req.session.userId = user.id;
 
-      // Save session first to generate the signed cookie
-      req.session.save((err) => {
-        if (err) {
-          console.error("Session save error:", err);
-          return res.status(500).json({ error: "Failed to create session" });
-        }
+      // Generate signed session cookie for mobile apps
+      const sessionCookie = generateSignedSessionCookie(req.sessionID);
 
-        // Get the Set-Cookie header value for mobile apps
-        const setCookieHeader = res.getHeader('set-cookie');
-        let sessionCookie: string | undefined;
-        if (Array.isArray(setCookieHeader)) {
-          sessionCookie = setCookieHeader.find(c => c.startsWith('connect.sid='));
-        } else if (typeof setCookieHeader === 'string') {
-          sessionCookie = setCookieHeader.startsWith('connect.sid=') ? setCookieHeader : undefined;
-        }
-
-        res.json({
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          rating: user.rating,
-          gamesPlayed: user.gamesPlayed,
-          gamesWon: user.gamesWon,
-          sessionCookie, // Full signed cookie for mobile apps
-        });
+      res.json({
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        rating: user.rating,
+        gamesPlayed: user.gamesPlayed,
+        gamesWon: user.gamesWon,
+        sessionCookie, // Full signed cookie for mobile apps
       });
     } catch (error) {
       console.error("Registration error:", error);
@@ -103,31 +105,17 @@ export async function registerRoutes(
 
       req.session.userId = user.id;
 
-      // Save session first to generate the signed cookie
-      req.session.save((err) => {
-        if (err) {
-          console.error("Session save error:", err);
-          return res.status(500).json({ error: "Failed to create session" });
-        }
+      // Generate signed session cookie for mobile apps
+      const sessionCookie = generateSignedSessionCookie(req.sessionID);
 
-        // Get the Set-Cookie header value for mobile apps
-        const setCookieHeader = res.getHeader('set-cookie');
-        let sessionCookie: string | undefined;
-        if (Array.isArray(setCookieHeader)) {
-          sessionCookie = setCookieHeader.find(c => c.startsWith('connect.sid='));
-        } else if (typeof setCookieHeader === 'string') {
-          sessionCookie = setCookieHeader.startsWith('connect.sid=') ? setCookieHeader : undefined;
-        }
-
-        res.json({
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          rating: user.rating,
-          gamesPlayed: user.gamesPlayed,
-          gamesWon: user.gamesWon,
-          sessionCookie, // Full signed cookie for mobile apps
-        });
+      res.json({
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        rating: user.rating,
+        gamesPlayed: user.gamesPlayed,
+        gamesWon: user.gamesWon,
+        sessionCookie, // Full signed cookie for mobile apps
       });
     } catch (error) {
       console.error("Login error:", error);
