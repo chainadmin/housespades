@@ -167,7 +167,13 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
 - `storeUser()` emits true → RootLayout updates immediately → navigation to home
 - `authenticatedFetch()` throws `AuthError` on 401 to halt stale execution
 - Session cookies stored in SecureStore (React Native doesn't auto-persist cookies like browsers)
-- App version 2.0.11 (build 13)
+- App version 2.0.12 (build 14)
+
+### Server CORS Configuration
+- CORS enabled with origin allowlist for mobile app compatibility
+- Mobile apps send requests without Origin header, which is handled specially
+- Session cookie `sameSite: "none"` in production for cross-origin mobile requests
+- `Set-Cookie` header exposed for mobile apps to extract session cookies
 
 ### Game Logic Synchronization
 - Added shared game functions to `shared/schema.ts`: `actsAsSpade()`, `generateStandardDeck()`, `generateJJDDDeck()`, `shuffleArray()`, `sortHand()`, `getPlayableCards()`, `getCardPower()`, `isTrump()`
