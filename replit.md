@@ -161,7 +161,16 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
 
 ## Recent Changes (January 2026)
 
-### Mobile Auth Architecture (Latest)
+### Session Management Fixes (Latest)
+- **PostgreSQL Session Store**: Switched from MemoryStore to `connect-pg-simple` for persistent sessions
+  - Sessions now survive Railway container restarts
+  - Auto-creates `session` table in PostgreSQL if missing
+- **Explicit Session Save**: Login and register endpoints now call `req.session.save()` before responding
+  - Fixes race condition where session wasn't persisted before mobile app made next request
+  - Ensures `/api/user/profile` check succeeds immediately after login
+- **Added /api/user/profile endpoint**: Alias to /api/auth/me for mobile compatibility
+
+### Mobile Auth Architecture
 - Event-based auth state management with `subscribeToAuthState()` and `notifyAuthStateChange()`
 - `clearAuth()` emits false → RootLayout updates immediately → navigation to login
 - `storeUser()` emits true → RootLayout updates immediately → navigation to home
