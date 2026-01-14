@@ -59,15 +59,18 @@ export default function SignupScreen() {
       // Try to get session from headers first, fallback to response body
       let sessionCookie = extractSessionCookie(response);
       if (!sessionCookie && data.sessionCookie) {
-        // Extract just the cookie value (connect.sid=xxx) from full Set-Cookie header
-        const match = data.sessionCookie.match(/connect\.sid=[^;]+/);
-        sessionCookie = match ? match[0] : null;
+        // The server returns the full cookie string directly
+        sessionCookie = data.sessionCookie;
       }
+      console.log('[Signup] Session cookie:', sessionCookie ? 'received' : 'missing');
+      
       if (sessionCookie) {
         await storeSessionCookie(sessionCookie);
+        console.log('[Signup] Session cookie stored');
       }
 
       // Store user data (response has user fields at root level)
+      console.log('[Signup] Storing user:', data.username);
       await storeUser({
         id: data.id,
         username: data.username,
@@ -76,8 +79,10 @@ export default function SignupScreen() {
         gamesPlayed: data.gamesPlayed,
         gamesWon: data.gamesWon,
       });
+      console.log('[Signup] User stored, navigating to home...');
 
       router.replace('/');
+      console.log('[Signup] Navigation called');
     } catch (err: any) {
       setError(err.message || 'An error occurred');
     } finally {
