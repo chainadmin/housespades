@@ -127,8 +127,9 @@ export async function checkAuthStatus(): Promise<{ isAuthenticated: boolean; use
       return { isAuthenticated: true, user };
     }
     
-    // Server rejected - clear all auth data
-    await clearAuth();
+    // Server rejected - just report not authenticated
+    // Don't call clearAuth() here to avoid race condition where a stale auth check
+    // wipes out a freshly stored login cookie
     return { isAuthenticated: false, user: null };
   } catch (err) {
     // Network error - use cached user if available
