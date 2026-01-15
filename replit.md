@@ -164,11 +164,15 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
 ### Session Management Fixes (Latest)
 - **PostgreSQL Session Store**: Switched from MemoryStore to `connect-pg-simple` for persistent sessions
   - Sessions now survive Railway container restarts
-  - Auto-creates `session` table in PostgreSQL if missing
+  - Session table created via `migrate.ts` (not auto-created to avoid production build issues)
 - **Explicit Session Save**: Login and register endpoints now call `req.session.save()` before responding
   - Fixes race condition where session wasn't persisted before mobile app made next request
   - Ensures `/api/user/profile` check succeeds immediately after login
 - **Added /api/user/profile endpoint**: Alias to /api/auth/me for mobile compatibility
+- **Mobile Auth Race Condition Fix (v2.0.16)**: Removed `clearAuth()` from `checkAuthStatus()`
+  - Previously: If user logged in quickly after app launch, the initial auth check (with no cookie) would return 401 and call `clearAuth()`, wiping the freshly stored login cookie
+  - Now: `checkAuthStatus()` only reads/reports auth status without modifying it
+  - Auth invalidation still happens via `authenticatedFetch()` on real 401s during API usage
 
 ### Mobile Auth Architecture
 - Event-based auth state management with `subscribeToAuthState()` and `notifyAuthStateChange()`
@@ -176,7 +180,7 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
 - `storeUser()` emits true → RootLayout updates immediately → navigation to home
 - `authenticatedFetch()` throws `AuthError` on 401 to halt stale execution
 - Session cookies stored in SecureStore (React Native doesn't auto-persist cookies like browsers)
-- App version 2.0.12 (build 14)
+- App version 2.0.16 (build 18)
 
 ### Server CORS Configuration
 - CORS enabled with origin allowlist for mobile app compatibility
