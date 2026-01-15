@@ -1,4 +1,5 @@
-import { View, StyleSheet } from 'react-native';
+import { useEffect } from 'react';
+import { View, StyleSheet, Platform } from 'react-native';
 import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
 import { BANNER_AD_UNIT_ID } from '@/hooks/useAds';
 
@@ -13,7 +14,17 @@ export function AdBanner({
   hasRemoveAds = false,
   isTrackingAllowed = false
 }: AdBannerProps) {
+  useEffect(() => {
+    console.log('[AdBanner] Mounting with:', {
+      hasRemoveAds,
+      isTrackingAllowed,
+      adUnitId: BANNER_AD_UNIT_ID,
+      platform: Platform.OS,
+    });
+  }, [hasRemoveAds, isTrackingAllowed]);
+
   if (hasRemoveAds) {
+    console.log('[AdBanner] Not showing - user has removeAds');
     return null;
   }
 
@@ -25,8 +36,11 @@ export function AdBanner({
         requestOptions={{
           requestNonPersonalizedAdsOnly: !isTrackingAllowed,
         }}
-        onAdFailedToLoad={(error) => {
-          console.error('Banner ad failed to load:', error);
+        onAdLoaded={() => {
+          console.log('[AdBanner] Ad loaded successfully');
+        }}
+        onAdFailedToLoad={(error: any) => {
+          console.error('[AdBanner] Ad failed to load:', error?.code || 'unknown', error?.message || error);
         }}
       />
     </View>

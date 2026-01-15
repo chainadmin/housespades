@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { View, StyleSheet, Dimensions, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -38,11 +38,14 @@ export default function GameScreen() {
   
   const [localGameState, setLocalGameState] = useState<GameState | null>(null);
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+  const [showGameOverModal, setShowGameOverModal] = useState(false);
   
   const localPlayerId = 'player-1';
   const gameStateRef = useRef<GameState | null>(null);
   const previousPhaseRef = useRef<string | null>(null);
   const gameCompletedRef = useRef(false);
+  const isMountedRef = useRef(true);
+  const gameOverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // WebSocket for multiplayer
   const {
@@ -68,6 +71,17 @@ export default function GameScreen() {
   useEffect(() => {
     gameStateRef.current = gameState;
   }, [gameState]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      if (gameOverTimeoutRef.current) {
+        clearTimeout(gameOverTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (isMultiplayer) {
@@ -350,13 +364,33 @@ export default function GameScreen() {
     if (isGameOver && !wasGameOver && !gameCompletedRef.current) {
       gameCompletedRef.current = true;
       recordGameCompleted();
-      if (shouldShowAd) {
-        showInterstitialAd();
-      }
+      
+      // Show interstitial ad if applicable, then show game over modal
+      const handleGameOver = async () => {
+        // Check if still mounted before proceeding
+        if (!isMountedRef.current) return;
+        
+        if (shouldShowAd) {
+          try {
+            await showInterstitialAd();
+          } catch (err) {
+            console.log('Interstitial ad failed, continuing to game over modal');
+          }
+        }
+        // Only set state if still mounted
+        if (isMountedRef.current) {
+          setShowGameOverModal(true);
+        }
+      };
+      
+      // Small delay to let the final trick display, then show ad/modal
+      // Store timeout ref for cleanup
+      gameOverTimeoutRef.current = setTimeout(handleGameOver, 1500);
     }
     
     if (currentPhase === 'bidding' && previousPhaseRef.current !== 'bidding') {
       gameCompletedRef.current = false;
+      setShowGameOverModal(false);
     }
     
     previousPhaseRef.current = currentPhase || null;
@@ -506,6 +540,61 @@ export default function GameScreen() {
           <AdBanner hasRemoveAds={hasRemoveAds} isTrackingAllowed={isTrackingAllowed} />
         </View>
       )}
+
+      {/* Game Over Modal */}
+      <Modal
+        visible={showGameOverModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {}}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Ionicons 
+              name="trophy" 
+              size={64} 
+              color={colors.primary} 
+              style={{ marginBottom: 16 }} 
+            />
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Game Over!</Text>
+            {gameState && (() => {
+              const winningTeamIndex = gameState.teams.findIndex(t => t.score >= gameState.winningScore);
+              const winningTeam = winningTeamIndex !== -1 ? gameState.teams[winningTeamIndex] : null;
+              const isPlayerWinner = winningTeam?.players.includes(playerId);
+              return (
+                <>
+                  <Text style={[styles.modalSubtitle, { color: isPlayerWinner ? colors.success : colors.error }]}>
+                    {isPlayerWinner ? 'You Win!' : 'You Lose'}
+                  </Text>
+                  <View style={styles.finalScoreContainer}>
+                    {gameState.teams.map((team, idx) => (
+                      <View key={idx} style={styles.teamScoreRow}>
+                        <Text style={[styles.teamName, { color: colors.textSecondary }]}>
+                          {team.name}:
+                        </Text>
+                        <Text style={[styles.teamScore, { color: colors.text }]}>
+                          {team.score}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                </>
+              );
+            })()}
+            <TouchableOpacity
+              style={[styles.modalButton, { backgroundColor: colors.primary }]}
+              onPress={() => {
+                setShowGameOverModal(false);
+                router.back();
+              }}
+            >
+              <Text style={[styles.modalButtonText, { color: colors.primaryForeground }]}>
+                Return Home
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -569,5 +658,57 @@ const styles = StyleSheet.create({
   bannerContainer: {
     alignItems: 'center',
     paddingBottom: 8,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalContent: {
+    width: '85%',
+    maxWidth: 340,
+    borderRadius: 16,
+    padding: 32,
+    alignItems: 'center',
+    borderWidth: 1,
+  },
+  modalTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  modalSubtitle: {
+    fontSize: 22,
+    fontWeight: '600',
+    marginBottom: 24,
+  },
+  finalScoreContainer: {
+    width: '100%',
+    marginBottom: 24,
+  },
+  teamScoreRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  teamName: {
+    fontSize: 16,
+  },
+  teamScore: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  modalButton: {
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 10,
+    width: '100%',
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
