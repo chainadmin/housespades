@@ -17,10 +17,11 @@ function generateSignedSessionCookie(sessionId: string): string {
     return "";
   }
   // cookie-signature.sign() returns "sessionId.signature"
-  // express-session expects the cookie value to be: s:sessionId.signature (URL encoded)
+  // express-session expects the cookie value to be: s:sessionId.signature
   const signedValue = signCookie(sessionId, secret);
-  // The cookie value must be URL encoded, with "s:" prefix indicating it's signed
-  return `connect.sid=${encodeURIComponent("s:" + signedValue)}`;
+  // DO NOT URL-encode - mobile sends this directly as Cookie header
+  // Express-session's cookie parser expects the raw value
+  return `connect.sid=s:${signedValue}`;
 }
 
 const registerSchema = z.object({
@@ -228,6 +229,11 @@ export async function registerRoutes(
   // Helper function for getting current user data
   const getCurrentUser = async (req: any, res: any) => {
     try {
+      // Debug logging for mobile auth issues
+      console.log('[Auth Debug] Cookie header:', req.headers.cookie);
+      console.log('[Auth Debug] Session ID:', req.sessionID);
+      console.log('[Auth Debug] Session userId:', req.session?.userId);
+      
       const userId = req.session.userId;
       if (!userId) {
         return res.status(401).json({ error: "Not authenticated" });
