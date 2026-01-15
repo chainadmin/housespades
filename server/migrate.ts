@@ -56,6 +56,20 @@ export async function migrate() {
       )
     `);
 
+    // Session table for connect-pg-simple (express sessions)
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS "session" (
+        "sid" varchar NOT NULL COLLATE "default",
+        "sess" json NOT NULL,
+        "expire" timestamp(6) NOT NULL,
+        PRIMARY KEY ("sid")
+      )
+    `);
+    
+    await db.execute(sql`
+      CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "session" ("expire")
+    `);
+
     console.log("Database migration complete");
   } catch (error) {
     console.error("Database migration failed:", error);

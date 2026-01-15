@@ -66,7 +66,7 @@ app.use(
     store: new PgSession({
       pool: pool,
       tableName: 'session', // Table name for sessions
-      createTableIfMissing: true, // Auto-create table if it doesn't exist
+      // Table is created by migrate.ts - don't use createTableIfMissing as it fails in production builds
     }),
     cookie: {
       secure: process.env.NODE_ENV === "production",
