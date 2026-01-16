@@ -27,35 +27,42 @@ declare module "express-session" {
 const PgSession = connectPgSimple(session);
 
 // CORS configuration for mobile app and web
-// In production: restrict to known origins
-// In development: allow all origins for easier testing
 const allowedOrigins = [
   'https://housespades-production.up.railway.app',
+  'https://www.housespades-production.up.railway.app',
   'https://housespades.com',
+  'https://www.housespades.com',
   'http://localhost:5000',
   'http://localhost:3000',
+  'http://localhost:8081', // Expo dev
+  'http://localhost:19006', // Expo web
 ];
 
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (mobile apps, curl, Postman)
-    // Mobile apps don't send an Origin header like browsers do
+    // Native mobile apps don't send an Origin header
     if (!origin) {
       return callback(null, true);
     }
-    // In development, allow all origins
-    if (process.env.NODE_ENV !== 'production') {
+    // Allow all Railway subdomains
+    if (origin.endsWith('.up.railway.app')) {
       return callback(null, true);
     }
-    // In production, allow listed origins
+    // Allow localhost in any environment for development
+    if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+      return callback(null, true);
+    }
+    // Allow listed origins
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    // Block other origins in production
+    // Log blocked origins for debugging
+    console.log('CORS blocked origin:', origin);
     callback(new Error('Not allowed by CORS'));
   },
-  credentials: true, // Allow cookies to be sent
-  exposedHeaders: ['set-cookie'], // Expose Set-Cookie header for mobile apps
+  credentials: true,
+  exposedHeaders: ['set-cookie'],
 }));
 
 app.use(
