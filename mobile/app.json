@@ -4,7 +4,7 @@
     "slug": "house-spades",
     "version": "2.0.18",
     "orientation": "portrait",
-    "icon": "./assets/house-card-logo.png",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
     "splash": {
@@ -16,7 +16,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.housespades.app",
       "buildNumber": "20",
-      "icon": "./assets/house-card-logo.png",
+      "icon": "./assets/icon.png",
       "infoPlist": {
         "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you. You can still use the app with non-personalized ads if you decline.",
         "SKAdNetworkItems": [
