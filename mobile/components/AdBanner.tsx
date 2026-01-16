@@ -1,30 +1,27 @@
-import { useEffect } from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
+import { useState } from 'react';
+import { View, StyleSheet, Platform, Dimensions } from 'react-native';
 import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
 import { BANNER_AD_UNIT_ID } from '@/hooks/useAds';
 
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
 interface AdBannerProps {
-  size?: BannerAdSize;
   hasRemoveAds?: boolean;
   isTrackingAllowed?: boolean;
 }
 
 export function AdBanner({ 
-  size = BannerAdSize.ANCHORED_ADAPTIVE_BANNER,
   hasRemoveAds = false,
   isTrackingAllowed = false
 }: AdBannerProps) {
-  useEffect(() => {
-    console.log('[AdBanner] Mounting with:', {
-      hasRemoveAds,
-      isTrackingAllowed,
-      adUnitId: BANNER_AD_UNIT_ID,
-      platform: Platform.OS,
-    });
-  }, [hasRemoveAds, isTrackingAllowed]);
+  const [adError, setAdError] = useState(false);
 
   if (hasRemoveAds) {
-    console.log('[AdBanner] Not showing - user has removeAds');
+    return null;
+  }
+
+  // If adaptive banner failed, don't show anything (avoid broken UI)
+  if (adError) {
     return null;
   }
 
@@ -32,15 +29,15 @@ export function AdBanner({
     <View style={styles.container}>
       <BannerAd
         unitId={BANNER_AD_UNIT_ID}
-        size={size}
+        size={BannerAdSize.BANNER}
         requestOptions={{
           requestNonPersonalizedAdsOnly: !isTrackingAllowed,
         }}
         onAdLoaded={() => {
-          console.log('[AdBanner] Ad loaded successfully');
+          setAdError(false);
         }}
-        onAdFailedToLoad={(error: any) => {
-          console.error('[AdBanner] Ad failed to load:', error?.code || 'unknown', error?.message || error);
+        onAdFailedToLoad={() => {
+          setAdError(true);
         }}
       />
     </View>
@@ -49,7 +46,9 @@ export function AdBanner({
 
 const styles = StyleSheet.create({
   container: {
+    width: SCREEN_WIDTH,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'transparent',
   },
 });
