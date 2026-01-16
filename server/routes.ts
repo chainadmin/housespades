@@ -459,12 +459,15 @@ export async function registerRoutes(
   // Matchmaking Routes
   app.post("/api/matchmaking/join", async (req, res) => {
     try {
-      const { userId, gameMode, pointGoal } = req.body;
+      // Use session userId first, fallback to body for backwards compatibility
+      const userId = req.session.userId || req.body.userId;
+      const { gameMode, pointGoal } = req.body;
+      
       if (!userId) {
-        return res.status(400).json({ error: "User ID required" });
+        return res.status(401).json({ error: "Not authenticated" });
       }
 
-      const user = await storage.getUser(parseInt(userId, 10));
+      const user = await storage.getUser(typeof userId === 'string' ? parseInt(userId, 10) : userId);
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -487,12 +490,14 @@ export async function registerRoutes(
 
   app.post("/api/matchmaking/leave", async (req, res) => {
     try {
-      const { userId } = req.body;
+      // Use session userId first, fallback to body for backwards compatibility
+      const userId = req.session.userId || req.body.userId;
+      
       if (!userId) {
-        return res.status(400).json({ error: "User ID required" });
+        return res.status(401).json({ error: "Not authenticated" });
       }
 
-      matchmaking.removeFromQueue(parseInt(userId, 10));
+      matchmaking.removeFromQueue(typeof userId === 'string' ? parseInt(userId, 10) : userId);
       res.json({ message: "Removed from queue" });
     } catch (error) {
       res.status(500).json({ error: "Failed to leave matchmaking" });
