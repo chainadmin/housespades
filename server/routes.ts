@@ -264,6 +264,22 @@ export async function registerRoutes(
   app.get("/api/auth/me", getCurrentUser);
   app.get("/api/user/profile", getCurrentUser);
 
+  // Match history endpoint
+  app.get("/api/user/match-history", async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const matches = await storage.getUserMatchHistory(userId);
+      res.json({ matches });
+    } catch (error) {
+      console.error("Get match history error:", error);
+      res.status(500).json({ error: "Failed to get match history" });
+    }
+  });
+
   app.post("/api/auth/logout", (req, res) => {
     req.session.destroy((err) => {
       if (err) {

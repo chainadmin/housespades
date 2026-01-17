@@ -28,15 +28,17 @@ export default function HomeScreen() {
       const storedUser = await getStoredUser();
       if (storedUser) {
         setUser(storedUser);
+        // Only fetch from server if we have a stored user (authenticated)
+        const response = await authenticatedFetch('/api/user/profile');
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data);
+        }
       }
-      
-      const response = await authenticatedFetch('/api/user/profile');
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data);
-      }
+      // If no stored user, just continue as guest (no API call needed)
     } catch (err) {
-      console.log('Error fetching profile:', err);
+      // Silently handle errors for guests
+      console.log('Profile fetch skipped or failed');
     } finally {
       setIsCheckingAuth(false);
     }
@@ -62,25 +64,7 @@ export default function HomeScreen() {
     );
   }
 
-  // If user data not loaded yet, show loading (layout handles auth redirect)
-  if (!user) {
-    return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center' }}>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Image source={logoImage} style={{ width: 128, height: 128, marginBottom: 24 }} resizeMode="contain" />
-          <Text style={{ fontSize: 32, fontWeight: 'bold', color: colors.text }}>House Spades</Text>
-          <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 24 }} />
-        </View>
-        <View style={{ paddingBottom: 40, alignItems: 'center' }}>
-          <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 8 }}>Powered by</Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <Image source={chainLogo} style={{ width: 32, height: 32, borderRadius: 4 }} resizeMode="cover" />
-            <Text style={{ fontSize: 14, fontWeight: '500', color: colors.textSecondary }}>Chain Software Group</Text>
-          </View>
-        </View>
-      </SafeAreaView>
-    );
-  }
+  // Guest users can still access the home screen
 
   const handlePlaySolo = () => {
     router.push(`/game?mode=${selectedMode}&points=${selectedPoints}&type=solo`);
@@ -120,7 +104,7 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* User stats bar */}
+        {/* User stats bar - only shown for logged in users */}
         {user && (
           <View style={styles.statsBar}>
             <View style={styles.statItem}>
@@ -138,10 +122,31 @@ export default function HomeScreen() {
           </View>
         )}
 
+        {/* Guest banner */}
+        {!user && !isCheckingAuth && (
+          <TouchableOpacity 
+            style={[styles.guestBanner, { backgroundColor: colors.card }]}
+            onPress={() => router.push('/auth/login')}
+          >
+            <View style={styles.guestBannerContent}>
+              <Ionicons name="person-add-outline" size={20} color={colors.primary} />
+              <View style={styles.guestBannerText}>
+                <Text style={[styles.guestBannerTitle, { color: colors.text }]}>Playing as Guest</Text>
+                <Text style={[styles.guestBannerSubtitle, { color: colors.textSecondary }]}>Sign in to play online and track stats</Text>
+              </View>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+        )}
+
         {/* Welcome */}
         <View style={styles.welcomeSection}>
           <Text style={styles.welcomeTitle}>Welcome{user ? `, ${user.username}` : ''}</Text>
-          <Text style={styles.welcomeSubtitle}>Choose your game mode and point goal, then jump into a game.</Text>
+          <Text style={styles.welcomeSubtitle}>
+            {user 
+              ? 'Choose your game mode and point goal, then jump into a game.' 
+              : 'Play solo against bots or sign in to compete online.'}
+          </Text>
         </View>
 
         {/* Play options */}
@@ -165,10 +170,14 @@ export default function HomeScreen() {
             </View>
             <View style={styles.playCardContent}>
               <Text style={styles.playCardTitle}>Find Match</Text>
-              <Text style={styles.playCardDescription}>Play with others online</Text>
+              <Text style={styles.playCardDescription}>
+                {user ? 'Play with others online' : 'Sign in required to play online'}
+              </Text>
             </View>
             <TouchableOpacity style={[styles.playCardButton, styles.playCardButtonOutline]} onPress={handlePlayOnline}>
-              <Text style={styles.playCardButtonOutlineText}>Find Opponents</Text>
+              <Text style={styles.playCardButtonOutlineText}>
+                {user ? 'Find Opponents' : 'Sign In to Play'}
+              </Text>
             </TouchableOpacity>
           </TouchableOpacity>
         </View>
@@ -506,5 +515,30 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
     howToPlayBold: {
       fontWeight: '600',
       color: colors.text,
+    },
+    guestBanner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: 16,
+      borderRadius: 12,
+      marginBottom: 24,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    guestBannerContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    guestBannerText: {
+      gap: 2,
+    },
+    guestBannerTitle: {
+      fontSize: 15,
+      fontWeight: '600',
+    },
+    guestBannerSubtitle: {
+      fontSize: 13,
     },
   });

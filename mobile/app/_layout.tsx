@@ -66,16 +66,14 @@ export default function RootLayout() {
     if (!isReady || isAuthenticated === null) return;
 
     const inAuthGroup = segments[0] === 'auth';
-    const currentPath = '/' + segments.join('/');
 
     const performNavigation = async () => {
-      if (!isAuthenticated && !inAuthGroup) {
-        // Not authenticated and not on auth screens - go to login
-        await router.replace('/auth/login');
-      } else if (isAuthenticated && inAuthGroup) {
+      if (isAuthenticated && inAuthGroup) {
         // Authenticated but on auth screens - go to home
         await router.replace('/');
       }
+      // Allow guests to access home, game, profile screens
+      // They will be prompted to login when trying to play online
       
       // Hide splash after initial navigation is complete
       if (!navigationDone.current) {
@@ -135,6 +133,8 @@ export default function RootLayout() {
           <Stack.Screen name="game" />
           <Stack.Screen name="matchmaking" />
           <Stack.Screen name="profile" />
+          <Stack.Screen name="settings" />
+          <Stack.Screen name="match-history" />
         </Stack>
         <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
       </SafeAreaProvider>

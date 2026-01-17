@@ -42,6 +42,16 @@ export interface IStorage {
     losingScore: number,
     players: { userId: number | null; isBot: boolean; teamIndex: number; ratingChange: number }[]
   ): Promise<void>;
+  getUserMatchHistory(userId: number): Promise<{
+    id: number;
+    matchId: number;
+    finalScore: number;
+    opponentScore: number;
+    ratingChange: number;
+    gameMode: string;
+    completedAt: string;
+    won: boolean;
+  }[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -204,6 +214,50 @@ export class DatabaseStorage implements IStorage {
         ratingChange: player.ratingChange,
       });
     }
+  }
+
+  async getUserMatchHistory(userId: number): Promise<{
+    id: number;
+    matchId: number;
+    finalScore: number;
+    opponentScore: number;
+    ratingChange: number;
+    gameMode: string;
+    completedAt: string;
+    won: boolean;
+  }[]> {
+    const playerMatches = await db
+      .select({
+        id: matchPlayers.id,
+        matchId: matchPlayers.matchId,
+        teamIndex: matchPlayers.teamIndex,
+        ratingChange: matchPlayers.ratingChange,
+        gameMode: matchHistory.gameMode,
+        winningTeamScore: matchHistory.winningTeamScore,
+        losingTeamScore: matchHistory.losingTeamScore,
+        completedAt: matchHistory.completedAt,
+      })
+      .from(matchPlayers)
+      .innerJoin(matchHistory, eq(matchPlayers.matchId, matchHistory.id))
+      .where(eq(matchPlayers.userId, userId))
+      .orderBy(sql`${matchHistory.completedAt} DESC`)
+      .limit(50);
+
+    return playerMatches.map((pm) => {
+      // ratingChange is positive for winners and negative/zero for losers
+      // Use ratingChange to determine if player won the match
+      const won = pm.ratingChange > 0;
+      return {
+        id: pm.id,
+        matchId: pm.matchId,
+        finalScore: won ? pm.winningTeamScore : pm.losingTeamScore,
+        opponentScore: won ? pm.losingTeamScore : pm.winningTeamScore,
+        ratingChange: pm.ratingChange,
+        gameMode: pm.gameMode,
+        completedAt: pm.completedAt.toISOString(),
+        won,
+      };
+    });
   }
 }
 

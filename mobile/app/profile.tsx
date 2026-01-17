@@ -7,7 +7,7 @@ import { useColors } from '@/hooks/useColorScheme';
 import { authenticatedFetch, clearAuth, getStoredUser, User } from '@/lib/auth';
 
 interface UserProfile {
-  id: string;
+  id: number;
   username: string;
   email: string;
   rating: number;
@@ -156,13 +156,19 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.menuSection}>
-          <TouchableOpacity style={[styles.menuItem, { backgroundColor: colors.card }]}>
+          <TouchableOpacity 
+            style={[styles.menuItem, { backgroundColor: colors.card }]}
+            onPress={() => router.push('/match-history')}
+          >
             <Ionicons name="stats-chart-outline" size={22} color={colors.text} />
             <Text style={styles.menuItemText}>Match History</Text>
             <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.menuItem, { backgroundColor: colors.card }]}>
+          <TouchableOpacity 
+            style={[styles.menuItem, { backgroundColor: colors.card }]}
+            onPress={() => router.push('/settings')}
+          >
             <Ionicons name="settings-outline" size={22} color={colors.text} />
             <Text style={styles.menuItemText}>Settings</Text>
             <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
