@@ -177,7 +177,7 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
   - Creates 3 bots with ratings similar to waiting player
 - **Server user-client mapping**: `userIdToClient` Map tracks authenticated WebSocket clients
   - Cleaned up on disconnect, removes user from matchmaking queue
-- App version 2.0.22 (build 24)
+- App version 2.0.23 (build 25)
 
 ### Guest Access & Match History
 - **Guest Access**: Users can browse home and play solo games without logging in
