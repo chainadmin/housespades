@@ -28,7 +28,9 @@ mobile/                          # Mobile app (Expo/React Native)
 │   ├── index.tsx                # Home screen
 │   ├── game.tsx                 # Game screen
 │   ├── matchmaking.tsx          # Matchmaking screen
-│   └── profile.tsx              # User profile
+│   ├── profile.tsx              # User profile
+│   ├── settings.tsx             # App settings, delete account
+│   └── match-history.tsx        # Player match history
 ├── components/                  # Mobile UI components
 │   ├── PlayingCard.tsx
 │   ├── PlayerHand.tsx
@@ -67,6 +69,10 @@ PostgreSQL with Drizzle ORM:
 - `POST /api/auth/forgot-password` - Request reset
 - `POST /api/auth/reset-password` - Reset password
 - `DELETE /api/auth/account` - Delete user account (requires authentication)
+
+### User Profile
+- `GET /api/user/profile` - Get user profile data
+- `GET /api/user/match-history` - Get user's match history (last 50 games)
 
 ### Matchmaking
 - `POST /api/matchmaking/join` - Join queue
@@ -161,7 +167,21 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
 
 ## Recent Changes (January 2026)
 
-### Session Management Fixes (Latest)
+### Guest Access & Match History (Latest)
+- **Guest Access**: Users can browse home and play solo games without logging in
+  - Home screen shows "Playing as Guest" banner for unauthenticated users
+  - Online multiplayer requires registration (button shows "Sign In to Play")
+  - Layout no longer redirects unauthenticated users to login
+- **Match History Screen**: View past games with win/loss, scores, rating changes
+  - GET `/api/user/match-history` endpoint returns last 50 games
+  - Win/loss determined by ratingChange (winners: +25, losers: -20)
+  - gameMode values: 'joker_joker_deuce_deuce' and 'ace_high'
+- **Settings Screen**: Account management and app settings
+  - Delete account with confirmation (type "delete" to confirm)
+  - "Remove Ads" button (Coming Soon - awaiting RevenueCat integration)
+  - Links to Privacy Policy and Terms of Service
+
+### Session Management Fixes
 - **PostgreSQL Session Store**: Switched from MemoryStore to `connect-pg-simple` for persistent sessions
   - Sessions now survive Railway container restarts
   - Session table created via `migrate.ts` (not auto-created to avoid production build issues)
