@@ -180,7 +180,7 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
 - `storeUser()` emits true → RootLayout updates immediately → navigation to home
 - `authenticatedFetch()` throws `AuthError` on 401 to halt stale execution
 - Session cookies stored in SecureStore (React Native doesn't auto-persist cookies like browsers)
-- App version 2.0.19 (build 21)
+- App version 2.0.20 (build 22)
 
 ### Server CORS Configuration
 - CORS enabled with origin allowlist for mobile app compatibility
@@ -216,10 +216,11 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
 - EAS Build configuration for iOS/Android production builds
 - RevenueCat integration deferred to post-launch update
 
-### AdMob Fixes (v2.0.19)
-- **SDK Initialization**: Added `mobileAds().initialize()` call in `_layout.tsx` on app startup
+### AdMob Fixes (v2.0.19 - v2.0.20)
+- **SDK Initialization**: Moved `mobileAds().initialize()` into useEffect with run-once guard for proper timing on both iOS and Android
 - **iOS Static Frameworks**: Added `expo-build-properties` plugin with `useFrameworks: "static"` for iOS compatibility
 - **iOS Foreground Fix**: AdBanner now uses `useForeground` hook to reload ads when app returns from background
+- **SKAdNetwork Identifiers**: Added 46 SKAdNetwork identifiers required for iOS ad networks to serve ads
 - **Error Logging**: Added console logging for ad load success/failure for debugging
 - **Matchmaking Session Auth**: Server now uses `req.session.userId` for matchmaking endpoints (no mobile changes needed)
 

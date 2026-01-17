@@ -56,13 +56,19 @@ export function useAds(): UseAdsReturn {
   }, [hasRemoveAds]);
 
   const loadAd = useCallback(async () => {
-    if (hasRemoveAds || isAdLoading || isAdLoaded) return;
+    if (hasRemoveAds || isAdLoading || isAdLoaded) {
+      console.log('[Ads] Skip load - hasRemoveAds:', hasRemoveAds, 'isAdLoading:', isAdLoading, 'isAdLoaded:', isAdLoaded);
+      return;
+    }
 
     if (canRequestTracking) {
+      console.log('[Ads] Requesting tracking permission...');
       await requestTracking();
     }
 
     setIsAdLoading(true);
+    console.log('[Ads] Loading interstitial ad with unit ID:', INTERSTITIAL_AD_UNIT_ID);
+    console.log('[Ads] Platform:', Platform.OS, '| Tracking allowed:', isTrackingAllowed);
 
     try {
       const interstitial = InterstitialAd.createForAdRequest(INTERSTITIAL_AD_UNIT_ID, {
@@ -72,24 +78,26 @@ export function useAds(): UseAdsReturn {
       interstitialRef.current = interstitial;
 
       interstitial.addAdEventListener(AdEventType.LOADED, () => {
+        console.log('[Ads] Interstitial ad loaded successfully');
         setIsAdLoaded(true);
         setIsAdLoading(false);
       });
 
       interstitial.addAdEventListener(AdEventType.ERROR, (error) => {
-        console.error('Ad failed to load:', error);
+        console.error('[Ads] Interstitial ad failed to load:', error);
         setIsAdLoading(false);
         setTimeout(() => loadAd(), 60000);
       });
 
       interstitial.addAdEventListener(AdEventType.CLOSED, () => {
+        console.log('[Ads] Interstitial ad closed');
         setIsAdLoaded(false);
         loadAd();
       });
 
       await interstitial.load();
     } catch (err) {
-      console.error('Failed to create ad:', err);
+      console.error('[Ads] Failed to create interstitial ad:', err);
       setIsAdLoading(false);
     }
   }, [hasRemoveAds, isAdLoading, isAdLoaded, isTrackingAllowed, canRequestTracking, requestTracking]);

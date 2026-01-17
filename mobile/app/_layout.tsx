@@ -10,17 +10,10 @@ import mobileAds from 'react-native-google-mobile-ads';
 
 SplashScreen.preventAutoHideAsync();
 
-mobileAds()
-  .initialize()
-  .then((adapterStatuses) => {
-    console.log('AdMob initialized:', adapterStatuses);
-  })
-  .catch((error) => {
-    console.error('AdMob initialization error:', error);
-  });
-
 const logoImage = require('@/assets/house-card-logo.png');
 const chainLogo = require('@/assets/chain-logo.jpg');
+
+let adsInitialized = false;
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -32,9 +25,22 @@ export default function RootLayout() {
   const navigationDone = useRef(false);
 
   useEffect(() => {
+    if (!adsInitialized) {
+      adsInitialized = true;
+      mobileAds()
+        .initialize()
+        .then((adapterStatuses) => {
+          console.log('AdMob initialized:', adapterStatuses);
+        })
+        .catch((error) => {
+          console.error('AdMob initialization error:', error);
+        });
+    }
+  }, []);
+
+  useEffect(() => {
     performAuthCheck();
     
-    // Subscribe to auth state changes (e.g., when 401 triggers clearAuth)
     const unsubscribe = subscribeToAuthState((authenticated) => {
       setIsAuthenticated(authenticated);
     });
