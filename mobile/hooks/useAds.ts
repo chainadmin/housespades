@@ -128,7 +128,9 @@ export function useAds(): UseAdsReturn {
     await showInterstitialAd();
   }, [hasRemoveAds, showInterstitialAd]);
 
-  const shouldShowAd = !hasRemoveAds && gamesPlayed > 0 && gamesPlayed % GAMES_BEFORE_AD === 0;
+  // Show ad after every GAMES_BEFORE_AD games (including first game completion)
+  // gamesPlayed is incremented BEFORE this is checked in the game screen
+  const shouldShowAd = !hasRemoveAds && gamesPlayed >= GAMES_BEFORE_AD;
 
   return {
     showInterstitialAd,

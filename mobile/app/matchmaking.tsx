@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
 import { GameMode, PointGoal } from '@/constants/game';
 import { authenticatedFetch } from '@/lib/auth';
+import { AdBanner } from '@/components/AdBanner';
 
 export default function MatchmakingScreen() {
   const router = useRouter();
@@ -179,6 +180,10 @@ export default function MatchmakingScreen() {
       <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
         <Text style={styles.cancelText}>Cancel</Text>
       </TouchableOpacity>
+      
+      <View style={styles.adContainer}>
+        <AdBanner />
+      </View>
     </SafeAreaView>
   );
 }
@@ -271,5 +276,13 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       fontSize: 16,
       color: colors.textSecondary,
       fontWeight: '600',
+    },
+    adContainer: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      alignItems: 'center',
+      backgroundColor: colors.background,
     },
   });

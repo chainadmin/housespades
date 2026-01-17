@@ -365,12 +365,14 @@ export default function GameScreen() {
       gameCompletedRef.current = true;
       recordGameCompleted();
       
-      // Show interstitial ad if applicable, then show game over modal
+      // Show interstitial ad after game completion, then show game over modal
       const handleGameOver = async () => {
         // Check if still mounted before proceeding
         if (!isMountedRef.current) return;
         
-        if (shouldShowAd) {
+        // Always try to show interstitial after game completion
+        // The hook handles hasRemoveAds check internally
+        if (!hasRemoveAds) {
           try {
             await showInterstitialAd();
           } catch (err) {
@@ -394,7 +396,7 @@ export default function GameScreen() {
     }
     
     previousPhaseRef.current = currentPhase || null;
-  }, [gameState?.phase, shouldShowAd]);
+  }, [gameState?.phase, hasRemoveAds, showInterstitialAd, recordGameCompleted]);
 
   // Bot AI for solo mode
   useEffect(() => {

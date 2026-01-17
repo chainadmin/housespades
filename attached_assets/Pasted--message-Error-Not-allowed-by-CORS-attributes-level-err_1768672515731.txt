@@ -1,0 +1,39 @@
+{"message":"Error: Not allowed by CORS","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:12.060319740Z"}
+{"message":"    at Xr.process_params (/app/dist/index.cjs:38:8471)","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:12.060319741Z"}
+{"message":"    at origin (/app/dist/index.cjs:178:673)","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:12.060325665Z"}
+{"message":"    at /app/dist/index.cjs:70:34335","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:12.060332118Z"}
+{"message":"    at x (/app/dist/index.cjs:38:7874)","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:12.060337957Z"}
+{"message":"    at f (/app/dist/index.cjs:70:34155)","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:12.060339153Z"}
+{"message":"    at /app/dist/index.cjs:70:34182","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:12.060348806Z"}
+{"message":"    at /app/dist/index.cjs:38:11142","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:12.060350484Z"}
+{"message":"    at ei.handle_request (/app/dist/index.cjs:38:3170)","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:12.060358734Z"}
+{"message":"    at b (/app/dist/index.cjs:38:8355)","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:12.060363901Z"}
+{"message":"    at /app/dist/index.cjs:38:7948","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:12.060368414Z"}
+{"message":"    at Xr.process_params (/app/dist/index.cjs:38:8471)","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:12.060372945Z"}
+{"message":"    at x (/app/dist/index.cjs:38:7874)","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:12.060377138Z"}
+{"message":"    at /app/dist/index.cjs:38:11142","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:12.060381716Z"}
+{"message":"CORS blocked origin: https://house-spades.com","attributes":{"level":"info"},"timestamp":"2026-01-17T17:48:12.060385376Z"}
+{"message":"Error: Not allowed by CORS","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:12.060389939Z"}
+{"message":"    at origin (/app/dist/index.cjs:178:673)","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:12.060394521Z"}
+{"message":"    at /app/dist/index.cjs:70:34335","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:12.060402720Z"}
+{"message":"    at f (/app/dist/index.cjs:70:34155)","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:12.060408752Z"}
+{"message":"    at /app/dist/index.cjs:70:34182","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:12.060414361Z"}
+{"message":"    at ei.handle_request (/app/dist/index.cjs:38:3170)","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:12.060419760Z"}
+{"message":"    at b (/app/dist/index.cjs:38:8355)","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:12.060425807Z"}
+{"message":"    at /app/dist/index.cjs:38:7948","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:12.060431893Z"}
+{"message":"2026-01-17 17:48:17.097 UTC [78] LOG:  checkpoint starting: time","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:18.231176349Z"}
+{"message":"2026-01-17 17:48:17.685 UTC [78] LOG:  checkpoint complete: wrote 5 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.437 s, sync=0.010 s, total=0.589 s; sync files=5, longest=0.008 s, average=0.002 s; distance=5 kB, estimate=21 kB; lsn=0/19FFD48, redo lsn=0/19FFCF0","attributes":{"level":"error"},"timestamp":"2026-01-17T17:48:18.231187628Z"}
+{"message":"[Auth Debug] Cookie header: connect.sid=s:upw2toYeb6h65vxIk8ITCe4m68oJNspG.c688B8349v7ABicxZ78Tw0k4bZtERT7hatqo8ZqPWZU","attributes":{"level":"info"},"timestamp":"2026-01-17T17:51:22.310216011Z"}
+{"message":"[Auth Debug] Session ID: upw2toYeb6h65vxIk8ITCe4m68oJNspG","attributes":{"level":"info"},"timestamp":"2026-01-17T17:51:22.310231057Z"}
+{"message":"[Auth Debug] Session userId: 1","attributes":{"level":"info"},"timestamp":"2026-01-17T17:51:22.310241060Z"}
+{"message":"[Auth Debug] Session userId: 1","attributes":{"level":"info"},"timestamp":"2026-01-17T17:51:22.310243611Z"}
+{"message":"5:51:18 PM [express] GET /api/user/profile 304 in 7ms :: {\"id\":1,\"username\":\"Jacobbi2025\",\"email\":\"jacobbimccant@gmail.com\",\"rating\":1000,\"gamesPlayed\":0,\"gamesWon\":0,\"removeAds\":false}","attributes":{"level":"info"},"timestamp":"2026-01-17T17:51:22.310253434Z"}
+{"message":"5:51:18 PM [express] GET /api/user/profile 304 in 9ms :: {\"id\":1,\"username\":\"Jacobbi2025\",\"email\":\"jacobbimccant@gmail.com\",\"rating\":1000,\"gamesPlayed\":0,\"gamesWon\":0,\"removeAds\":false}","attributes":{"level":"info"},"timestamp":"2026-01-17T17:51:22.310255603Z"}
+{"message":"[Auth Debug] Cookie header: connect.sid=s:upw2toYeb6h65vxIk8ITCe4m68oJNspG.c688B8349v7ABicxZ78Tw0k4bZtERT7hatqo8ZqPWZU","attributes":{"level":"info"},"timestamp":"2026-01-17T17:51:22.310264223Z"}
+{"message":"[Auth Debug] Session ID: upw2toYeb6h65vxIk8ITCe4m68oJNspG","attributes":{"level":"info"},"timestamp":"2026-01-17T17:51:22.310273741Z"}
+{"message":"[Auth Debug] Cookie header: connect.sid=s:upw2toYeb6h65vxIk8ITCe4m68oJNspG.c688B8349v7ABicxZ78Tw0k4bZtERT7hatqo8ZqPWZU","attributes":{"level":"info"},"timestamp":"2026-01-17T17:51:22.502293605Z"}
+{"message":"[Auth Debug] Session ID: upw2toYeb6h65vxIk8ITCe4m68oJNspG","attributes":{"level":"info"},"timestamp":"2026-01-17T17:51:22.502301574Z"}
+{"message":"[Auth Debug] Session userId: 1","attributes":{"level":"info"},"timestamp":"2026-01-17T17:51:22.502307870Z"}
+{"message":"5:51:22 PM [express] GET /api/user/profile 304 in 8ms :: {\"id\":1,\"username\":\"Jacobbi2025\",\"email\":\"jacobbimccant@gmail.com\",\"rating\":1000,\"gamesPlayed\":0,\"gamesWon\":0,\"removeAds\":false}","attributes":{"level":"info"},"timestamp":"2026-01-17T17:51:22.513119915Z"}
+{"message":"2026-01-17 17:53:17.784 UTC [78] LOG:  checkpoint starting: time","attributes":{"level":"error"},"timestamp":"2026-01-17T17:53:19.402803187Z"}
+{"message":"2026-01-17 17:53:18.141 UTC [78] LOG:  checkpoint complete: wrote 4 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.311 s, sync=0.008 s, total=0.357 s; sync files=4, longest=0.006 s, average=0.002 s; distance=6 kB, estimate=19 kB; lsn=0/1A01628, redo lsn=0/1A015D0","attributes":{"level":"error"},"timestamp":"2026-01-17T17:53:19.402814296Z"}
