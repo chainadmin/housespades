@@ -6,8 +6,18 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { View, ActivityIndicator, Image, Text } from 'react-native';
 import { useColorScheme, useColors } from '@/hooks/useColorScheme';
 import { checkAuthStatus, subscribeToAuthState } from '@/lib/auth';
+import mobileAds from 'react-native-google-mobile-ads';
 
 SplashScreen.preventAutoHideAsync();
+
+mobileAds()
+  .initialize()
+  .then((adapterStatuses) => {
+    console.log('AdMob initialized:', adapterStatuses);
+  })
+  .catch((error) => {
+    console.error('AdMob initialization error:', error);
+  });
 
 const logoImage = require('@/assets/house-card-logo.png');
 const chainLogo = require('@/assets/chain-logo.jpg');

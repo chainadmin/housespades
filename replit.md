@@ -180,7 +180,7 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
 - `storeUser()` emits true → RootLayout updates immediately → navigation to home
 - `authenticatedFetch()` throws `AuthError` on 401 to halt stale execution
 - Session cookies stored in SecureStore (React Native doesn't auto-persist cookies like browsers)
-- App version 2.0.16 (build 18)
+- App version 2.0.19 (build 21)
 
 ### Server CORS Configuration
 - CORS enabled with origin allowlist for mobile app compatibility
@@ -215,6 +215,13 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
   - Android Interstitial: `ca-app-pub-1580761947831808/3258670768`
 - EAS Build configuration for iOS/Android production builds
 - RevenueCat integration deferred to post-launch update
+
+### AdMob Fixes (v2.0.19)
+- **SDK Initialization**: Added `mobileAds().initialize()` call in `_layout.tsx` on app startup
+- **iOS Static Frameworks**: Added `expo-build-properties` plugin with `useFrameworks: "static"` for iOS compatibility
+- **iOS Foreground Fix**: AdBanner now uses `useForeground` hook to reload ads when app returns from background
+- **Error Logging**: Added console logging for ad load success/failure for debugging
+- **Matchmaking Session Auth**: Server now uses `req.session.userId` for matchmaking endpoints (no mobile changes needed)
 
 ### Card Sorting in JJDD Mode
 - Trumps now appear first: Big Joker, Little Joker, 2♠, 2♦, A♠...3♠
