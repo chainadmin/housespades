@@ -44,6 +44,8 @@ export function useAds(): UseAdsReturn {
   const [isAdLoading, setIsAdLoading] = useState(false);
   const [gamesPlayed, setGamesPlayed] = useState(0);
   const interstitialRef = useRef<InterstitialAd | null>(null);
+  const pendingShowRef = useRef(false);
+  const pendingResolveRef = useRef<((value: boolean) => void) | null>(null);
 
   useEffect(() => {
     if (hasRemoveAds) return;
@@ -52,6 +54,8 @@ export function useAds(): UseAdsReturn {
       if (interstitialRef.current) {
         interstitialRef.current.removeAllListeners();
       }
+      pendingShowRef.current = false;
+      pendingResolveRef.current = null;
     };
   }, [hasRemoveAds]);
 
@@ -77,15 +81,40 @@ export function useAds(): UseAdsReturn {
 
       interstitialRef.current = interstitial;
 
-      interstitial.addAdEventListener(AdEventType.LOADED, () => {
+      interstitial.addAdEventListener(AdEventType.LOADED, async () => {
         console.log('[Ads] Interstitial ad loaded successfully');
         setIsAdLoaded(true);
         setIsAdLoading(false);
+        
+        if (pendingShowRef.current && interstitialRef.current) {
+          console.log('[Ads] Pending show detected, showing ad now');
+          pendingShowRef.current = false;
+          try {
+            await interstitialRef.current.show();
+            if (pendingResolveRef.current) {
+              pendingResolveRef.current(true);
+              pendingResolveRef.current = null;
+            }
+          } catch (err) {
+            console.error('[Ads] Failed to show pending ad:', err);
+            if (pendingResolveRef.current) {
+              pendingResolveRef.current(false);
+              pendingResolveRef.current = null;
+            }
+          }
+        }
       });
 
       interstitial.addAdEventListener(AdEventType.ERROR, (error) => {
         console.error('[Ads] Interstitial ad failed to load:', error);
         setIsAdLoading(false);
+        if (pendingShowRef.current) {
+          pendingShowRef.current = false;
+          if (pendingResolveRef.current) {
+            pendingResolveRef.current(false);
+            pendingResolveRef.current = null;
+          }
+        }
         setTimeout(() => loadAd(), 60000);
       });
 
@@ -104,9 +133,22 @@ export function useAds(): UseAdsReturn {
 
   const showInterstitialAd = useCallback(async (): Promise<boolean> => {
     if (hasRemoveAds) return false;
+    
     if (!isAdLoaded || !interstitialRef.current) {
+      console.log('[Ads] Ad not loaded, setting pending show flag');
+      pendingShowRef.current = true;
       loadAd();
-      return false;
+      return new Promise((resolve) => {
+        pendingResolveRef.current = resolve;
+        setTimeout(() => {
+          if (pendingShowRef.current) {
+            console.log('[Ads] Pending show timed out after 5s');
+            pendingShowRef.current = false;
+            pendingResolveRef.current = null;
+            resolve(false);
+          }
+        }, 5000);
+      });
     }
 
     try {

@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { View, StyleSheet, Dimensions, Modal } from 'react-native';
+import { View, StyleSheet, Dimensions, Modal, AppState, AppStateStatus } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity, Text } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 import { useColors } from '@/hooks/useColorScheme';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { 
@@ -83,6 +84,72 @@ export default function GameScreen() {
     };
   }, []);
 
+  const GAME_STATE_KEY = 'house_spades_game_state';
+
+  const saveGameState = useCallback(async (state: GameState | null) => {
+    if (!state || state.phase === 'game_over' || state.phase === 'waiting' || isMultiplayer) {
+      await SecureStore.deleteItemAsync(GAME_STATE_KEY);
+      return;
+    }
+    try {
+      const saveData = {
+        gameState: state,
+        selectedCard,
+        mode,
+        pointGoal,
+        savedAt: Date.now(),
+      };
+      await SecureStore.setItemAsync(GAME_STATE_KEY, JSON.stringify(saveData));
+      console.log('[Game] Saved game state');
+    } catch (err) {
+      console.error('[Game] Failed to save game state:', err);
+    }
+  }, [isMultiplayer, selectedCard, mode, pointGoal]);
+
+  const loadGameState = useCallback(async (): Promise<boolean> => {
+    if (isMultiplayer) return false;
+    try {
+      const savedData = await SecureStore.getItemAsync(GAME_STATE_KEY);
+      if (!savedData) return false;
+      
+      const parsed = JSON.parse(savedData);
+      if (parsed.mode !== mode || parsed.pointGoal !== pointGoal) {
+        await SecureStore.deleteItemAsync(GAME_STATE_KEY);
+        return false;
+      }
+      
+      const savedAt = parsed.savedAt || 0;
+      const age = Date.now() - savedAt;
+      if (age > 30 * 60 * 1000) {
+        await SecureStore.deleteItemAsync(GAME_STATE_KEY);
+        return false;
+      }
+      
+      console.log('[Game] Restoring saved game state');
+      setLocalGameState(parsed.gameState);
+      if (parsed.selectedCard) setSelectedCard(parsed.selectedCard);
+      return true;
+    } catch (err) {
+      console.error('[Game] Failed to load game state:', err);
+      return false;
+    }
+  }, [isMultiplayer, mode, pointGoal]);
+
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      if (nextAppState === 'background' || nextAppState === 'inactive') {
+        if (gameStateRef.current && !isMultiplayer) {
+          saveGameState(gameStateRef.current);
+        }
+      }
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    return () => {
+      subscription.remove();
+    };
+  }, [saveGameState, isMultiplayer]);
+
   useEffect(() => {
     if (isMultiplayer) {
       connect();
@@ -91,7 +158,11 @@ export default function GameScreen() {
         disconnect();
       };
     } else {
-      initializeLocalGame();
+      loadGameState().then((restored) => {
+        if (!restored) {
+          initializeLocalGame();
+        }
+      });
     }
   }, [isMultiplayer, mode, pointGoal]);
 
@@ -468,6 +539,7 @@ export default function GameScreen() {
             if (gameState.phase !== 'game_over' && gameState.phase !== 'waiting') {
               await recordGameAbandoned();
             }
+            await SecureStore.deleteItemAsync(GAME_STATE_KEY);
             router.back();
           }} 
           style={styles.backButton}
@@ -585,8 +657,9 @@ export default function GameScreen() {
             })()}
             <TouchableOpacity
               style={[styles.modalButton, { backgroundColor: colors.primary }]}
-              onPress={() => {
+              onPress={async () => {
                 setShowGameOverModal(false);
+                await SecureStore.deleteItemAsync(GAME_STATE_KEY);
                 router.back();
               }}
             >
