@@ -126,6 +126,7 @@ export const playerSchema = z.object({
   bid: z.number().nullable(),
   tricks: z.number(),
   isReady: z.boolean(),
+  userId: z.number().optional(),
 });
 export type Player = z.infer<typeof playerSchema>;
 
@@ -213,6 +214,8 @@ export const WS_MESSAGE_TYPES = [
   "player_joined",
   "player_left",
   "chat_message",
+  "match_found",
+  "authenticate",
 ] as const;
 export type WSMessageType = (typeof WS_MESSAGE_TYPES)[number];
 

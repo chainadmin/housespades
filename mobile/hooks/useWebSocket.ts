@@ -57,6 +57,8 @@ type WSMessageType =
   | 'place_bid'
   | 'play_card'
   | 'leave_lobby'
+  | 'match_found'
+  | 'authenticate'
   | 'error';
 
 interface WSMessage {
@@ -68,7 +70,10 @@ interface UseWebSocketOptions {
   onGameStateUpdate?: (state: GameState) => void;
   onError?: (message: string) => void;
   onPlayerJoined?: (playerId: string) => void;
+  onMatchFound?: (gameId: string) => void;
+  onAuthenticated?: () => void;
   autoConnect?: boolean;
+  userId?: number | null;
 }
 
 export function useWebSocket(options: UseWebSocketOptions = {}) {
@@ -98,6 +103,14 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         clearTimeout(reconnectTimeoutRef.current);
         reconnectTimeoutRef.current = null;
       }
+      
+      if (optionsRef.current.userId) {
+        ws.send(JSON.stringify({
+          type: 'authenticate',
+          payload: { userId: optionsRef.current.userId },
+        }));
+        console.log('[WebSocket] Sent authenticate message for user', optionsRef.current.userId);
+      }
     };
 
     ws.onmessage = (event) => {
@@ -108,10 +121,18 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
           case 'player_joined':
             setPlayerId(message.payload.playerId);
             optionsRef.current.onPlayerJoined?.(message.payload.playerId);
+            if (message.payload.authenticated) {
+              console.log('[WebSocket] Authentication confirmed');
+              optionsRef.current.onAuthenticated?.();
+            }
             break;
           case 'game_state_update':
             setGameState(message.payload);
             optionsRef.current.onGameStateUpdate?.(message.payload);
+            break;
+          case 'match_found':
+            console.log('[WebSocket] Match found:', message.payload.gameId);
+            optionsRef.current.onMatchFound?.(message.payload.gameId);
             break;
           case 'error':
             optionsRef.current.onError?.(message.payload.message);

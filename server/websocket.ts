@@ -4,12 +4,14 @@ import type { GameState, WSMessage, GameMode, PointGoal } from "@shared/schema";
 import { GameEngine } from "./gameEngine";
 import { BotAI } from "./botAI";
 import { storage } from "./storage";
+import { matchmaking } from "./matchmaking";
 
 interface Client {
   ws: WebSocket;
   playerId: string;
   gameId: string | null;
   lobbyId: string | null;
+  userId: number | null;
 }
 
 interface GameRoom {
@@ -24,10 +26,90 @@ export class GameWebSocketServer {
   private wss: WebSocketServer;
   private clients: Map<WebSocket, Client> = new Map();
   private gameRooms: Map<string, GameRoom> = new Map();
+  private userIdToClient: Map<number, Client> = new Map();
 
   constructor(server: Server) {
     this.wss = new WebSocketServer({ server, path: "/ws" });
     this.setupConnectionHandler();
+    this.startMatchmaking();
+  }
+
+  private startMatchmaking() {
+    matchmaking.start((match) => {
+      console.log(`[Matchmaking] Match found with ${match.players.length} players`);
+      
+      const humanPlayers = match.players.filter(p => p.id > 0);
+      const botPlayers = match.players.filter(p => p.id < 0);
+      
+      const clients: Client[] = [];
+      for (const player of humanPlayers) {
+        const client = this.userIdToClient.get(player.id);
+        if (client) {
+          clients.push(client);
+        } else {
+          console.log(`[Matchmaking] Client not found for user ${player.id}, skipping match`);
+          return;
+        }
+      }
+
+      const gamePlayers = match.players.map((p, index) => ({
+        id: p.id > 0 ? (clients.find(c => this.userIdToClient.get(p.id) === c)?.playerId || `player-${p.id}`) : `bot-${Math.abs(p.id)}`,
+        name: p.username,
+        isBot: p.id < 0,
+        userId: p.id > 0 ? p.id : undefined,
+      }));
+
+      const gameState = GameEngine.createGame(gamePlayers, match.gameMode, match.pointGoal);
+      
+      const authenticatedHumans = gamePlayers.filter(p => !p.isBot && p.userId).length;
+      const isRanked = authenticatedHumans >= 2;
+      
+      const gameRoom: GameRoom = {
+        gameState,
+        clients: new Map(),
+        botTimer: null,
+        statsSaved: false,
+        isRanked,
+      };
+
+      for (const client of clients) {
+        const playerData = gamePlayers.find(p => p.userId === this.getClientUserId(client));
+        if (playerData) {
+          const existingPlayer = gameState.players.find(p => p.userId === playerData.userId);
+          if (existingPlayer) {
+            gameRoom.clients.set(existingPlayer.id, client);
+            client.gameId = gameState.id;
+          }
+        }
+      }
+
+      this.gameRooms.set(gameState.id, gameRoom);
+
+      for (const client of clients) {
+        this.sendMessage(client.ws, {
+          type: "match_found",
+          payload: { gameId: gameState.id },
+        });
+      }
+
+      this.broadcastGameState(gameState.id);
+      this.scheduleBotMove(gameState.id);
+      
+      console.log(`[Matchmaking] Game ${gameState.id} created with ${humanPlayers.length} humans and ${botPlayers.length} bots`);
+    });
+  }
+
+  private getClientUserId(client: Client): number | null {
+    return client.userId;
+  }
+
+  associateUserWithClient(userId: number, ws: WebSocket) {
+    const client = this.clients.get(ws);
+    if (client) {
+      client.userId = userId;
+      this.userIdToClient.set(userId, client);
+      console.log(`[WebSocket] Associated user ${userId} with client ${client.playerId}`);
+    }
   }
 
   private setupConnectionHandler() {
@@ -38,6 +120,7 @@ export class GameWebSocketServer {
         playerId,
         gameId: null,
         lobbyId: null,
+        userId: null,
       };
       this.clients.set(ws, client);
 
@@ -71,6 +154,9 @@ export class GameWebSocketServer {
     if (!client) return;
 
     switch (message.type) {
+      case "authenticate":
+        this.handleAuthenticate(ws, message.payload);
+        break;
       case "start_game":
         this.handleStartGame(ws, message.payload);
         break;
@@ -84,6 +170,20 @@ export class GameWebSocketServer {
         this.handleLeaveLobby(ws);
         break;
     }
+  }
+
+  private handleAuthenticate(ws: WebSocket, payload: { userId: number }) {
+    const client = this.clients.get(ws);
+    if (!client || !payload.userId) return;
+    
+    client.userId = payload.userId;
+    this.userIdToClient.set(payload.userId, client);
+    console.log(`[WebSocket] Client ${client.playerId} authenticated as user ${payload.userId}`);
+    
+    this.sendMessage(ws, {
+      type: "player_joined",
+      payload: { playerId: client.playerId, authenticated: true },
+    });
   }
 
   private handleStartGame(ws: WebSocket, payload: { mode: GameMode; pointGoal: PointGoal; players: { id: string; name: string; isBot: boolean; userId?: number }[] }) {
@@ -198,6 +298,11 @@ export class GameWebSocketServer {
     const client = this.clients.get(ws);
     if (client) {
       this.handleLeaveLobby(ws);
+      if (client.userId) {
+        this.userIdToClient.delete(client.userId);
+        matchmaking.removeFromQueue(client.userId);
+        console.log(`[WebSocket] User ${client.userId} disconnected and removed from matchmaking queue`);
+      }
       this.clients.delete(ws);
     }
   }

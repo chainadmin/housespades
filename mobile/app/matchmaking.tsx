@@ -12,8 +12,9 @@ import Animated, {
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
 import { GameMode, PointGoal } from '@/constants/game';
-import { authenticatedFetch } from '@/lib/auth';
+import { authenticatedFetch, getStoredUser } from '@/lib/auth';
 import { AdBanner } from '@/components/AdBanner';
+import { useWebSocket } from '@/hooks/useWebSocket';
 
 export default function MatchmakingScreen() {
   const router = useRouter();
@@ -22,11 +23,33 @@ export default function MatchmakingScreen() {
   
   const [playersFound, setPlayersFound] = useState(1);
   const [status, setStatus] = useState('Joining matchmaking queue...');
+  const [userId, setUserId] = useState<number | null>(null);
   const rotation = useSharedValue(0);
   
-  // Use ref for polling control to avoid stale closure issues
   const inQueueRef = useRef(false);
-  const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const matchFoundRef = useRef(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const { connect, disconnect, isConnected } = useWebSocket({
+    userId,
+    onMatchFound: (gameId) => {
+      if (matchFoundRef.current) return;
+      matchFoundRef.current = true;
+      inQueueRef.current = false;
+      setStatus('Match found! Starting game...');
+      setPlayersFound(4);
+      
+      setTimeout(() => {
+        router.replace(`/game?mode=${params.mode}&points=${params.points}&type=multiplayer&gameId=${gameId}`);
+      }, 1000);
+    },
+    onAuthenticated: () => {
+      setIsAuthenticated(true);
+    },
+    onError: (message) => {
+      console.error('[Matchmaking] WebSocket error:', message);
+    },
+  });
 
   useEffect(() => {
     rotation.value = withRepeat(
@@ -37,12 +60,44 @@ export default function MatchmakingScreen() {
   }, []);
 
   useEffect(() => {
-    joinMatchmaking();
+    const initMatchmaking = async () => {
+      const user = await getStoredUser();
+      if (user) {
+        setUserId(user.id);
+      } else {
+        setStatus('Sign in required for online play');
+        setTimeout(() => {
+          router.replace('/auth/login');
+        }, 2000);
+      }
+    };
+    
+    initMatchmaking();
 
     return () => {
       leaveMatchmaking();
+      disconnect();
     };
   }, [params.mode, params.points]);
+
+  useEffect(() => {
+    if (userId && !isConnected) {
+      setStatus('Connecting...');
+      connect();
+    }
+  }, [userId, isConnected, connect]);
+
+  useEffect(() => {
+    if (isConnected && !isAuthenticated) {
+      setStatus('Authenticating...');
+    }
+  }, [isConnected, isAuthenticated]);
+
+  useEffect(() => {
+    if (isAuthenticated && !inQueueRef.current) {
+      joinMatchmaking();
+    }
+  }, [isAuthenticated]);
 
   const joinMatchmaking = async () => {
     try {
@@ -58,7 +113,6 @@ export default function MatchmakingScreen() {
       if (response.ok) {
         inQueueRef.current = true;
         setStatus('Searching for players...');
-        startPolling();
       } else {
         const data = await response.json();
         setStatus(data.message || 'Failed to join queue');
@@ -69,51 +123,8 @@ export default function MatchmakingScreen() {
     }
   };
 
-  const startPolling = () => {
-    const checkStatus = async () => {
-      if (!inQueueRef.current) return;
-
-      try {
-        const response = await authenticatedFetch('/api/matchmaking/status');
-        
-        if (response.ok) {
-          const data = await response.json();
-          
-          if (data.matched && data.gameId) {
-            inQueueRef.current = false;
-            setStatus('Match found! Starting game...');
-            setPlayersFound(4);
-            setTimeout(() => {
-              router.replace(`/game?mode=${params.mode}&points=${params.points}&type=multiplayer&gameId=${data.gameId}`);
-            }, 1000);
-            return;
-          }
-          
-          if (data.playersInQueue !== undefined) {
-            setPlayersFound(Math.min(data.playersInQueue, 4));
-            setStatus(`${data.playersInQueue} player${data.playersInQueue !== 1 ? 's' : ''} in queue...`);
-          }
-        }
-      } catch (err) {
-        console.error('Failed to check status:', err);
-      }
-      
-      // Continue polling if still in queue
-      if (inQueueRef.current) {
-        pollingTimeoutRef.current = setTimeout(checkStatus, 2000);
-      }
-    };
-    
-    checkStatus();
-  };
-
   const leaveMatchmaking = async () => {
     inQueueRef.current = false;
-    
-    if (pollingTimeoutRef.current) {
-      clearTimeout(pollingTimeoutRef.current);
-      pollingTimeoutRef.current = null;
-    }
     
     try {
       await authenticatedFetch('/api/matchmaking/leave', { method: 'POST' });
@@ -124,6 +135,7 @@ export default function MatchmakingScreen() {
 
   const handleCancel = () => {
     leaveMatchmaking();
+    disconnect();
     router.back();
   };
 

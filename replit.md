@@ -167,7 +167,19 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
 
 ## Recent Changes (January 2026)
 
-### Guest Access & Match History (Latest)
+### Matchmaking WebSocket Refactor (Latest)
+- **WebSocket-only match notifications**: Removed HTTP polling from matchmaking screen
+  - HTTP POST `/api/matchmaking/join` and `/api/matchmaking/leave` for queue management
+  - WebSocket `authenticate` message with userId to register client for notifications
+  - WebSocket `match_found` event triggers navigation to game
+- **Bot fill threshold**: Server fills matches with bots after 30 seconds wait
+  - `BOT_FILL_THRESHOLD = 30000` in `server/matchmaking.ts`
+  - Creates 3 bots with ratings similar to waiting player
+- **Server user-client mapping**: `userIdToClient` Map tracks authenticated WebSocket clients
+  - Cleaned up on disconnect, removes user from matchmaking queue
+- App version 2.0.22 (build 24)
+
+### Guest Access & Match History
 - **Guest Access**: Users can browse home and play solo games without logging in
   - Home screen shows "Playing as Guest" banner for unauthenticated users
   - Online multiplayer requires registration (button shows "Sign In to Play")

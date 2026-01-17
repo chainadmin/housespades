@@ -66,7 +66,7 @@ class MatchmakingService {
       groups.get(key)!.push(player);
     }
 
-    for (const [, groupPlayers] of Array.from(groups.entries())) {
+    for (const [key, groupPlayers] of Array.from(groups.entries())) {
       if (groupPlayers.length >= 4) {
         const matched = this.selectBestMatch(groupPlayers);
         if (matched && this.onMatchFound) {
@@ -74,6 +74,28 @@ class MatchmakingService {
             this.queue.delete(p.id);
           }
           this.onMatchFound(matched);
+        }
+      } else if (groupPlayers.length >= 1) {
+        const longestWait = Math.max(...groupPlayers.map(p => Date.now() - p.queuedAt));
+        const BOT_FILL_THRESHOLD = 30000;
+        
+        if (longestWait >= BOT_FILL_THRESHOLD) {
+          console.log(`[Matchmaking] Filling match with bots after ${Math.round(longestWait / 1000)}s wait (${groupPlayers.length} players in queue for ${key})`);
+          const filledPlayers = this.fillWithBots(groupPlayers);
+          const teams = this.balanceTeams(filledPlayers);
+          
+          for (const p of groupPlayers) {
+            this.queue.delete(p.id);
+          }
+          
+          if (this.onMatchFound) {
+            this.onMatchFound({
+              players: filledPlayers,
+              teams,
+              gameMode: groupPlayers[0].gameMode,
+              pointGoal: groupPlayers[0].pointGoal,
+            });
+          }
         }
       }
     }
