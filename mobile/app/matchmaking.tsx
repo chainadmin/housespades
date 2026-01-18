@@ -15,11 +15,13 @@ import { GameMode, PointGoal } from '@/constants/game';
 import { authenticatedFetch, getStoredUser } from '@/lib/auth';
 import { AdBanner } from '@/components/AdBanner';
 import { useWebSocket } from '@/hooks/useWebSocket';
+import { useAds } from '@/hooks/useAds';
 
 export default function MatchmakingScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ mode: GameMode; points: PointGoal }>();
   const colors = useColors();
+  const { showInterstitialAd, hasRemoveAds } = useAds();
   
   const [playersFound, setPlayersFound] = useState(1);
   const [status, setStatus] = useState('Joining matchmaking queue...');
@@ -133,9 +135,18 @@ export default function MatchmakingScreen() {
     }
   };
 
-  const handleCancel = () => {
+  const handleCancel = async () => {
     leaveMatchmaking();
     disconnect();
+    
+    if (!hasRemoveAds) {
+      try {
+        await showInterstitialAd();
+      } catch (err) {
+        console.log('[Matchmaking] Interstitial ad failed, continuing to navigate back');
+      }
+    }
+    
     router.back();
   };
 
