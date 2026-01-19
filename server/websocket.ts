@@ -42,17 +42,26 @@ export class GameWebSocketServer {
       const botPlayers = match.players.filter(p => p.id < 0);
       
       const clients: Client[] = [];
+      const connectedHumanPlayers: typeof humanPlayers = [];
+      
       for (const player of humanPlayers) {
         const client = this.userIdToClient.get(player.id);
         if (client) {
           clients.push(client);
+          connectedHumanPlayers.push(player);
         } else {
-          console.log(`[Matchmaking] Client not found for user ${player.id}, skipping match`);
-          return;
+          console.log(`[Matchmaking] Client not found for user ${player.id}, removing from match`);
         }
       }
+      
+      if (connectedHumanPlayers.length === 0) {
+        console.log(`[Matchmaking] No connected human players, skipping match`);
+        return;
+      }
 
-      const gamePlayers = match.players.map((p, index) => ({
+      const allPlayers = [...connectedHumanPlayers, ...botPlayers];
+      
+      const gamePlayers = allPlayers.map((p) => ({
         id: p.id > 0 ? (clients.find(c => this.userIdToClient.get(p.id) === c)?.playerId || `player-${p.id}`) : `bot-${Math.abs(p.id)}`,
         name: p.username,
         isBot: p.id < 0,
@@ -95,7 +104,7 @@ export class GameWebSocketServer {
       this.broadcastGameState(gameState.id);
       this.scheduleBotMove(gameState.id);
       
-      console.log(`[Matchmaking] Game ${gameState.id} created with ${humanPlayers.length} humans and ${botPlayers.length} bots`);
+      console.log(`[Matchmaking] Game ${gameState.id} created with ${connectedHumanPlayers.length} humans and ${botPlayers.length} bots`);
     });
   }
 

@@ -175,10 +175,13 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
 - **Bot fill threshold**: Server fills matches with bots after 30 seconds wait
   - `BOT_FILL_THRESHOLD = 30000` in `server/matchmaking.ts`
   - Creates 3 bots with ratings similar to waiting player
+- **Bot fill fix**: Fixed bug where bot-filled matches were not created
+  - Previously aborted if any human player's client was missing
+  - Now skips disconnected players and continues with connected humans + bots
 - **Server user-client mapping**: `userIdToClient` Map tracks authenticated WebSocket clients
   - Cleaned up on disconnect, removes user from matchmaking queue
 - **Interstitial ad on matchmaking cancel**: Shows ad when user backs out of matchmaking
-- App version 2.0.24 (build 26)
+- App version 2.0.25 (build 27)
 
 ### Guest Access & Match History
 - **Guest Access**: Users can browse home and play solo games without logging in
