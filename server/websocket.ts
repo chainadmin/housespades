@@ -18,9 +18,12 @@ interface GameRoom {
   gameState: GameState;
   clients: Map<string, Client>;
   botTimer: NodeJS.Timeout | null;
+  idleTimer: NodeJS.Timeout | null;
   statsSaved: boolean;
   isRanked: boolean; // Only true for multiplayer (2+ authenticated humans)
 }
+
+const IDLE_TIMEOUT_MS = 60000; // 60 seconds idle timeout for human players
 
 export class GameWebSocketServer {
   private wss: WebSocketServer;
@@ -77,6 +80,7 @@ export class GameWebSocketServer {
         gameState,
         clients: new Map(),
         botTimer: null,
+        idleTimer: null,
         statsSaved: false,
         isRanked,
       };
@@ -103,6 +107,7 @@ export class GameWebSocketServer {
 
       this.broadcastGameState(gameState.id);
       this.scheduleBotMove(gameState.id);
+      this.scheduleIdleTimeout(gameState.id);
       
       console.log(`[Matchmaking] Game ${gameState.id} created with ${connectedHumanPlayers.length} humans and ${botPlayers.length} bots`);
     });
@@ -221,6 +226,7 @@ export class GameWebSocketServer {
         gameState,
         clients: new Map(),
         botTimer: null,
+        idleTimer: null,
         statsSaved: false,
         isRanked,
       };
@@ -234,8 +240,9 @@ export class GameWebSocketServer {
       // Send initial state
       this.broadcastGameState(gameState.id);
 
-      // Start bot logic if first player is bot
+      // Start bot logic if first player is bot, or idle timer if human
       this.scheduleBotMove(gameState.id);
+      this.scheduleIdleTimeout(gameState.id);
     } catch (error) {
       this.sendError(ws, (error as Error).message);
     }
@@ -252,6 +259,7 @@ export class GameWebSocketServer {
       room.gameState = GameEngine.placeBid(room.gameState, client.playerId, payload.bid);
       this.broadcastGameState(client.gameId);
       this.scheduleBotMove(client.gameId);
+      this.scheduleIdleTimeout(client.gameId);
     } catch (error) {
       this.sendError(ws, (error as Error).message);
     }
@@ -276,10 +284,12 @@ export class GameWebSocketServer {
             currentRoom.gameState = GameEngine.clearTrick(currentRoom.gameState);
             this.broadcastGameState(client.gameId!);
             this.scheduleBotMove(client.gameId!);
+            this.scheduleIdleTimeout(client.gameId!);
           }
         }, 1500);
       } else {
         this.scheduleBotMove(client.gameId);
+        this.scheduleIdleTimeout(client.gameId);
       }
     } catch (error) {
       this.sendError(ws, (error as Error).message);
@@ -303,7 +313,7 @@ export class GameWebSocketServer {
         // Clean up room if no human clients remain
         if (room.clients.size === 0) {
           console.log(`[Game ${client.gameId}] No human clients remaining, cleaning up room`);
-          if (room.botTimer) clearTimeout(room.botTimer);
+          this.clearGameTimers(room);
           this.gameRooms.delete(client.gameId);
         }
       }
@@ -342,6 +352,7 @@ export class GameWebSocketServer {
 
     this.broadcastGameState(gameId);
     this.scheduleBotMove(gameId);
+    this.scheduleIdleTimeout(gameId);
   }
 
   private handleDisconnect(ws: WebSocket) {
@@ -401,15 +412,90 @@ export class GameWebSocketServer {
               r.gameState = GameEngine.clearTrick(r.gameState);
               this.broadcastGameState(gameId);
               this.scheduleBotMove(gameId);
+              this.scheduleIdleTimeout(gameId);
             }
           }, 1500);
         } else {
           this.scheduleBotMove(gameId);
+          this.scheduleIdleTimeout(gameId);
         }
       } catch (error) {
         console.error("Bot move error:", error);
       }
     }, delay);
+  }
+
+  private scheduleIdleTimeout(gameId: string) {
+    const room = this.gameRooms.get(gameId);
+    if (!room) return;
+
+    const { gameState } = room;
+    const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+
+    // Clear existing idle timer
+    if (room.idleTimer) {
+      clearTimeout(room.idleTimer);
+      room.idleTimer = null;
+    }
+
+    // Only apply idle timeout for human players in active game phases
+    if (!currentPlayer || currentPlayer.isBot) return;
+    if (gameState.phase !== "bidding" && gameState.phase !== "playing") return;
+
+    // Schedule auto-play for idle human player
+    room.idleTimer = setTimeout(() => {
+      const currentRoom = this.gameRooms.get(gameId);
+      if (!currentRoom) return;
+
+      const { gameState: state } = currentRoom;
+      const player = state.players[state.currentPlayerIndex];
+      if (!player || player.isBot) return;
+
+      console.log(`[Idle Timeout] Player ${player.name} timed out, auto-playing`);
+
+      try {
+        if (state.phase === "bidding") {
+          // Auto-bid using bot AI logic
+          const bid = BotAI.calculateBid(player.hand, state.mode);
+          currentRoom.gameState = GameEngine.placeBid(state, player.id, bid);
+        } else if (state.phase === "playing") {
+          // Auto-play using bot AI logic
+          const card = BotAI.selectCard(state, state.currentPlayerIndex);
+          currentRoom.gameState = GameEngine.playCard(state, player.id, card.id);
+        }
+
+        this.broadcastGameState(gameId);
+
+        // Handle trick completion
+        if (currentRoom.gameState.currentTrick.cards.length === 4) {
+          setTimeout(() => {
+            const r = this.gameRooms.get(gameId);
+            if (r && r.gameState.currentTrick.cards.length === 4) {
+              r.gameState = GameEngine.clearTrick(r.gameState);
+              this.broadcastGameState(gameId);
+              this.scheduleBotMove(gameId);
+              this.scheduleIdleTimeout(gameId);
+            }
+          }, 1500);
+        } else {
+          this.scheduleBotMove(gameId);
+          this.scheduleIdleTimeout(gameId);
+        }
+      } catch (error) {
+        console.error("Idle timeout auto-play error:", error);
+      }
+    }, IDLE_TIMEOUT_MS);
+  }
+
+  private clearGameTimers(room: GameRoom) {
+    if (room.botTimer) {
+      clearTimeout(room.botTimer);
+      room.botTimer = null;
+    }
+    if (room.idleTimer) {
+      clearTimeout(room.idleTimer);
+      room.idleTimer = null;
+    }
   }
 
   private broadcastGameState(gameId: string) {
@@ -425,9 +511,14 @@ export class GameWebSocketServer {
     });
 
     // Check if game is over and save stats (only once, only for ranked multiplayer games)
-    if (room.gameState.phase === "game_over" && !room.statsSaved && room.isRanked) {
-      room.statsSaved = true;
-      this.saveGameStats(room.gameState);
+    if (room.gameState.phase === "game_over") {
+      // Clear all timers when game ends
+      this.clearGameTimers(room);
+      
+      if (!room.statsSaved && room.isRanked) {
+        room.statsSaved = true;
+        this.saveGameStats(room.gameState);
+      }
     }
   }
 
