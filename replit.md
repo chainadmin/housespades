@@ -186,7 +186,7 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
 - **Server user-client mapping**: `userIdToClient` Map tracks authenticated WebSocket clients
   - Cleaned up on disconnect, removes user from matchmaking queue
 - **Interstitial ad on matchmaking cancel**: Shows ad when user backs out of matchmaking
-- App version 2.0.27 (build 29)
+- App version 2.0.26 (build 26)
 
 ### Guest Access & Match History
 - **Guest Access**: Users can browse home and play solo games without logging in
