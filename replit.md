@@ -182,10 +182,11 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
   - Bot takes over the player's position and continues playing
   - Preserves team composition and turn order
   - Game continues without interruption for remaining players
+  - **Quit penalty**: Player who quits loses 30 rating points (ranked games only)
 - **Server user-client mapping**: `userIdToClient` Map tracks authenticated WebSocket clients
   - Cleaned up on disconnect, removes user from matchmaking queue
 - **Interstitial ad on matchmaking cancel**: Shows ad when user backs out of matchmaking
-- App version 2.0.26 (build 28)
+- App version 2.0.27 (build 29)
 
 ### Guest Access & Match History
 - **Guest Access**: Users can browse home and play solo games without logging in

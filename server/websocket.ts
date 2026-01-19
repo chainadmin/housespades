@@ -311,12 +311,14 @@ export class GameWebSocketServer {
     }
   }
 
-  private replacePlayerWithBot(gameId: string, playerId: string) {
+  private async replacePlayerWithBot(gameId: string, playerId: string) {
     const room = this.gameRooms.get(gameId);
     if (!room) return;
 
     const player = room.gameState.players.find(p => p.id === playerId);
     if (!player || player.isBot) return;
+
+    const quitterUserId = (player as any).userId as number | undefined;
 
     const botNames = ["SpadeMaster", "TrickTaker", "CardShark", "AceHunter", "BotPlayer"];
     const usedNames = new Set(room.gameState.players.map(p => p.name));
@@ -327,6 +329,16 @@ export class GameWebSocketServer {
     player.isBot = true;
     player.name = botName;
     (player as any).userId = undefined;
+
+    // Apply quit penalty for ranked games (-30 rating)
+    if (room.isRanked && quitterUserId) {
+      try {
+        await storage.updateUserStats(quitterUserId, false, -30);
+        console.log(`[Game ${gameId}] Applied -30 rating penalty to user ${quitterUserId} for quitting`);
+      } catch (err) {
+        console.error(`[Game ${gameId}] Failed to apply quit penalty:`, err);
+      }
+    }
 
     this.broadcastGameState(gameId);
     this.scheduleBotMove(gameId);
