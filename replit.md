@@ -178,10 +178,14 @@ Note: EAS Build handles iOS builds in the cloud without needing Xcode locally.
 - **Bot fill fix**: Fixed bug where bot-filled matches were not created
   - Previously aborted if any human player's client was missing
   - Now skips disconnected players and continues with connected humans + bots
+- **Mid-game bot replacement**: When a player disconnects during a game, they are replaced with a bot
+  - Bot takes over the player's position and continues playing
+  - Preserves team composition and turn order
+  - Game continues without interruption for remaining players
 - **Server user-client mapping**: `userIdToClient` Map tracks authenticated WebSocket clients
   - Cleaned up on disconnect, removes user from matchmaking queue
 - **Interstitial ad on matchmaking cancel**: Shows ad when user backs out of matchmaking
-- App version 2.0.25 (build 27)
+- App version 2.0.26 (build 28)
 
 ### Guest Access & Match History
 - **Guest Access**: Users can browse home and play solo games without logging in

@@ -294,13 +294,42 @@ export class GameWebSocketServer {
       const room = this.gameRooms.get(client.gameId);
       if (room) {
         room.clients.delete(client.playerId);
+        
+        // Replace disconnected player with bot if game is still in progress
+        if (room.gameState.phase !== 'game_over' && room.gameState.phase !== 'waiting') {
+          this.replacePlayerWithBot(client.gameId, client.playerId);
+        }
+        
+        // Clean up room if no human clients remain
         if (room.clients.size === 0) {
+          console.log(`[Game ${client.gameId}] No human clients remaining, cleaning up room`);
           if (room.botTimer) clearTimeout(room.botTimer);
           this.gameRooms.delete(client.gameId);
         }
       }
       client.gameId = null;
     }
+  }
+
+  private replacePlayerWithBot(gameId: string, playerId: string) {
+    const room = this.gameRooms.get(gameId);
+    if (!room) return;
+
+    const player = room.gameState.players.find(p => p.id === playerId);
+    if (!player || player.isBot) return;
+
+    const botNames = ["SpadeMaster", "TrickTaker", "CardShark", "AceHunter", "BotPlayer"];
+    const usedNames = new Set(room.gameState.players.map(p => p.name));
+    let botName = botNames.find(name => !usedNames.has(name)) || `Bot${Date.now()}`;
+
+    console.log(`[Game ${gameId}] Player ${player.name} disconnected, replacing with bot ${botName}`);
+
+    player.isBot = true;
+    player.name = botName;
+    (player as any).userId = undefined;
+
+    this.broadcastGameState(gameId);
+    this.scheduleBotMove(gameId);
   }
 
   private handleDisconnect(ws: WebSocket) {
