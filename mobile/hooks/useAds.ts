@@ -77,6 +77,7 @@ export function useAds(): UseAdsReturn {
     try {
       const interstitial = InterstitialAd.createForAdRequest(INTERSTITIAL_AD_UNIT_ID, {
         requestNonPersonalizedAdsOnly: !isTrackingAllowed,
+        keywords: ['game', 'cards', 'family', 'puzzle'],
       });
 
       interstitialRef.current = interstitial;

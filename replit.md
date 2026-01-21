@@ -37,6 +37,7 @@ House Spades is an online multiplayer Spades card game with both web and mobile 
     - Mobile authentication handles session cookies via SecureStore and uses an event-based state management system.
 - **Game Logic:** Shared game functions for card generation, shuffling, sorting, trump evaluation, and playable card determination ensure consistency between client and server.
 - **Ad Integration:** Google Mobile Ads (AdMob) for banner and interstitial ads on the mobile app, with specific placements (game screen banners, interstitials after games or on matchmaking cancel). Includes App Tracking Transparency (ATT) for iOS.
+  - **Family-friendly ads configured:** `maxAdContentRating: G`, `tagForChildDirectedTreatment: true`, `tagForUnderAgeOfConsent: true` set globally before AdMob initialization.
 - **Game Statistics:** Match history is recorded for multiplayer games, including scores, game mode, and ELO changes. Solo games do not affect rankings.
 
 **System Design Choices:**

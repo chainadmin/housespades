@@ -6,7 +6,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { View, ActivityIndicator, Image, Text } from 'react-native';
 import { useColorScheme, useColors } from '@/hooks/useColorScheme';
 import { checkAuthStatus, subscribeToAuthState } from '@/lib/auth';
-import mobileAds from 'react-native-google-mobile-ads';
+import mobileAds, { MaxAdContentRating } from 'react-native-google-mobile-ads';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -27,8 +27,17 @@ export default function RootLayout() {
   useEffect(() => {
     if (!adsInitialized) {
       adsInitialized = true;
+      
       mobileAds()
-        .initialize()
+        .setRequestConfiguration({
+          maxAdContentRating: MaxAdContentRating.G,
+          tagForChildDirectedTreatment: true,
+          tagForUnderAgeOfConsent: true,
+        })
+        .then(() => {
+          console.log('AdMob configured for family-friendly content');
+          return mobileAds().initialize();
+        })
         .then((adapterStatuses) => {
           console.log('AdMob initialized:', adapterStatuses);
         })
