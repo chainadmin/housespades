@@ -82,7 +82,7 @@ class MatchmakingService {
         }
       } else if (groupPlayers.length >= 1) {
         const longestWait = Math.max(...groupPlayers.map(p => Date.now() - p.queuedAt));
-        const BOT_FILL_THRESHOLD = 30000;
+        const BOT_FILL_THRESHOLD = 10000;
         
         if (longestWait >= BOT_FILL_THRESHOLD) {
           console.log(`[Matchmaking] Filling match with bots after ${Math.round(longestWait / 1000)}s wait (${groupPlayers.length} players in queue for ${key})`);

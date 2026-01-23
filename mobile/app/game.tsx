@@ -40,6 +40,7 @@ export default function GameScreen() {
   const [localGameState, setLocalGameState] = useState<GameState | null>(null);
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [showGameOverModal, setShowGameOverModal] = useState(false);
+  const [playedCardIds, setPlayedCardIds] = useState<Set<string>>(new Set());
   
   const localPlayerId = 'player-1';
   const gameStateRef = useRef<GameState | null>(null);
@@ -72,6 +73,12 @@ export default function GameScreen() {
   useEffect(() => {
     gameStateRef.current = gameState;
   }, [gameState]);
+
+  useEffect(() => {
+    if (gameState) {
+      setPlayedCardIds(new Set());
+    }
+  }, [gameState?.currentPlayerIndex, gameState?.roundNumber, gameState?.phase]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -286,12 +293,23 @@ export default function GameScreen() {
   }, [localGameState, isMultiplayer, wsPlaceBid]);
 
   const handlePlayCard = useCallback((card: Card) => {
+    if (playedCardIds.has(card.id)) return;
+    
+    if (!localGameState && !isMultiplayer) {
+      return;
+    }
+    
+    setPlayedCardIds(prev => new Set(prev).add(card.id));
+    setSelectedCard(null);
+    
     if (isMultiplayer) {
       wsPlayCard(card.id);
       return;
     }
 
-    if (!localGameState) return;
+    if (!localGameState) {
+      return;
+    }
     
     setLocalGameState((prev) => {
       if (!prev) return prev;
@@ -415,8 +433,6 @@ export default function GameScreen() {
       
       return { ...prev, players: newPlayers, currentTrick: { cards: newTrickCards, leadSuit, winnerId: null }, currentPlayerIndex: (prev.currentPlayerIndex + 1) % 4, spadesBroken };
     });
-    
-    setSelectedCard(null);
   }, [localGameState, isMultiplayer, wsPlayCard]);
 
   const handleBidRef = useRef(handleBid);

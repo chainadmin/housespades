@@ -35,6 +35,7 @@ export default function Game() {
   const [isGameReady, setIsGameReady] = useState(false);
   
   const [localPlayerId, setLocalPlayerId] = useState("player-1");
+  const [playedCardIds, setPlayedCardIds] = useState<Set<string>>(new Set());
   const gameStateRef = useRef<GameState | null>(null);
   
   const {
@@ -66,6 +67,12 @@ export default function Game() {
   useEffect(() => {
     gameStateRef.current = gameState;
   }, [gameState]);
+
+  useEffect(() => {
+    if (gameState) {
+      setPlayedCardIds(new Set());
+    }
+  }, [gameState?.currentPlayerIndex, gameState?.roundNumber, gameState?.phase]);
 
   useEffect(() => {
     if (isMultiplayer) {
@@ -267,12 +274,23 @@ export default function Game() {
   }, [isMultiplayer, localGameState, wsPlaceBid]);
 
   const handlePlayCard = useCallback((card: Card) => {
+    if (playedCardIds.has(card.id)) return;
+    
+    if (!localGameState && !isMultiplayer) {
+      return;
+    }
+    
+    setPlayedCardIds(prev => new Set(prev).add(card.id));
+    setSelectedCard(null);
+    
     if (isMultiplayer) {
       wsPlayCard(card.id);
       return;
     }
     
-    if (!localGameState) return;
+    if (!localGameState) {
+      return;
+    }
     
     setLocalGameState((prev) => {
       if (!prev) return prev;
