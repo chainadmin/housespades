@@ -57,6 +57,11 @@ class MatchmakingService {
   private tryMatch() {
     const players = Array.from(this.queue.values());
     
+    if (players.length > 0) {
+      console.log(`[Matchmaking] tryMatch - ${players.length} players in queue:`, 
+        players.map(p => `${p.username} (${p.gameMode}-${p.pointGoal}, wait: ${Math.round((Date.now() - p.queuedAt) / 1000)}s)`));
+    }
+    
     const groups = new Map<string, QueuedPlayer[]>();
     for (const player of players) {
       const key = `${player.gameMode}-${player.pointGoal}`;

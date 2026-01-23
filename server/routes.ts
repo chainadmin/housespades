@@ -494,6 +494,8 @@ export async function registerRoutes(
         pointGoal || "300"
       );
 
+      console.log(`[Routes] User ${user.username} (id: ${user.id}) joined queue for ${gameMode}-${pointGoal}. Queue size: ${matchmaking.getQueueSize()}`);
+
       res.json({ 
         message: "Added to matchmaking queue",
         queueSize: matchmaking.getQueueSize()

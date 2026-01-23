@@ -121,7 +121,7 @@ function sortHand(hand: Card[], mode: GameMode): Card[] {
 export class GameEngine {
   // Create a new game
   static createGame(
-    players: { id: string; name: string; isBot: boolean }[],
+    players: { id: string; name: string; isBot: boolean; userId?: number }[],
     mode: GameMode,
     pointGoal: PointGoal
   ): GameState {
@@ -141,6 +141,7 @@ export class GameEngine {
       bid: null,
       tricks: 0,
       isReady: true,
+      userId: p.userId,
     }));
 
     const teams: Team[] = [
