@@ -303,7 +303,15 @@ export class GameEngine {
       { playerId, card },
     ];
 
-    const leadSuit = state.currentTrick.leadSuit || card.suit;
+    // In JJDD mode, if 2♦ or joker leads, treat it as spades lead
+    let leadSuit = state.currentTrick.leadSuit;
+    if (!leadSuit) {
+      if (this.actsAsSpade(card, state.mode)) {
+        leadSuit = "spades";
+      } else {
+        leadSuit = card.suit;
+      }
+    }
 
     // Check if spades broken
     let spadesBroken = state.spadesBroken;

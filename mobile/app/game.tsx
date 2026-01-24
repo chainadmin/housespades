@@ -325,8 +325,15 @@ export default function GameScreen() {
       });
       
       const newTrickCards = [...prev.currentTrick.cards, { playerId: currentPlayer.id, card }];
-      // When a joker leads, treat it as spades lead (jokers are trump)
-      const leadSuit = prev.currentTrick.leadSuit || (card.suit === 'joker' ? 'spades' : card.suit);
+      // When a trump card leads (joker, 2♦ in JJDD), treat it as spades lead
+      let leadSuit = prev.currentTrick.leadSuit;
+      if (!leadSuit) {
+        if (actsAsSpade(card, prev.mode)) {
+          leadSuit = 'spades';
+        } else {
+          leadSuit = card.suit;
+        }
+      }
       
       let spadesBroken = prev.spadesBroken;
       if (isTrump(card, prev.mode)) spadesBroken = true;

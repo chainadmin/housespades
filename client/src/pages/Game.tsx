@@ -9,7 +9,7 @@ import { useWebSocket } from "@/hooks/useWebSocket";
 import { useToast } from "@/hooks/use-toast";
 import type { GameState, Card, Player, Team, GameMode, PointGoal, Position } from "@shared/schema";
 import { getCardPower, isTrump, POINT_GOAL_VALUES } from "@shared/schema";
-import { generateStandardDeck, generateJJDDDeck, shuffleArray, sortHand } from "@/lib/gameUtils";
+import { generateStandardDeck, generateJJDDDeck, shuffleArray, sortHand, actsAsSpade } from "@/lib/gameUtils";
 import { ArrowLeft, Wifi, WifiOff } from "lucide-react";
 
 const BOT_NAMES = ["SpadeMaster", "TrickTaker", "CardShark", "AceHunter"];
@@ -313,7 +313,15 @@ export default function Game() {
         { playerId: currentPlayer.id, card },
       ];
       
-      const leadSuit = prev.currentTrick.leadSuit || card.suit;
+      // When a trump card leads (joker, 2♦ in JJDD), treat it as spades lead
+      let leadSuit = prev.currentTrick.leadSuit;
+      if (!leadSuit) {
+        if (actsAsSpade(card, prev.mode)) {
+          leadSuit = "spades";
+        } else {
+          leadSuit = card.suit;
+        }
+      }
       
       let spadesBroken = prev.spadesBroken;
       if (isTrump(card, prev.mode)) {

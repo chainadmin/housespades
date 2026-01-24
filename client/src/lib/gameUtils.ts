@@ -85,6 +85,17 @@ export function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
+// Check if a card acts as a spade for following-suit purposes
+// In JJDD mode: jokers (LJ, BJ) and 2♦ all count as spades
+export function actsAsSpade(card: Card, mode: GameMode): boolean {
+  if (card.suit === "spades") return true;
+  if (mode === "joker_joker_deuce_deuce") {
+    if (card.value === "LJ" || card.value === "BJ") return true;
+    if (card.suit === "diamonds" && card.value === "2") return true;
+  }
+  return false;
+}
+
 // Check if a card is a trump in JJDD mode (for sorting purposes)
 function isTrumpInJJDD(card: Card): boolean {
   if (card.suit === "spades") return true;
