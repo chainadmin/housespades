@@ -24,7 +24,8 @@ export function PlayingCard({
   size = 'medium',
 }: PlayingCardProps) {
   const colors = useColors();
-  const isJoker = card.suit === 'joker';
+  // Jokers are detected by value (LJ/BJ), not suit - in JJDD mode jokers have suit: 'spades'
+  const isJoker = card.value === 'LJ' || card.value === 'BJ';
   
   // Colors matching web app
   const getCardTextColor = () => {
