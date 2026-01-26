@@ -32,6 +32,8 @@ const allowedOrigins = [
   'https://www.housespades-production.up.railway.app',
   'https://housespades.com',
   'https://www.housespades.com',
+  'https://house-spades.com',
+  'https://www.house-spades.com',
   'http://localhost:5000',
   'http://localhost:3000',
   'http://localhost:8081', // Expo dev

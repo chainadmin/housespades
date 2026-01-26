@@ -1,0 +1,186 @@
+e-spades.com
+Details
+Build Logs
+Deploy Logs
+HTTP Logs
+Network Flow Logs
+Filter and search logs
+
+{"message":"    at x (/app/dist/index.cjs:38:7874)","attributes":{"level":"error"},"timestamp":"2026-01-26T15:49:40.155139696Z"}
+{"message":"    at Yr.process_params (/app/dist/index.cjs:38:8471)","attributes":{"level":"error"},"timestamp":"2026-01-26T15:49:40.155140761Z"}
+{"message":"    at /app/dist/index.cjs:38:11142","attributes":{"level":"error"},"timestamp":"2026-01-26T15:49:40.155150409Z"}
+{"message":"    at x (/app/dist/index.cjs:38:7874)","attributes":{"level":"error"},"timestamp":"2026-01-26T15:49:40.155151217Z"}
+{"message":"    at /app/dist/index.cjs:38:11142","attributes":{"level":"error"},"timestamp":"2026-01-26T15:49:40.155158960Z"}
+{"message":"CORS blocked origin: https://house-spades.com","attributes":{"level":"info"},"timestamp":"2026-01-26T15:49:40.155165977Z"}
+{"message":"Error: Not allowed by CORS","attributes":{"level":"error"},"timestamp":"2026-01-26T15:49:40.155175819Z"}
+{"message":"    at origin (/app/dist/index.cjs:178:700)","attributes":{"level":"error"},"timestamp":"2026-01-26T15:49:40.155228409Z"}
+{"message":"[Auth Debug] Cookie header: undefined","attributes":{"level":"info"},"timestamp":"2026-01-26T15:54:15.086486541Z"}
+{"message":"[Auth Debug] Session ID: QcqTMeTPkVs-eno1sHCxjqNJCEXAsIOh","attributes":{"level":"info"},"timestamp":"2026-01-26T15:54:15.086493016Z"}
+{"message":"[Auth Debug] Session userId: undefined","attributes":{"level":"info"},"timestamp":"2026-01-26T15:54:15.086498685Z"}
+{"message":"3:54:09 PM [express] GET /api/auth/me 401 in 1ms :: {\"error\":\"Not authenticated\"}","attributes":{"level":"info"},"timestamp":"2026-01-26T15:54:15.086523283Z"}
+{"message":"4:04:25 PM [express] POST /api 200 in 2ms","attributes":{"level":"info"},"timestamp":"2026-01-26T16:04:32.767382007Z"}
+{"message":"4:15:34 PM [express] POST /api 200 in 2ms","attributes":{"level":"info"},"timestamp":"2026-01-26T16:15:44.275414981Z"}
+{"message":"4:43:11 PM [express] POST /api 200 in 1ms","attributes":{"level":"info"},"timestamp":"2026-01-26T16:43:20.057211130Z"}
+{"message":"4:59:28 PM [express] POST /api 200 in 3ms","attributes":{"level":"info"},"timestamp":"2026-01-26T16:59:30.237413378Z"}
+{"message":"5:03:00 PM [express] POST /api 200 in 8ms","attributes":{"level":"info"},"timestamp":"2026-01-26T17:03:01.955125902Z"}
+{"message":"5:11:51 PM [express] POST /api 200 in 1ms","attributes":{"level":"info"},"timestamp":"2026-01-26T17:11:55.732512730Z"}
+{"message":"5:46:38 PM [express] POST /api 200 in 2ms","attributes":{"level":"info"},"timestamp":"2026-01-26T17:46:46.181110442Z"}
+{"message":"6:02:57 PM [express] POST /api 200 in 3ms","attributes":{"level":"info"},"timestamp":"2026-01-26T18:02:59.990289753Z"}
+{"message":"6:15:46 PM [express] POST /api 200 in 2ms","attributes":{"level":"info"},"timestamp":"2026-01-26T18:15:51.658104616Z"}
+{"message":"6:47:24 PM [express] POST /api 200 in 2ms","attributes":{"level":"info"},"timestamp":"2026-01-26T18:47:27.516900619Z"}
+{"message":"6:51:12 PM [express] POST /api 200 in 5ms","attributes":{"level":"info"},"timestamp":"2026-01-26T18:51:22.257457061Z"}
+{"message":"6:59:23 PM [express] POST /api 200 in 0ms","attributes":{"level":"info"},"timestamp":"2026-01-26T18:59:31.858036462Z"}
+{"message":"6:59:23 PM [express] POST /api 200 in 4ms","attributes":{"level":"info"},"timestamp":"2026-01-26T18:59:31.858043281Z"}
+{"message":"7:43:06 PM [express] POST /api 200 in 1ms","attributes":{"level":"info"},"timestamp":"2026-01-26T19:43:14.877567105Z"}
+{"message":"8:08:08 PM [express] POST /api 200 in 1ms","attributes":{"level":"info"},"timestamp":"2026-01-26T20:08:16.319257910Z"}
+{"message":"8:08:19 PM [express] POST /api 200 in 1ms","attributes":{"level":"info"},"timestamp":"2026-01-26T20:08:19.323383080Z"}
+{"message":"8:39:36 PM [express] POST /api 200 in 1ms","attributes":{"level":"info"},"timestamp":"2026-01-26T20:39:44.631458998Z"}
+{"message":"CORS blocked origin: https://house-spades.com","attributes":{"level":"info"},"timestamp":"2026-01-26T20:53:19.387935957Z"}
+{"message":"Error: Not allowed by CORS","attributes":{"level":"error"},"timestamp":"2026-01-26T20:53:19.387943291Z"}
+{"message":"    at origin (/app/dist/index.cjs:178:700)","attributes":{"level":"error"},"timestamp":"2026-01-26T20:53:19.387949366Z"}
+{"message":"    at /app/dist/index.cjs:70:34335","attributes":{"level":"error"},"timestamp":"2026-01-26T20:53:19.387955786Z"}
+{"message":"    at f (/app/dist/index.cjs:70:34155)","attributes":{"level":"error"},"timestamp":"2026-01-26T20:53:19.387961641Z"}
+{"message":"    at /app/dist/index.cjs:70:34182","attributes":{"level":"error"},"timestamp":"2026-01-26T20:53:19.387967414Z"}
+{"message":"    at ri.handle_request (/app/dist/index.cjs:38:3170)","attributes":{"level":"error"},"timestamp":"2026-01-26T20:53:19.387973284Z"}
+{"message":"    at b (/app/dist/index.cjs:38:8355)","attributes":{"level":"error"},"timestamp":"2026-01-26T20:53:19.387978905Z"}
+{"message":"    at /app/dist/index.cjs:38:7948","attributes":{"level":"error"},"timestamp":"2026-01-26T20:53:19.387984765Z"}
+{"message":"    at Yr.process_params (/app/dist/index.cjs:38:8471)","attributes":{"level":"error"},"timestamp":"2026-01-26T20:53:19.387991302Z"}
+{"message":"    at x (/app/dist/index.cjs:38:7874)","attributes":{"level":"error"},"timestamp":"2026-01-26T20:53:19.387996833Z"}
+{"message":"    at /app/dist/index.cjs:38:11142","attributes":{"level":"error"},"timestamp":"2026-01-26T20:53:19.388002641Z"}
+{"message":"CORS blocked origin: https://house-spades.com","attributes":{"level":"info"},"timestamp":"2026-01-26T20:53:19.388008422Z"}
+{"message":"Error: Not allowed by CORS","attributes":{"level":"error"},"timestamp":"2026-01-26T20:53:19.388015069Z"}
+{"message":"    at origin (/app/dist/index.cjs:178:700)","attributes":{"level":"error"},"timestamp":"2026-01-26T20:53:19.388019800Z"}
+{"message":"    at /app/dist/index.cjs:70:34335","attributes":{"level":"error"},"timestamp":"2026-01-26T20:53:19.388024374Z"}
+{"message":"    at f (/app/dist/index.cjs:70:34155)","attributes":{"level":"error"},"timestamp":"2026-01-26T20:53:19.388028969Z"}
+{"message":"    at /app/dist/index.cjs:70:34182","attributes":{"level":"error"},"timestamp":"2026-01-26T20:53:19.388035688Z"}
+{"message":"    at ri.handle_request (/app/dist/index.cjs:38:3170)","attributes":{"level":"error"},"timestamp":"2026-01-26T20:53:19.388044477Z"}
+{"message":"    at b (/app/dist/index.cjs:38:8355)","attributes":{"level":"error"},"timestamp":"2026-01-26T20:53:19.388050402Z"}
+{"message":"    at /app/dist/index.cjs:38:7948","attributes":{"level":"error"},"timestamp":"2026-01-26T20:53:19.388056111Z"}
+{"message":"    at Yr.process_params (/app/dist/index.cjs:38:8471)","attributes":{"level":"error"},"timestamp":"2026-01-26T20:53:19.388061989Z"}
+{"message":"    at x (/app/dist/index.cjs:38:7874)","attributes":{"level":"error"},"timestamp":"2026-01-26T20:53:19.388067590Z"}
+{"message":"    at /app/dist/index.cjs:38:11142","attributes":{"level":"error"},"timestamp":"2026-01-26T20:53:19.388073705Z"}
+{"message":"8:57:12 PM [express] POST /api 200 in 1ms","attributes":{"level":"info"},"timestamp":"2026-01-26T20:57:22.284422964Z"}
+{"message":"8:59:07 PM [express] POST /api 200 in 6ms","attributes":{"level":"info"},"timestamp":"2026-01-26T20:59:15.494805565Z"}
+{"message":"9:00:21 PM [express] POST /api 200 in 2ms","attributes":{"level":"info"},"timestamp":"2026-01-26T21:00:30.342786736Z"}
+{"message":"    at b (/app/dist/index.cjs:38:8355)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:24:43.082657785Z"}
+{"message":"    at /app/dist/index.cjs:38:7948","attributes":{"level":"error"},"timestamp":"2026-01-26T21:24:43.082675248Z"}
+{"message":"    at Yr.process_params (/app/dist/index.cjs:38:8471)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:24:43.082685670Z"}
+{"message":"    at x (/app/dist/index.cjs:38:7874)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:24:43.082693540Z"}
+{"message":"    at /app/dist/index.cjs:38:11142","attributes":{"level":"error"},"timestamp":"2026-01-26T21:24:43.082700011Z"}
+{"message":"CORS blocked origin: https://house-spades.com","attributes":{"level":"info"},"timestamp":"2026-01-26T21:24:43.082704804Z"}
+{"message":"Error: Not allowed by CORS","attributes":{"level":"error"},"timestamp":"2026-01-26T21:24:43.082711325Z"}
+{"message":"    at origin (/app/dist/index.cjs:178:700)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:24:43.082717459Z"}
+{"message":"    at /app/dist/index.cjs:70:34335","attributes":{"level":"error"},"timestamp":"2026-01-26T21:24:43.082723744Z"}
+{"message":"    at f (/app/dist/index.cjs:70:34155)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:24:43.082729877Z"}
+{"message":"    at /app/dist/index.cjs:70:34182","attributes":{"level":"error"},"timestamp":"2026-01-26T21:24:43.082735826Z"}
+{"message":"    at ri.handle_request (/app/dist/index.cjs:38:3170)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:24:43.082740800Z"}
+{"message":"    at b (/app/dist/index.cjs:38:8355)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:24:43.082745011Z"}
+{"message":"    at /app/dist/index.cjs:38:7948","attributes":{"level":"error"},"timestamp":"2026-01-26T21:24:43.082750140Z"}
+{"message":"    at Yr.process_params (/app/dist/index.cjs:38:8471)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:24:43.082754352Z"}
+{"message":"    at x (/app/dist/index.cjs:38:7874)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:24:43.082759414Z"}
+{"message":"    at /app/dist/index.cjs:38:11142","attributes":{"level":"error"},"timestamp":"2026-01-26T21:24:43.082763552Z"}
+{"message":"CORS blocked origin: https://house-spades.com","attributes":{"level":"info"},"timestamp":"2026-01-26T21:24:43.082767730Z"}
+{"message":"Error: Not allowed by CORS","attributes":{"level":"error"},"timestamp":"2026-01-26T21:24:43.082772094Z"}
+{"message":"    at origin (/app/dist/index.cjs:178:700)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:24:43.082776670Z"}
+{"message":"    at /app/dist/index.cjs:70:34335","attributes":{"level":"error"},"timestamp":"2026-01-26T21:24:43.082780732Z"}
+{"message":"    at f (/app/dist/index.cjs:70:34155)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:24:43.082785273Z"}
+{"message":"    at /app/dist/index.cjs:70:34182","attributes":{"level":"error"},"timestamp":"2026-01-26T21:24:43.082789338Z"}
+{"message":"    at ri.handle_request (/app/dist/index.cjs:38:3170)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:24:43.082793148Z"}
+{"message":"CORS blocked origin: https://house-spades.com","attributes":{"level":"info"},"timestamp":"2026-01-26T21:29:36.079767722Z"}
+{"message":"Error: Not allowed by CORS","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:36.079772245Z"}
+{"message":"    at origin (/app/dist/index.cjs:178:700)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:36.079776733Z"}
+{"message":"    at /app/dist/index.cjs:70:34335","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:36.079780755Z"}
+{"message":"    at f (/app/dist/index.cjs:70:34155)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:36.079788429Z"}
+{"message":"    at /app/dist/index.cjs:70:34182","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:36.079792819Z"}
+{"message":"    at ri.handle_request (/app/dist/index.cjs:38:3170)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:36.079797338Z"}
+{"message":"    at b (/app/dist/index.cjs:38:8355)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:36.079802001Z"}
+{"message":"    at /app/dist/index.cjs:38:7948","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:36.079806214Z"}
+{"message":"    at Yr.process_params (/app/dist/index.cjs:38:8471)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:36.079810504Z"}
+{"message":"    at x (/app/dist/index.cjs:38:7874)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:36.079815066Z"}
+{"message":"    at /app/dist/index.cjs:38:11142","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:36.079819353Z"}
+{"message":"CORS blocked origin: https://house-spades.com","attributes":{"level":"info"},"timestamp":"2026-01-26T21:29:36.079825738Z"}
+{"message":"Error: Not allowed by CORS","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:36.079830061Z"}
+{"message":"    at origin (/app/dist/index.cjs:178:700)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:36.079835277Z"}
+{"message":"    at /app/dist/index.cjs:70:34335","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:36.079839249Z"}
+{"message":"    at f (/app/dist/index.cjs:70:34155)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:36.079843029Z"}
+{"message":"    at /app/dist/index.cjs:70:34182","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:36.079847672Z"}
+{"message":"    at ri.handle_request (/app/dist/index.cjs:38:3170)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:36.079851823Z"}
+{"message":"    at b (/app/dist/index.cjs:38:8355)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:36.079855915Z"}
+{"message":"    at /app/dist/index.cjs:38:7948","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:36.079860945Z"}
+{"message":"    at Yr.process_params (/app/dist/index.cjs:38:8471)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:36.079865013Z"}
+{"message":"    at x (/app/dist/index.cjs:38:7874)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:36.079869133Z"}
+{"message":"    at /app/dist/index.cjs:38:11142","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:36.079873506Z"}
+{"message":"CORS blocked origin: https://house-spades.com","attributes":{"level":"info"},"timestamp":"2026-01-26T21:29:38.542269859Z"}
+{"message":"Error: Not allowed by CORS","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:38.542276127Z"}
+{"message":"    at origin (/app/dist/index.cjs:178:700)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:38.542281925Z"}
+{"message":"    at /app/dist/index.cjs:70:34335","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:38.542286626Z"}
+{"message":"    at f (/app/dist/index.cjs:70:34155)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:38.542292185Z"}
+{"message":"    at /app/dist/index.cjs:70:34182","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:38.542296662Z"}
+{"message":"    at ri.handle_request (/app/dist/index.cjs:38:3170)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:38.542301290Z"}
+{"message":"    at b (/app/dist/index.cjs:38:8355)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:38.542306365Z"}
+{"message":"    at /app/dist/index.cjs:38:7948","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:38.542310497Z"}
+{"message":"    at Yr.process_params (/app/dist/index.cjs:38:8471)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:38.542315336Z"}
+{"message":"    at x (/app/dist/index.cjs:38:7874)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:38.542319397Z"}
+{"message":"    at /app/dist/index.cjs:38:11142","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:38.542323307Z"}
+{"message":"CORS blocked origin: https://house-spades.com","attributes":{"level":"info"},"timestamp":"2026-01-26T21:29:38.542327727Z"}
+{"message":"Error: Not allowed by CORS","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:38.542332069Z"}
+{"message":"    at origin (/app/dist/index.cjs:178:700)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:38.542335999Z"}
+{"message":"    at /app/dist/index.cjs:70:34335","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:38.542340405Z"}
+{"message":"    at f (/app/dist/index.cjs:70:34155)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:38.542345299Z"}
+{"message":"    at /app/dist/index.cjs:70:34182","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:38.542349570Z"}
+{"message":"    at ri.handle_request (/app/dist/index.cjs:38:3170)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:38.542353841Z"}
+{"message":"    at b (/app/dist/index.cjs:38:8355)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:38.542358112Z"}
+{"message":"    at /app/dist/index.cjs:38:7948","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:38.542362112Z"}
+{"message":"    at Yr.process_params (/app/dist/index.cjs:38:8471)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:38.542366081Z"}
+{"message":"    at x (/app/dist/index.cjs:38:7874)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:38.542370185Z"}
+{"message":"    at /app/dist/index.cjs:38:11142","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:38.546503699Z"}
+{"message":"CORS blocked origin: https://house-spades.com","attributes":{"level":"info"},"timestamp":"2026-01-26T21:29:39.580627479Z"}
+{"message":"Error: Not allowed by CORS","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:39.580637460Z"}
+{"message":"    at origin (/app/dist/index.cjs:178:700)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:39.580642855Z"}
+{"message":"    at /app/dist/index.cjs:70:34335","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:39.580649236Z"}
+{"message":"    at f (/app/dist/index.cjs:70:34155)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:39.580656183Z"}
+{"message":"    at /app/dist/index.cjs:70:34182","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:39.580662162Z"}
+{"message":"    at ri.handle_request (/app/dist/index.cjs:38:3170)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:39.580667587Z"}
+{"message":"    at b (/app/dist/index.cjs:38:8355)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:39.580673577Z"}
+{"message":"    at /app/dist/index.cjs:38:7948","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:39.580679678Z"}
+{"message":"    at Yr.process_params (/app/dist/index.cjs:38:8471)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:39.580685297Z"}
+{"message":"    at x (/app/dist/index.cjs:38:7874)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:39.580704200Z"}
+{"message":"    at /app/dist/index.cjs:38:11142","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:39.580711078Z"}
+{"message":"CORS blocked origin: https://house-spades.com","attributes":{"level":"info"},"timestamp":"2026-01-26T21:29:39.580717002Z"}
+{"message":"Error: Not allowed by CORS","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:39.580723059Z"}
+{"message":"    at origin (/app/dist/index.cjs:178:700)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:39.580729284Z"}
+{"message":"    at /app/dist/index.cjs:70:34335","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:39.580735403Z"}
+{"message":"    at f (/app/dist/index.cjs:70:34155)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:39.580750055Z"}
+{"message":"    at /app/dist/index.cjs:70:34182","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:39.580756034Z"}
+{"message":"    at ri.handle_request (/app/dist/index.cjs:38:3170)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:39.580762529Z"}
+{"message":"    at b (/app/dist/index.cjs:38:8355)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:39.584932528Z"}
+{"message":"    at /app/dist/index.cjs:38:7948","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:39.584940082Z"}
+{"message":"    at Yr.process_params (/app/dist/index.cjs:38:8471)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:39.584947074Z"}
+{"message":"    at x (/app/dist/index.cjs:38:7874)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:39.584958832Z"}
+{"message":"    at /app/dist/index.cjs:38:11142","attributes":{"level":"error"},"timestamp":"2026-01-26T21:29:39.584965361Z"}
+{"message":"    at Yr.process_params (/app/dist/index.cjs:38:8471)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:48.082048165Z"}
+{"message":"    at x (/app/dist/index.cjs:38:7874)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:48.082054790Z"}
+{"message":"    at origin (/app/dist/index.cjs:178:700)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:48.082062428Z"}
+{"message":"    at /app/dist/index.cjs:70:34335","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:48.082068476Z"}
+{"message":"    at f (/app/dist/index.cjs:70:34155)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:48.082074188Z"}
+{"message":"    at /app/dist/index.cjs:70:34182","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:48.082080127Z"}
+{"message":"    at ri.handle_request (/app/dist/index.cjs:38:3170)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:48.082085687Z"}
+{"message":"    at b (/app/dist/index.cjs:38:8355)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:48.082091247Z"}
+{"message":"    at /app/dist/index.cjs:38:7948","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:48.082096590Z"}
+{"message":"    at /app/dist/index.cjs:38:11142","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:48.082105276Z"}
+{"message":"CORS blocked origin: https://house-spades.com","attributes":{"level":"info"},"timestamp":"2026-01-26T21:44:48.082346612Z"}
+{"message":"Error: Not allowed by CORS","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:48.082352516Z"}
+{"message":"    at origin (/app/dist/index.cjs:178:700)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:48.082359624Z"}
+{"message":"    at /app/dist/index.cjs:70:34335","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:48.082368933Z"}
+{"message":"    at f (/app/dist/index.cjs:70:34155)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:48.082376536Z"}
+{"message":"    at /app/dist/index.cjs:70:34182","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:48.082382786Z"}
+{"message":"    at ri.handle_request (/app/dist/index.cjs:38:3170)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:48.082388908Z"}
+{"message":"    at b (/app/dist/index.cjs:38:8355)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:48.082395250Z"}
+{"message":"    at /app/dist/index.cjs:38:7948","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:48.082403803Z"}
+{"message":"    at Yr.process_params (/app/dist/index.cjs:38:8471)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:48.082410699Z"}
+{"message":"    at x (/app/dist/index.cjs:38:7874)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:48.082418582Z"}
+{"message":"    at /app/dist/index.cjs:38:11142","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:48.082429062Z"}
+{"message":"CORS blocked origin: https://house-spades.com","attributes":{"level":"info"},"timestamp":"2026-01-26T21:44:48.082436815Z"}
+{"message":"Error: Not allowed by CORS","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:48.082443236Z"}
+{"message":"    at b (/app/dist/index.cjs:38:8355)","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:55.459049286Z"}
+{"message":"    at /app/dist/index.cjs:38:7948","attributes":{"level":"error"},"timestamp":"2026-01-26T21:44:55.459056765Z"}
