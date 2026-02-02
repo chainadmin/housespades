@@ -2,7 +2,7 @@
   "expo": {
     "name": "House Spades",
     "slug": "house-spades",
-    "version": "2.0.26",
+    "version": "2.0.27",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.housespades.app",
-      "buildNumber": "26",
+      "buildNumber": "27",
       "icon": "./assets/icon.png",
       "infoPlist": {
         "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you. You can still use the app with non-personalized ads if you decline.",
@@ -71,7 +71,7 @@
       }
     },
     "android": {
-      "versionCode": 26,
+      "versionCode": 27,
       "adaptiveIcon": {
         "foregroundImage": "./assets/house-card-logo.png",
         "backgroundColor": "#121212"
