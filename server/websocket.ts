@@ -194,10 +194,60 @@ export class GameWebSocketServer {
     this.userIdToClient.set(payload.userId, client);
     console.log(`[WebSocket] Client ${client.playerId} authenticated as user ${payload.userId}`);
     
-    this.sendMessage(ws, {
-      type: "player_joined",
-      payload: { playerId: client.playerId, authenticated: true },
-    });
+    // Check if user has an active game and reconnect them
+    let reconnectedToGame = false;
+    const gameEntries = Array.from(this.gameRooms.entries());
+    for (const [gameId, room] of gameEntries) {
+      const player = room.gameState.players.find((p: any) => p.userId === payload.userId);
+      if (player) {
+        // User has an active game - reconnect them
+        console.log(`[WebSocket] Reconnecting user ${payload.userId} to game ${gameId} as player ${player.id}`);
+        
+        // Cancel any pending bot replacement for this user
+        const pendingKey = `${gameId}-${payload.userId}`;
+        const pendingTimeout = this.pendingReconnects.get(pendingKey);
+        if (pendingTimeout) {
+          clearTimeout(pendingTimeout);
+          this.pendingReconnects.delete(pendingKey);
+          console.log(`[WebSocket] Cancelled pending bot replacement for user ${payload.userId}`);
+        }
+        
+        // Update client's gameId and playerId to match the game
+        const oldPlayerId = client.playerId;
+        client.gameId = gameId;
+        client.playerId = player.id;
+        
+        // Clean up old mapping if it exists
+        if (oldPlayerId !== player.id) {
+          room.clients.delete(oldPlayerId);
+        }
+        
+        // Update the room's client mapping
+        room.clients.set(player.id, client);
+        
+        // Send player_joined with the correct playerId from the game
+        this.sendMessage(ws, {
+          type: "player_joined",
+          payload: { playerId: player.id, authenticated: true },
+        });
+        
+        // Send current game state to the reconnected client
+        this.sendMessage(ws, {
+          type: "game_state_update",
+          payload: room.gameState,
+        });
+        
+        reconnectedToGame = true;
+        break;
+      }
+    }
+    
+    if (!reconnectedToGame) {
+      this.sendMessage(ws, {
+        type: "player_joined",
+        payload: { playerId: client.playerId, authenticated: true },
+      });
+    }
   }
 
   private handleStartGame(ws: WebSocket, payload: { mode: GameMode; pointGoal: PointGoal; players: { id: string; name: string; isBot: boolean; userId?: number }[] }) {
@@ -296,6 +346,8 @@ export class GameWebSocketServer {
     }
   }
 
+  private pendingReconnects: Map<string, NodeJS.Timeout> = new Map();
+  
   private handleLeaveLobby(ws: WebSocket) {
     const client = this.clients.get(ws);
     if (!client) return;
@@ -305,16 +357,56 @@ export class GameWebSocketServer {
       if (room) {
         room.clients.delete(client.playerId);
         
-        // Replace disconnected player with bot if game is still in progress
+        // Replace disconnected player with bot after a grace period (5 seconds)
+        // This allows time for screen transitions/reconnections
         if (room.gameState.phase !== 'game_over' && room.gameState.phase !== 'waiting') {
-          this.replacePlayerWithBot(client.gameId, client.playerId);
+          const player = room.gameState.players.find(p => p.id === client.playerId);
+          if (player && !player.isBot && (player as any).userId) {
+            const userId = (player as any).userId;
+            const gameId = client.gameId;
+            
+            // Clear any existing pending reconnect for this user
+            const existingTimeout = this.pendingReconnects.get(`${gameId}-${userId}`);
+            if (existingTimeout) {
+              clearTimeout(existingTimeout);
+            }
+            
+            console.log(`[Game ${gameId}] Player ${player.name} disconnected, waiting 5s for reconnection...`);
+            
+            // Schedule bot replacement after grace period
+            const timeout = setTimeout(() => {
+              this.pendingReconnects.delete(`${gameId}-${userId}`);
+              const currentRoom = this.gameRooms.get(gameId);
+              if (currentRoom) {
+                const currentPlayer = currentRoom.gameState.players.find(p => p.id === client.playerId);
+                // Only replace if player hasn't reconnected (check if still has userId and no client)
+                if (currentPlayer && !currentPlayer.isBot && !currentRoom.clients.has(client.playerId)) {
+                  this.replacePlayerWithBot(gameId, client.playerId);
+                }
+              }
+            }, 5000);
+            
+            this.pendingReconnects.set(`${gameId}-${userId}`, timeout);
+          }
         }
         
-        // Clean up room if no human clients remain
+        // Clean up room if no human clients remain AND no pending reconnects
         if (room.clients.size === 0) {
-          console.log(`[Game ${client.gameId}] No human clients remaining, cleaning up room`);
-          this.clearGameTimers(room);
-          this.gameRooms.delete(client.gameId);
+          // Check if there are any pending reconnects for this game
+          let hasPendingReconnect = false;
+          const gameId = client.gameId;
+          for (const key of Array.from(this.pendingReconnects.keys())) {
+            if (key.startsWith(`${gameId}-`)) {
+              hasPendingReconnect = true;
+              break;
+            }
+          }
+          
+          if (!hasPendingReconnect) {
+            console.log(`[Game ${client.gameId}] No human clients remaining, cleaning up room`);
+            this.clearGameTimers(room);
+            this.gameRooms.delete(client.gameId);
+          }
         }
       }
       client.gameId = null;

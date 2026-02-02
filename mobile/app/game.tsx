@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity, Text } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { useColors } from '@/hooks/useColorScheme';
+import { getStoredUser } from '@/lib/auth';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { 
   GameState, Card, Player, Team, Trick, 
@@ -41,6 +42,7 @@ export default function GameScreen() {
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [showGameOverModal, setShowGameOverModal] = useState(false);
   const [playedCardIds, setPlayedCardIds] = useState<Set<string>>(new Set());
+  const [userId, setUserId] = useState<number | null>(null);
   
   const localPlayerId = 'player-1';
   const gameStateRef = useRef<GameState | null>(null);
@@ -61,6 +63,7 @@ export default function GameScreen() {
     leaveLobby,
     startGame: wsStartGame,
   } = useWebSocket({
+    userId,
     onError: (message) => {
       console.error('WebSocket error:', message);
     },
@@ -157,14 +160,35 @@ export default function GameScreen() {
     };
   }, [saveGameState, isMultiplayer]);
 
+  // Get userId for multiplayer authentication
   useEffect(() => {
     if (isMultiplayer) {
+      const initUser = async () => {
+        const user = await getStoredUser();
+        if (user) {
+          setUserId(user.id);
+        } else {
+          console.error('[Game] No user found for multiplayer');
+          router.replace('/auth/login');
+        }
+      };
+      initUser();
+    }
+  }, [isMultiplayer]);
+
+  // Connect to WebSocket after userId is available (for multiplayer only)
+  useEffect(() => {
+    if (isMultiplayer && userId) {
       connect();
       return () => {
-        leaveLobby();
         disconnect();
       };
-    } else {
+    }
+  }, [isMultiplayer, userId]);
+
+  // Initialize local game for solo play
+  useEffect(() => {
+    if (!isMultiplayer) {
       loadGameState().then((restored) => {
         if (!restored) {
           initializeLocalGame();

@@ -77,7 +77,11 @@ export default function MatchmakingScreen() {
     initMatchmaking();
 
     return () => {
-      leaveMatchmaking();
+      // Only leave matchmaking if we didn't find a match
+      // If match was found, the game screen will handle the connection
+      if (!matchFoundRef.current) {
+        leaveMatchmaking();
+      }
       disconnect();
     };
   }, [params.mode, params.points]);
