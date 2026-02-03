@@ -1,0 +1,391 @@
+Running "npm ci --include=dev" in /home/expo/workingdir/build/mobile directory
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: house-spades-mobile@2.0.0
+npm warn Found: @types/react@18.3.27
+npm warn node_modules/@types/react
+npm warn   dev @types/react@"~19.0.0" from the root project
+npm warn   2 more (@react-native/virtualized-lists, react-native)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peerOptional @types/react@"^18.2.6" from react-native@0.76.9
+npm warn node_modules/react-native
+npm warn   react-native@"0.79.2" from the root project
+npm warn   20 more (@expo/metro-runtime, ...)
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: house-spades-mobile@2.0.0
+npm warn Found: @types/react@18.3.27
+npm warn node_modules/@types/react
+npm warn   dev @types/react@"~19.0.0" from the root project
+npm warn   2 more (@react-native/virtualized-lists, react-native)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peerOptional @types/react@"^18.2.6" from react-native@0.76.9
+npm warn node_modules/react-native
+npm warn   react-native@"0.79.2" from the root project
+npm warn   20 more (@expo/metro-runtime, ...)
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: house-spades-mobile@2.0.0
+npm warn Found: @types/react@18.3.27
+npm warn node_modules/@types/react
+npm warn   dev @types/react@"~19.0.0" from the root project
+npm warn   2 more (@react-native/virtualized-lists, react-native)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peerOptional @types/react@"^18.2.6" from react-native@0.76.9
+npm warn node_modules/react-native
+npm warn   react-native@"0.79.2" from the root project
+npm warn   20 more (@expo/metro-runtime, ...)
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: house-spades-mobile@2.0.0
+npm warn Found: react@18.3.1
+npm warn node_modules/react
+npm warn   react@"19.0.0" from the root project
+npm warn   16 more (react-freeze, react-native, ...)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer react@"^18.2.0" from react-native@0.76.9
+npm warn node_modules/react-native
+npm warn   react-native@"0.79.2" from the root project
+npm warn   20 more (@expo/metro-runtime, ...)
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: house-spades-mobile@2.0.0
+npm warn Found: react@18.3.1
+npm warn node_modules/react
+npm warn   react@"19.0.0" from the root project
+npm warn   16 more (react-freeze, react-native, ...)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer react@"^18.2.0" from react-native@0.76.9
+npm warn node_modules/react-native
+npm warn   react-native@"0.79.2" from the root project
+npm warn   20 more (@expo/metro-runtime, ...)
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: house-spades-mobile@2.0.0
+npm warn Found: react@18.3.1
+npm warn node_modules/react
+npm warn   react@"19.0.0" from the root project
+npm warn   16 more (react-freeze, react-native, ...)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer react@"^18.2.0" from react-native@0.76.9
+npm warn node_modules/react-native
+npm warn   react-native@"0.79.2" from the root project
+npm warn   20 more (@expo/metro-runtime, ...)
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: house-spades-mobile@2.0.0
+npm warn Found: react@18.3.1
+npm warn node_modules/react
+npm warn   react@"19.0.0" from the root project
+npm warn   16 more (react-freeze, react-native, ...)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer react@"^18.2.0" from react-native@0.76.9
+npm warn node_modules/react-native
+npm warn   react-native@"0.79.2" from the root project
+npm warn   20 more (@expo/metro-runtime, ...)
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: house-spades-mobile@2.0.0
+npm warn Found: react@18.3.1
+npm warn node_modules/react
+npm warn   react@"19.0.0" from the root project
+npm warn   16 more (react-freeze, react-native, ...)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer react@"^18.2.0" from react-native@0.76.9
+npm warn node_modules/react-native
+npm warn   react-native@"0.79.2" from the root project
+npm warn   20 more (@expo/metro-runtime, ...)
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: house-spades-mobile@2.0.0
+npm warn Found: react@18.3.1
+npm warn node_modules/react
+npm warn   react@"19.0.0" from the root project
+npm warn   16 more (react-freeze, react-native, ...)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer react@"^18.2.0" from react-native@0.76.9
+npm warn node_modules/react-native
+npm warn   react-native@"0.79.2" from the root project
+npm warn   20 more (@expo/metro-runtime, ...)
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: house-spades-mobile@2.0.0
+npm warn Found: react@18.3.1
+npm warn node_modules/react
+npm warn   react@"19.0.0" from the root project
+npm warn   16 more (react-freeze, react-native, ...)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer react@"^18.2.0" from react-native@0.76.9
+npm warn node_modules/react-native
+npm warn   react-native@"0.79.2" from the root project
+npm warn   20 more (@expo/metro-runtime, ...)
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: house-spades-mobile@2.0.0
+npm warn Found: react@18.3.1
+npm warn node_modules/react
+npm warn   react@"19.0.0" from the root project
+npm warn   16 more (react-freeze, react-native, ...)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer react@"^18.2.0" from react-native@0.76.9
+npm warn node_modules/react-native
+npm warn   react-native@"0.79.2" from the root project
+npm warn   20 more (@expo/metro-runtime, ...)
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: house-spades-mobile@2.0.0
+npm warn Found: react@18.3.1
+npm warn node_modules/react
+npm warn   react@"19.0.0" from the root project
+npm warn   16 more (react-freeze, react-native, ...)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer react@"^18.2.0" from react-native@0.76.9
+npm warn node_modules/react-native
+npm warn   react-native@"0.79.2" from the root project
+npm warn   20 more (@expo/metro-runtime, ...)
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: house-spades-mobile@2.0.0
+npm warn Found: react@18.3.1
+npm warn node_modules/react
+npm warn   react@"19.0.0" from the root project
+npm warn   16 more (react-freeze, react-native, ...)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer react@"^18.2.0" from react-native@0.76.9
+npm warn node_modules/react-native
+npm warn   react-native@"0.79.2" from the root project
+npm warn   20 more (@expo/metro-runtime, ...)
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: house-spades-mobile@2.0.0
+npm warn Found: react@18.3.1
+npm warn node_modules/react
+npm warn   react@"19.0.0" from the root project
+npm warn   16 more (react-freeze, react-native, ...)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer react@"^18.2.0" from react-native@0.76.9
+npm warn node_modules/react-native
+npm warn   react-native@"0.79.2" from the root project
+npm warn   20 more (@expo/metro-runtime, ...)
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: house-spades-mobile@2.0.0
+npm warn Found: react@18.3.1
+npm warn node_modules/react
+npm warn   react@"19.0.0" from the root project
+npm warn   16 more (react-freeze, react-native, ...)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer react@"^18.2.0" from react-native@0.76.9
+npm warn node_modules/react-native
+npm warn   react-native@"0.79.2" from the root project
+npm warn   20 more (@expo/metro-runtime, ...)
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: house-spades-mobile@2.0.0
+npm warn Found: react@18.3.1
+npm warn node_modules/react
+npm warn   react@"19.0.0" from the root project
+npm warn   16 more (react-freeze, react-native, ...)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer react@"^18.2.0" from react-native@0.76.9
+npm warn node_modules/react-native
+npm warn   react-native@"0.79.2" from the root project
+npm warn   20 more (@expo/metro-runtime, ...)
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: house-spades-mobile@2.0.0
+npm warn Found: react@18.3.1
+npm warn node_modules/react
+npm warn   react@"19.0.0" from the root project
+npm warn   16 more (react-freeze, react-native, ...)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer react@"^18.2.0" from react-native@0.76.9
+npm warn node_modules/react-native
+npm warn   react-native@"0.79.2" from the root project
+npm warn   20 more (@expo/metro-runtime, ...)
+npm error code EUSAGE
+npm error
+npm error `npm ci` can only install packages when your package.json and package-lock.json or npm-shrinkwrap.json are in sync. Please update your lock file with `npm install` before continuing.
+npm error
+npm error Invalid: lock file's @types/react@18.3.27 does not satisfy @types/react@19.0.14
+npm error Invalid: lock file's expo@52.0.48 does not satisfy expo@53.0.26
+npm error Invalid: lock file's expo-build-properties@0.13.3 does not satisfy expo-build-properties@0.14.8
+npm error Invalid: lock file's expo-linking@7.0.5 does not satisfy expo-linking@7.1.7
+npm error Invalid: lock file's expo-router@4.0.22 does not satisfy expo-router@5.0.7
+npm error Invalid: lock file's expo-secure-store@14.0.1 does not satisfy expo-secure-store@14.2.4
+npm error Invalid: lock file's expo-splash-screen@0.29.24 does not satisfy expo-splash-screen@0.30.10
+npm error Invalid: lock file's expo-status-bar@2.0.1 does not satisfy expo-status-bar@2.2.3
+npm error Invalid: lock file's expo-tracking-transparency@5.1.1 does not satisfy expo-tracking-transparency@5.2.4
+npm error Invalid: lock file's react@18.3.1 does not satisfy react@19.0.0
+npm error Invalid: lock file's react-native@0.76.9 does not satisfy react-native@0.79.2
+npm error Invalid: lock file's react-native-gesture-handler@2.20.2 does not satisfy react-native-gesture-handler@2.24.0
+npm error Invalid: lock file's react-native-reanimated@3.16.7 does not satisfy react-native-reanimated@3.17.5
+npm error Invalid: lock file's react-native-safe-area-context@4.12.0 does not satisfy react-native-safe-area-context@5.4.1
+npm error Invalid: lock file's react-native-screens@4.4.0 does not satisfy react-native-screens@4.10.0
+npm error Invalid: lock file's react-native-svg@15.8.0 does not satisfy react-native-svg@15.11.2
+npm error Invalid: lock file's typescript@5.3.3 does not satisfy typescript@5.8.3
+npm error Invalid: lock file's @react-navigation/native@7.1.26 does not satisfy @react-navigation/native@7.1.28
+npm error Invalid: lock file's expo-asset@11.0.5 does not satisfy expo-asset@11.1.7
+npm error Invalid: lock file's expo-constants@17.0.8 does not satisfy expo-constants@17.1.8
+npm error Invalid: lock file's expo-file-system@18.0.12 does not satisfy expo-file-system@18.1.11
+npm error Invalid: lock file's expo-font@13.0.4 does not satisfy expo-font@13.3.2
+npm error Invalid: lock file's @react-navigation/core@7.13.7 does not satisfy @react-navigation/core@7.14.0
+npm error Invalid: lock file's react-is@19.2.3 does not satisfy react-is@19.2.4
+npm error Invalid: lock file's @expo/cli@0.22.27 does not satisfy @expo/cli@0.24.24
+npm error Invalid: lock file's @expo/config@10.0.11 does not satisfy @expo/config@11.0.13
+npm error Invalid: lock file's @expo/config-plugins@9.0.17 does not satisfy @expo/config-plugins@10.1.2
+npm error Invalid: lock file's @expo/fingerprint@0.11.11 does not satisfy @expo/fingerprint@0.13.4
+npm error Invalid: lock file's @expo/metro-config@0.19.12 does not satisfy @expo/metro-config@0.20.18
+npm error Invalid: lock file's babel-preset-expo@12.0.11 does not satisfy babel-preset-expo@13.2.5
+npm error Invalid: lock file's expo-keep-awake@14.0.3 does not satisfy expo-keep-awake@14.1.4
+npm error Invalid: lock file's expo-modules-autolinking@2.0.8 does not satisfy expo-modules-autolinking@2.1.14
+npm error Invalid: lock file's expo-modules-core@2.2.3 does not satisfy expo-modules-core@2.5.0
+npm error Missing: react-native-edge-to-edge@1.6.0 from lock file
+npm error Invalid: lock file's @expo/code-signing-certificates@0.0.5 does not satisfy @expo/code-signing-certificates@0.0.6
+npm error Invalid: lock file's @expo/env@0.4.2 does not satisfy @expo/env@1.0.7
+npm error Invalid: lock file's @expo/image-utils@0.6.5 does not satisfy @expo/image-utils@0.7.6
+npm error Invalid: lock file's @expo/package-manager@1.9.9 does not satisfy @expo/package-manager@1.9.10
+npm error Invalid: lock file's @expo/plist@0.2.2 does not satisfy @expo/plist@0.3.5
+npm error Invalid: lock file's @expo/prebuild-config@8.2.0 does not satisfy @expo/prebuild-config@9.0.12
+npm error Missing: @expo/schema-utils@0.1.8 from lock file
+npm error Invalid: lock file's @expo/xcpretty@4.3.2 does not satisfy @expo/xcpretty@4.4.0
+npm error Invalid: lock file's @react-native/dev-middleware@0.76.9 does not satisfy @react-native/dev-middleware@0.79.6
+npm error Invalid: lock file's bplist-creator@0.0.7 does not satisfy bplist-creator@0.1.0
+npm error Invalid: lock file's getenv@1.0.0 does not satisfy getenv@2.0.0
+npm error Missing: lan-network@0.1.7 from lock file
+npm error Missing: minimatch@9.0.5 from lock file
+npm error Invalid: lock file's tar@6.2.1 does not satisfy tar@7.5.7
+npm error Invalid: lock file's @expo/config-types@52.0.5 does not satisfy @expo/config-types@53.0.5
+npm error Missing: minimatch@9.0.5 from lock file
+npm error Missing: minimatch@9.0.5 from lock file
+npm error Invalid: lock file's @xmldom/xmldom@0.7.13 does not satisfy @xmldom/xmldom@0.8.11
+npm error Invalid: lock file's xmlbuilder@14.0.0 does not satisfy xmlbuilder@15.1.1
+npm error Invalid: lock file's @react-native/normalize-colors@0.76.9 does not satisfy @react-native/normalize-colors@0.79.6
+npm error Invalid: lock file's @react-native/debugger-frontend@0.76.9 does not satisfy @react-native/debugger-frontend@0.79.6
+npm error Invalid: lock file's @babel/plugin-proposal-decorators@7.28.0 does not satisfy @babel/plugin-proposal-decorators@7.29.0
+npm error Invalid: lock file's @babel/plugin-syntax-export-default-from@7.27.1 does not satisfy @babel/plugin-syntax-export-default-from@7.28.6
+npm error Invalid: lock file's @babel/plugin-transform-object-rest-spread@7.28.4 does not satisfy @babel/plugin-transform-object-rest-spread@7.28.6
+npm error Invalid: lock file's @babel/plugin-transform-private-methods@7.27.1 does not satisfy @babel/plugin-transform-private-methods@7.28.6
+npm error Invalid: lock file's @babel/plugin-transform-private-property-in-object@7.27.1 does not satisfy @babel/plugin-transform-private-property-in-object@7.28.6
+npm error Invalid: lock file's @babel/plugin-transform-runtime@7.28.5 does not satisfy @babel/plugin-transform-runtime@7.29.0
+npm error Invalid: lock file's @react-native/babel-preset@0.76.9 does not satisfy @react-native/babel-preset@0.79.6
+npm error Invalid: lock file's @babel/helper-create-class-features-plugin@7.28.5 does not satisfy @babel/helper-create-class-features-plugin@7.28.6
+npm error Invalid: lock file's @babel/helper-plugin-utils@7.27.1 does not satisfy @babel/helper-plugin-utils@7.28.6
+npm error Invalid: lock file's @babel/plugin-syntax-decorators@7.27.1 does not satisfy @babel/plugin-syntax-decorators@7.28.6
+npm error Invalid: lock file's @babel/helper-replace-supers@7.27.1 does not satisfy @babel/helper-replace-supers@7.28.6
+npm error Invalid: lock file's @babel/traverse@7.28.5 does not satisfy @babel/traverse@7.29.0
+npm error Invalid: lock file's @babel/plugin-syntax-flow@7.27.1 does not satisfy @babel/plugin-syntax-flow@7.28.6
+npm error Invalid: lock file's @babel/helper-compilation-targets@7.27.2 does not satisfy @babel/helper-compilation-targets@7.28.6
+npm error Invalid: lock file's @babel/compat-data@7.28.5 does not satisfy @babel/compat-data@7.29.0
+npm error Invalid: lock file's @babel/helper-module-imports@7.27.1 does not satisfy @babel/helper-module-imports@7.28.6
+npm error Invalid: lock file's babel-plugin-polyfill-corejs2@0.4.14 does not satisfy babel-plugin-polyfill-corejs2@0.4.15
+npm error Invalid: lock file's babel-plugin-polyfill-regenerator@0.6.5 does not satisfy babel-plugin-polyfill-regenerator@0.6.6
+npm error Invalid: lock file's @babel/types@7.28.5 does not satisfy @babel/types@7.29.0
+npm error Invalid: lock file's @babel/plugin-transform-react-jsx@7.27.1 does not satisfy @babel/plugin-transform-react-jsx@7.28.6
+npm error Invalid: lock file's @babel/plugin-syntax-jsx@7.27.1 does not satisfy @babel/plugin-syntax-jsx@7.28.6
+npm error Missing: @babel/code-frame@7.29.0 from lock file
+npm error Invalid: lock file's @babel/generator@7.28.5 does not satisfy @babel/generator@7.29.0
+npm error Invalid: lock file's @babel/parser@7.28.5 does not satisfy @babel/parser@7.29.0
+npm error Invalid: lock file's @babel/template@7.27.2 does not satisfy @babel/template@7.28.6
+npm error Missing: @babel/code-frame@7.29.0 from lock file
+npm error Invalid: lock file's @babel/plugin-transform-async-generator-functions@7.28.0 does not satisfy @babel/plugin-transform-async-generator-functions@7.29.0
+npm error Invalid: lock file's @babel/plugin-transform-async-to-generator@7.27.1 does not satisfy @babel/plugin-transform-async-to-generator@7.28.6
+npm error Invalid: lock file's @babel/plugin-transform-block-scoping@7.28.5 does not satisfy @babel/plugin-transform-block-scoping@7.28.6
+npm error Invalid: lock file's @babel/plugin-transform-computed-properties@7.27.1 does not satisfy @babel/plugin-transform-computed-properties@7.28.6
+npm error Invalid: lock file's @babel/plugin-transform-logical-assignment-operators@7.28.5 does not satisfy @babel/plugin-transform-logical-assignment-operators@7.28.6
+npm error Invalid: lock file's @babel/plugin-transform-named-capturing-groups-regex@7.27.1 does not satisfy @babel/plugin-transform-named-capturing-groups-regex@7.29.0
+npm error Invalid: lock file's @babel/plugin-transform-numeric-separator@7.27.1 does not satisfy @babel/plugin-transform-numeric-separator@7.28.6
+npm error Invalid: lock file's @babel/plugin-transform-optional-catch-binding@7.27.1 does not satisfy @babel/plugin-transform-optional-catch-binding@7.28.6
+npm error Invalid: lock file's @babel/plugin-transform-regenerator@7.28.4 does not satisfy @babel/plugin-transform-regenerator@7.29.0
+npm error Invalid: lock file's @babel/plugin-transform-spread@7.27.1 does not satisfy @babel/plugin-transform-spread@7.28.6
+npm error Invalid: lock file's @react-native/babel-plugin-codegen@0.76.9 does not satisfy @react-native/babel-plugin-codegen@0.79.6
+npm error Invalid: lock file's @babel/helper-wrap-function@7.28.3 does not satisfy @babel/helper-wrap-function@7.28.6
+npm error Invalid: lock file's @react-native/codegen@0.76.9 does not satisfy @react-native/codegen@0.79.6
+npm error Invalid: lock file's hermes-parser@0.23.1 does not satisfy hermes-parser@0.25.1
+npm error Invalid: lock file's @babel/helper-define-polyfill-provider@0.6.5 does not satisfy @babel/helper-define-polyfill-provider@0.6.6
+npm error Invalid: lock file's core-js-compat@3.47.0 does not satisfy core-js-compat@3.48.0
+npm error Invalid: lock file's mkdirp@0.5.6 does not satisfy mkdirp@1.0.4
+npm error Invalid: lock file's @expo/metro-runtime@4.0.1 does not satisfy @expo/metro-runtime@5.0.4
+npm error Invalid: lock file's @expo/server@0.5.3 does not satisfy @expo/server@0.6.3
+npm error Invalid: lock file's @radix-ui/react-slot@1.0.1 does not satisfy @radix-ui/react-slot@1.2.0
+npm error Invalid: lock file's @react-navigation/bottom-tabs@7.9.0 does not satisfy @react-navigation/bottom-tabs@7.12.0
+npm error Invalid: lock file's @react-navigation/native-stack@7.9.0 does not satisfy @react-navigation/native-stack@7.12.0
+npm error Invalid: lock file's @radix-ui/react-compose-refs@1.0.0 does not satisfy @radix-ui/react-compose-refs@1.1.2
+npm error Invalid: lock file's @react-navigation/elements@2.9.3 does not satisfy @react-navigation/elements@2.9.5
+npm error Invalid: lock file's hermes-estree@0.23.1 does not satisfy hermes-estree@0.25.1
+npm error Invalid: lock file's @react-native/assets-registry@0.76.9 does not satisfy @react-native/assets-registry@0.79.2
+npm error Missing: @react-native/codegen@0.79.2 from lock file
+npm error Invalid: lock file's @react-native/community-cli-plugin@0.76.9 does not satisfy @react-native/community-cli-plugin@0.79.2
+npm error Invalid: lock file's @react-native/gradle-plugin@0.76.9 does not satisfy @react-native/gradle-plugin@0.79.2
+npm error Invalid: lock file's @react-native/js-polyfills@0.76.9 does not satisfy @react-native/js-polyfills@0.79.2
+npm error Missing: @react-native/normalize-colors@0.79.2 from lock file
+npm error Missing: @react-native/virtualized-lists@0.79.2 from lock file
+npm error Invalid: lock file's metro-runtime@0.81.5 does not satisfy metro-runtime@0.82.5
+npm error Invalid: lock file's metro-source-map@0.81.5 does not satisfy metro-source-map@0.82.5
+npm error Invalid: lock file's react-devtools-core@5.3.2 does not satisfy react-devtools-core@6.1.5
+npm error Invalid: lock file's scheduler@0.23.2 does not satisfy scheduler@0.25.0
+npm error Missing: @react-native/dev-middleware@0.79.2 from lock file
+npm error Missing: debug@2.6.9 from lock file
+npm error Invalid: lock file's metro@0.81.5 does not satisfy metro@0.82.5
+npm error Invalid: lock file's metro-config@0.81.5 does not satisfy metro-config@0.82.5
+npm error Invalid: lock file's metro-core@0.81.5 does not satisfy metro-core@0.82.5
+npm error Invalid: lock file's hermes-parser@0.25.1 does not satisfy hermes-parser@0.29.1
+npm error Invalid: lock file's metro-babel-transformer@0.81.5 does not satisfy metro-babel-transformer@0.82.5
+npm error Invalid: lock file's metro-cache@0.81.5 does not satisfy metro-cache@0.82.5
+npm error Invalid: lock file's metro-cache-key@0.81.5 does not satisfy metro-cache-key@0.82.5
+npm error Invalid: lock file's metro-file-map@0.81.5 does not satisfy metro-file-map@0.82.5
+npm error Invalid: lock file's metro-resolver@0.81.5 does not satisfy metro-resolver@0.82.5
+npm error Invalid: lock file's metro-symbolicate@0.81.5 does not satisfy metro-symbolicate@0.82.5
+npm error Invalid: lock file's metro-transform-plugins@0.81.5 does not satisfy metro-transform-plugins@0.82.5
+npm error Invalid: lock file's metro-transform-worker@0.81.5 does not satisfy metro-transform-worker@0.82.5
+npm error Invalid: lock file's hermes-parser@0.25.1 does not satisfy hermes-parser@0.29.1
+npm error Missing: https-proxy-agent@7.0.6 from lock file
+npm error Missing: agent-base@7.1.4 from lock file
+npm error Invalid: lock file's @babel/traverse--for-generate-function-map@7.28.5 does not satisfy @babel/traverse--for-generate-function-map@7.29.0
+npm error Invalid: lock file's ob1@0.81.5 does not satisfy ob1@0.82.5
+npm error Missing: @babel/code-frame@7.29.0 from lock file
+npm error Invalid: lock file's metro-minify-terser@0.81.5 does not satisfy metro-minify-terser@0.82.5
+npm error Invalid: lock file's terser@5.44.1 does not satisfy terser@5.46.0
+npm error Missing: react-native-is-edge-to-edge@1.1.7 from lock file
+npm error Missing: @isaacs/fs-minipass@4.0.1 from lock file
+npm error Invalid: lock file's chownr@2.0.0 does not satisfy chownr@3.0.0
+npm error Invalid: lock file's minizlib@2.1.2 does not satisfy minizlib@3.1.0
+npm error Invalid: lock file's yallist@4.0.0 does not satisfy yallist@5.0.0
+npm error Invalid: lock file's uuid@8.3.2 does not satisfy uuid@7.0.3
+npm error Missing: brace-expansion@2.0.2 from lock file
+npm error Missing: brace-expansion@2.0.2 from lock file
+npm error Missing: brace-expansion@2.0.2 from lock file
+npm error Missing: @react-native/debugger-frontend@0.79.2 from lock file
+npm error Missing: ws@6.2.3 from lock file
+npm error Missing: ms@2.0.0 from lock file
+npm error Invalid: lock file's hermes-estree@0.25.1 does not satisfy hermes-estree@0.29.1
+npm error Invalid: lock file's hermes-estree@0.25.1 does not satisfy hermes-estree@0.29.1
+npm error
+npm error Clean install a project
+npm error
+npm error Usage:
+npm error npm ci
+npm error
+npm error Options:
+npm error [--install-strategy <hoisted|nested|shallow|linked>] [--legacy-bundling]
+npm error [--global-style] [--omit <dev|optional|peer> [--omit <dev|optional|peer> ...]]
+npm error [--include <prod|dev|optional|peer> [--include <prod|dev|optional|peer> ...]]
+npm error [--strict-peer-deps] [--foreground-scripts] [--ignore-scripts] [--no-audit]
+npm error [--no-bin-links] [--no-fund] [--dry-run]
+npm error [-w|--workspace <workspace-name> [-w|--workspace <workspace-name> ...]]
+npm error [-ws|--workspaces] [--include-workspace-root] [--install-links]
+npm error
+npm error aliases: clean-install, ic, install-clean, isntall-clean
+npm error
+npm error Run "npm help ci" for more info
+npm error A complete log of this run can be found in: /home/expo/.npm/_logs/2026-02-03T16_39_09_199Z-debug-0.log
+npm ci --include=dev exited with non-zero code: 1
+
+Fail job
+
+1s
+
+
+Build failed
+
+npm ci --include=dev exited with non-zero code: 1
