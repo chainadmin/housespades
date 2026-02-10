@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
-import { authenticatedFetch, clearAuth } from '@/lib/auth';
+import { authenticatedFetch, clearAuth, getStoredUser } from '@/lib/auth';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -12,10 +12,11 @@ export default function SettingsScreen() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteText, setDeleteText] = useState('');
   const [deleting, setDeleting] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const handleRemoveAds = () => {
-    Alert.alert('Coming Soon', 'Remove ads feature will be available in a future update.');
-  };
+  useEffect(() => {
+    getStoredUser().then(user => setIsLoggedIn(!!user));
+  }, []);
 
   const handleDeleteAccount = async () => {
     if (deleteText.toLowerCase() !== 'delete') {
@@ -56,84 +57,69 @@ export default function SettingsScreen() {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Purchases</Text>
-          <TouchableOpacity 
-            style={[styles.menuItem, { backgroundColor: colors.card }]}
-            onPress={handleRemoveAds}
-          >
-            <View style={styles.menuItemLeft}>
-              <Ionicons name="remove-circle-outline" size={22} color={colors.text} />
-              <View style={styles.menuItemContent}>
-                <Text style={styles.menuItemText}>Remove Ads</Text>
-                <Text style={styles.menuItemSubtext}>Coming Soon</Text>
-              </View>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account</Text>
-          
-          {!showDeleteConfirm ? (
-            <TouchableOpacity 
-              style={[styles.menuItem, { backgroundColor: colors.card }]}
-              onPress={() => setShowDeleteConfirm(true)}
-            >
-              <View style={styles.menuItemLeft}>
-                <Ionicons name="trash-outline" size={22} color={colors.error} />
-                <Text style={[styles.menuItemText, { color: colors.error }]}>Delete Account</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
-            </TouchableOpacity>
-          ) : (
-            <View style={[styles.deleteConfirmCard, { backgroundColor: colors.card }]}>
-              <Text style={styles.deleteWarningTitle}>Delete Your Account?</Text>
-              <Text style={styles.deleteWarningText}>
-                This action is permanent and cannot be undone. All your data, including match history and statistics, will be deleted.
-              </Text>
-              <Text style={styles.deleteInstructions}>
-                Type "delete" to confirm:
-              </Text>
-              <TextInput
-                style={[styles.deleteInput, { 
-                  backgroundColor: colors.background,
-                  color: colors.text,
-                  borderColor: colors.border
-                }]}
-                value={deleteText}
-                onChangeText={setDeleteText}
-                placeholder="Type delete here"
-                placeholderTextColor={colors.textSecondary}
-                autoCapitalize="none"
-              />
-              <View style={styles.deleteButtons}>
-                <TouchableOpacity 
-                  style={[styles.cancelButton, { borderColor: colors.border }]}
-                  onPress={() => {
-                    setShowDeleteConfirm(false);
-                    setDeleteText('');
-                  }}
-                >
-                  <Text style={[styles.cancelButtonText, { color: colors.text }]}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={[styles.confirmDeleteButton, { 
-                    backgroundColor: deleteText.toLowerCase() === 'delete' ? colors.error : colors.textSecondary,
-                    opacity: deleting ? 0.5 : 1
+        {isLoggedIn && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Account</Text>
+            
+            {!showDeleteConfirm ? (
+              <TouchableOpacity 
+                style={[styles.menuItem, { backgroundColor: colors.card }]}
+                onPress={() => setShowDeleteConfirm(true)}
+              >
+                <View style={styles.menuItemLeft}>
+                  <Ionicons name="trash-outline" size={22} color={colors.error} />
+                  <Text style={[styles.menuItemText, { color: colors.error }]}>Delete Account</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+              </TouchableOpacity>
+            ) : (
+              <View style={[styles.deleteConfirmCard, { backgroundColor: colors.card }]}>
+                <Text style={styles.deleteWarningTitle}>Delete Your Account?</Text>
+                <Text style={styles.deleteWarningText}>
+                  This action is permanent and cannot be undone. All your data, including match history and statistics, will be deleted.
+                </Text>
+                <Text style={styles.deleteInstructions}>
+                  Type "delete" to confirm:
+                </Text>
+                <TextInput
+                  style={[styles.deleteInput, { 
+                    backgroundColor: colors.background,
+                    color: colors.text,
+                    borderColor: colors.border
                   }]}
-                  onPress={handleDeleteAccount}
-                  disabled={deleting || deleteText.toLowerCase() !== 'delete'}
-                >
-                  <Text style={styles.confirmDeleteButtonText}>
-                    {deleting ? 'Deleting...' : 'Delete Account'}
-                  </Text>
-                </TouchableOpacity>
+                  value={deleteText}
+                  onChangeText={setDeleteText}
+                  placeholder="Type delete here"
+                  placeholderTextColor={colors.textSecondary}
+                  autoCapitalize="none"
+                />
+                <View style={styles.deleteButtons}>
+                  <TouchableOpacity 
+                    style={[styles.cancelButton, { borderColor: colors.border }]}
+                    onPress={() => {
+                      setShowDeleteConfirm(false);
+                      setDeleteText('');
+                    }}
+                  >
+                    <Text style={[styles.cancelButtonText, { color: colors.text }]}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={[styles.confirmDeleteButton, { 
+                      backgroundColor: deleteText.toLowerCase() === 'delete' ? colors.error : colors.textSecondary,
+                      opacity: deleting ? 0.5 : 1
+                    }]}
+                    onPress={handleDeleteAccount}
+                    disabled={deleting || deleteText.toLowerCase() !== 'delete'}
+                  >
+                    <Text style={styles.confirmDeleteButtonText}>
+                      {deleting ? 'Deleting...' : 'Delete Account'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
-          )}
-        </View>
+            )}
+          </View>
+        )}
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Legal</Text>
@@ -212,17 +198,9 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       gap: 12,
       flex: 1,
     },
-    menuItemContent: {
-      flex: 1,
-    },
     menuItemText: {
       fontSize: 16,
       color: colors.text,
-    },
-    menuItemSubtext: {
-      fontSize: 12,
-      color: colors.textSecondary,
-      marginTop: 2,
     },
     deleteConfirmCard: {
       padding: 16,

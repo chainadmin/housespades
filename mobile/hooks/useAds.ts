@@ -5,7 +5,6 @@ import {
   AdEventType,
   TestIds
 } from 'react-native-google-mobile-ads';
-import { useIAP } from './useIAP';
 import { useATT } from './useATT';
 
 const INTERSTITIAL_AD_UNIT_ID = __DEV__ 
@@ -38,7 +37,7 @@ interface UseAdsReturn {
 }
 
 export function useAds(): UseAdsReturn {
-  const { hasRemoveAds } = useIAP();
+  const hasRemoveAds = false;
   const { isTrackingAllowed, requestTracking, canRequestTracking } = useATT();
   const [isAdLoaded, setIsAdLoaded] = useState(false);
   const [isAdLoading, setIsAdLoading] = useState(false);

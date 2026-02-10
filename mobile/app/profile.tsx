@@ -28,9 +28,12 @@ export default function ProfileScreen() {
   const fetchProfile = async () => {
     try {
       const storedUser = await getStoredUser();
-      if (storedUser) {
-        setProfile(storedUser as UserProfile);
+      if (!storedUser) {
+        setProfile(null);
+        setLoading(false);
+        return;
       }
+      setProfile(storedUser as UserProfile);
       
       const response = await authenticatedFetch('/api/user/profile');
       if (response.ok) {
