@@ -1,0 +1,67 @@
+"message":"2026-02-14 19:22:07.564 UTC [57502] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.423317926Z"}
+{"message":"2026-02-14 19:22:05.107 UTC [57491] LOG:  invalid length of startup packet","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.423335503Z"}
+{"message":"2026-02-14 19:22:05.272 UTC [57492] LOG:  invalid length of startup packet","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.423349347Z"}
+{"message":"2026-02-14 19:22:07.919 UTC [57503] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.423353368Z"}
+{"message":"2026-02-14 19:22:05.447 UTC [57493] LOG:  invalid length of startup packet","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.423363339Z"}
+{"message":"2026-02-14 19:22:05.672 UTC [57494] LOG:  invalid length of startup packet","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.423376690Z"}
+{"message":"2026-02-14 19:22:05.826 UTC [57495] LOG:  invalid length of startup packet","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.423386366Z"}
+{"message":"2026-02-14 19:22:08.271 UTC [57504] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.423395513Z"}
+{"message":"2026-02-14 19:22:05.973 UTC [57496] LOG:  invalid length of startup packet","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.423400591Z"}
+{"message":"2026-02-14 19:22:06.130 UTC [57497] LOG:  invalid length of startup packet","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.423419006Z"}
+{"message":"2026-02-14 19:22:06.317 UTC [57498] LOG:  invalid length of startup packet","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.423430000Z"}
+{"message":"2026-02-14 19:22:06.468 UTC [57499] LOG:  could not accept SSL connection: version too low","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.423439277Z"}
+{"message":"2026-02-14 19:22:06.468 UTC [57499] HINT:  This may indicate that the client does not support any SSL protocol version between TLSv1.2 and TLSv1.3.","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.423446487Z"}
+{"message":"2026-02-14 19:22:06.805 UTC [57500] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.423455266Z"}
+{"message":"2026-02-14 19:22:07.160 UTC [57501] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.423463433Z"}
+{"message":"2026-02-14 19:22:08.617 UTC [57505] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.435706080Z"}
+{"message":"2026-02-14 19:22:08.957 UTC [57506] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.435713748Z"}
+{"message":"2026-02-14 19:22:09.364 UTC [57507] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.435722967Z"}
+{"message":"2026-02-14 19:22:09.659 UTC [57508] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.435736005Z"}
+{"message":"2026-02-14 19:22:09.958 UTC [57509] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.435745394Z"}
+{"message":"2026-02-14 19:22:10.257 UTC [57510] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.435753058Z"}
+{"message":"2026-02-14 19:22:10.680 UTC [57511] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.435761649Z"}
+{"message":"2026-02-14 19:22:10.994 UTC [57512] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.435771016Z"}
+{"message":"2026-02-14 19:22:11.327 UTC [57513] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.435781684Z"}
+{"message":"2026-02-14 19:22:11.775 UTC [57514] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.435791089Z"}
+{"message":"2026-02-14 19:22:13.080 UTC [57518] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.435798473Z"}
+{"message":"2026-02-14 19:22:12.172 UTC [57515] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.435801911Z"}
+{"message":"2026-02-14 19:22:13.420 UTC [57519] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.435810851Z"}
+{"message":"2026-02-14 19:22:12.486 UTC [57516] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.435813821Z"}
+{"message":"2026-02-14 19:22:13.722 UTC [57520] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.435825526Z"}
+{"message":"2026-02-14 19:22:12.779 UTC [57517] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.435827724Z"}
+{"message":"2026-02-14 19:22:14.064 UTC [57521] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.435834764Z"}
+{"message":"2026-02-14 19:22:14.378 UTC [57522] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.435844357Z"}
+{"message":"2026-02-14 19:22:14.661 UTC [57523] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.435852684Z"}
+{"message":"2026-02-14 19:22:14.969 UTC [57525] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.435860673Z"}
+{"message":"2026-02-14 19:22:15.283 UTC [57526] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:15.435868476Z"}
+{"message":"2026-02-14 19:22:15.604 UTC [57527] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:16.450203158Z"}
+{"message":"2026-02-14 19:22:15.908 UTC [57528] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:16.450211627Z"}
+{"message":"2026-02-14 19:22:16.230 UTC [57529] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:16.450218287Z"}
+{"message":"2026-02-14 19:22:16.531 UTC [57530] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:16.542104176Z"}
+{"message":"2026-02-14 19:22:16.825 UTC [57531] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:17.484018591Z"}
+{"message":"2026-02-14 19:22:17.139 UTC [57532] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:17.484026515Z"}
+{"message":"2026-02-14 19:22:17.455 UTC [57533] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:17.484034503Z"}
+{"message":"2026-02-14 19:22:17.751 UTC [57534] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:18.455864821Z"}
+{"message":"2026-02-14 19:22:18.054 UTC [57535] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:18.455882231Z"}
+{"message":"2026-02-14 19:22:18.407 UTC [57536] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:18.455891240Z"}
+{"message":"2026-02-14 19:22:18.709 UTC [57537] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:19.280862963Z"}
+{"message":"2026-02-14 19:22:19.006 UTC [57538] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:19.280874137Z"}
+{"message":"2026-02-14 19:22:19.303 UTC [57539] LOG:  received direct SSL connection request without ALPN protocol negotiation extension","attributes":{"level":"error"},"timestamp":"2026-02-14T19:22:19.311091335Z"}
+{"message":"[Auth Debug] Cookie header: undefined","attributes":{"level":"info"},"timestamp":"2026-02-14T22:33:35.598344636Z"}
+{"message":"[Auth Debug] Session ID: ZDncPxGmAOBdQME6dJfoWsA-FamW2pTW","attributes":{"level":"info"},"timestamp":"2026-02-14T22:33:35.598360137Z"}
+{"message":"[Auth Debug] Session userId: undefined","attributes":{"level":"info"},"timestamp":"2026-02-14T22:33:35.598366367Z"}
+{"message":"10:33:25 PM [express] GET /api/auth/me 401 in 1ms :: {\"error\":\"Not authenticated\"}","attributes":{"level":"info"},"timestamp":"2026-02-14T22:33:35.598371997Z"}
+{"message":"Error: Parse Error","attributes":{"level":"error"},"timestamp":"2026-02-14T22:52:30.700615259Z"}
+{"message":"    at socketOnEnd (node:_http_server:844:22)","attributes":{"level":"error"},"timestamp":"2026-02-14T22:52:30.700621179Z"}
+{"message":"    at Socket.emit (node:events:531:35)","attributes":{"level":"error"},"timestamp":"2026-02-14T22:52:30.700624289Z"}
+{"message":"    at endReadableNT (node:internal/streams/readable:1698:12)","attributes":{"level":"error"},"timestamp":"2026-02-14T22:52:30.700626779Z"}
+{"message":"    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)","attributes":{"level":"error"},"timestamp":"2026-02-14T22:52:30.700629529Z"}
+{"message":"[Auth Debug] Cookie header: undefined","attributes":{"level":"info"},"timestamp":"2026-02-15T09:50:19.040655545Z"}
+{"message":"[Auth Debug] Session ID: JeWlGCPtY8jpmpfFFiTECkIgWHmIYsOM","attributes":{"level":"info"},"timestamp":"2026-02-15T09:50:19.040660984Z"}
+{"message":"[Auth Debug] Session userId: undefined","attributes":{"level":"info"},"timestamp":"2026-02-15T09:50:19.040664184Z"}
+{"message":"9:50:11 AM [express] GET /api/auth/me 401 in 1ms :: {\"error\":\"Not authenticated\"}","attributes":{"level":"info"},"timestamp":"2026-02-15T09:50:19.040667204Z"}
+{"message":"[Auth Debug] Cookie header: undefined","attributes":{"level":"info"},"timestamp":"2026-02-15T09:50:19.040670084Z"}
+{"message":"[Auth Debug] Session ID: MAxQoLh7JbapXubBieBD2dZs2m6xcNpE","attributes":{"level":"info"},"timestamp":"2026-02-15T09:50:19.040673284Z"}
+{"message":"[Auth Debug] Session userId: undefined","attributes":{"level":"info"},"timestamp":"2026-02-15T09:50:19.040675974Z"}
+{"message":"9:50:11 AM [express] GET /api/auth/me 401 in 0ms :: {\"error\":\"Not authenticated\"}","attributes":{"level":"info"},"timestamp":"2026-02-15T09:50:19.040678564Z"}
+{"message":"[Auth Debug] Cookie header: undefined","attr
