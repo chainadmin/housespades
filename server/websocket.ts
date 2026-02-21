@@ -4,7 +4,7 @@ import type { GameState, WSMessage, GameMode, PointGoal } from "@shared/schema";
 import { GameEngine } from "./gameEngine";
 import { BotAI } from "./botAI";
 import { storage } from "./storage";
-import { matchmaking } from "./matchmaking";
+import { matchmaking, calculateRatingChange } from "./matchmaking";
 
 interface Client {
   ws: WebSocket;
@@ -615,7 +615,6 @@ export class GameWebSocketServer {
   }
 
   private async saveGameStats(gameState: GameState) {
-    // This is only called for ranked multiplayer games (2+ authenticated humans)
     try {
       const winningTeamIndex = gameState.teams.findIndex(
         (t) => t.score >= gameState.winningScore
@@ -625,18 +624,51 @@ export class GameWebSocketServer {
       const winningTeam = gameState.teams[winningTeamIndex];
       const losingTeam = gameState.teams[winningTeamIndex === 0 ? 1 : 0];
 
+      const humanPlayers = gameState.players.filter(p => !p.isBot && (p as any).userId);
+      const winnerUserIds = humanPlayers
+        .filter(p => winningTeam.players.includes(p.id))
+        .map(p => (p as any).userId as number);
+      const loserUserIds = humanPlayers
+        .filter(p => !winningTeam.players.includes(p.id))
+        .map(p => (p as any).userId as number);
+
+      const winnerRatings = await Promise.all(winnerUserIds.map(id => storage.getUser(id)));
+      const loserRatings = await Promise.all(loserUserIds.map(id => storage.getUser(id)));
+
+      const validWinnerRatings = winnerRatings.filter(Boolean);
+      const validLoserRatings = loserRatings.filter(Boolean);
+      const avgWinnerRating = validWinnerRatings.length > 0
+        ? validWinnerRatings.reduce((sum, u) => sum + u!.rating, 0) / validWinnerRatings.length
+        : 1000;
+      const avgLoserRating = validLoserRatings.length > 0
+        ? validLoserRatings.reduce((sum, u) => sum + u!.rating, 0) / validLoserRatings.length
+        : 1000;
+
       const players: { userId: number | null; isBot: boolean; teamIndex: number; ratingChange: number }[] = [];
 
       for (const player of gameState.players) {
         const isWinner = winningTeam.players.includes(player.id);
-        const teamIdx = winningTeam.players.includes(player.id) ? winningTeamIndex : (winningTeamIndex === 0 ? 1 : 0);
-        const ratingChange = isWinner ? 25 : -20;
+        const teamIdx = isWinner ? 0 : 1;
+        const userId = (player as any).userId as number | undefined;
+
+        let ratingChange = 0;
+        if (!player.isBot && userId) {
+          const user = isWinner
+            ? winnerRatings.find(u => u?.id === userId)
+            : loserRatings.find(u => u?.id === userId);
+          const playerRating = user?.rating ?? 1000;
+          const opponentAvg = isWinner ? avgLoserRating : avgWinnerRating;
+          ratingChange = calculateRatingChange(playerRating, opponentAvg, isWinner);
+
+          await storage.updateUserStats(userId, isWinner, ratingChange);
+          console.log(`[Game ${gameState.id}] Updated user ${userId} (${player.name}): ${isWinner ? 'WIN' : 'LOSS'}, rating change: ${ratingChange > 0 ? '+' : ''}${ratingChange}`);
+        }
 
         players.push({
-          userId: null, // User ID tracking will be added when auth is integrated with matchmaking
+          userId: userId ?? null,
           isBot: player.isBot,
           teamIndex: teamIdx,
-          ratingChange: player.isBot ? 0 : ratingChange,
+          ratingChange,
         });
       }
 

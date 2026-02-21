@@ -244,9 +244,7 @@ export class DatabaseStorage implements IStorage {
       .limit(50);
 
     return playerMatches.map((pm) => {
-      // ratingChange is positive for winners and negative/zero for losers
-      // Use ratingChange to determine if player won the match
-      const won = pm.ratingChange > 0;
+      const won = pm.teamIndex === 0;
       return {
         id: pm.id,
         matchId: pm.matchId,
