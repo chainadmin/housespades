@@ -1,0 +1,51 @@
+ge":"4:01:21 AM [express] GET /api/user/profile 304 in 10ms :: {\"id\":13,\"username\":\"dakshayani Pawar\",\"email\":\"pawardakshayani1995@gmail.com\",\"rating\":1000,\"gamesPlayed\":0,\"gamesWon\":0,\"removeAds\":false}","attributes":{"level":"info"},"timestamp":"2026-02-26T04:01:24.874722944Z"}
+{"message":"[Auth Debug] Cookie header: connect.sid=s:SJibp6hFsjsnKx5ba2yDoyWTfG-Gzm7R.0Yzx8jOy/Zkh00B1XNWx5zqmfKoDqSEX7F6zKwMs7C4","attributes":{"level":"info"},"timestamp":"2026-02-26T04:01:24.874724174Z"}
+{"message":"[Auth Debug] Session ID: SJibp6hFsjsnKx5ba2yDoyWTfG-Gzm7R","attributes":{"level":"info"},"timestamp":"2026-02-26T04:01:24.874731474Z"}
+{"message":"[Auth Debug] Session userId: 13","attributes":{"level":"info"},"timestamp":"2026-02-26T04:01:24.874735844Z"}
+{"message":"4:01:20 AM [express] GET /api/user/profile 304 in 18ms :: {\"id\":13,\"username\":\"dakshayani Pawar\",\"email\":\"pawardakshayani1995@gmail.com\",\"rating\":1000,\"gamesPlayed\":0,\"gamesWon\":0,\"removeAds\":false}","attributes":{"level":"info"},"timestamp":"2026-02-26T04:01:24.874739164Z"}
+{"message":"[Auth Debug] Cookie header: connect.sid=s:SJibp6hFsjsnKx5ba2yDoyWTfG-Gzm7R.0Yzx8jOy/Zkh00B1XNWx5zqmfKoDqSEX7F6zKwMs7C4","attributes":{"level":"info"},"timestamp":"2026-02-26T04:01:24.874742264Z"}
+{"message":"[Auth Debug] Session ID: SJibp6hFsjsnKx5ba2yDoyWTfG-Gzm7R","attributes":{"level":"info"},"timestamp":"2026-02-26T04:01:24.874745594Z"}
+{"message":"[Auth Debug] Session userId: 13","attributes":{"level":"info"},"timestamp":"2026-02-26T04:01:24.874752583Z"}
+{"message":"2026-02-26 04:01:54.960 UTC [78] LOG:  checkpoint starting: time","attributes":{"level":"error"},"timestamp":"2026-02-26T04:02:00.605524677Z"}
+{"message":"2026-02-26 04:01:55.338 UTC [78] LOG:  checkpoint complete: wrote 4 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.320 s, sync=0.017 s, total=0.379 s; sync files=4, longest=0.010 s, average=0.005 s; distance=10 kB, estimate=20 kB; lsn=0/1B21478, redo lsn=0/1B21420","attributes":{"level":"error"},"timestamp":"2026-02-26T04:02:00.605533000Z"}
+{"message":"[Auth Debug] Cookie header: undefined","attributes":{"level":"info"},"timestamp":"2026-02-26T04:02:35.009951476Z"}
+{"message":"[Auth Debug] Session ID: 8KqKHR_o0FAjuQsd9t43E_2URoiuQ8xz","attributes":{"level":"info"},"timestamp":"2026-02-26T04:02:35.009959866Z"}
+{"message":"[Auth Debug] Session userId: undefined","attributes":{"level":"info"},"timestamp":"2026-02-26T04:02:35.009966706Z"}
+{"message":"4:02:25 AM [express] GET /api/auth/me 401 in 1ms :: {\"error\":\"Not authenticated\"}","attributes":{"level":"info"},"timestamp":"2026-02-26T04:02:35.009971026Z"}
+{"message":"[Auth Debug] Cookie header: undefined","attributes":{"level":"info"},"timestamp":"2026-02-26T08:04:51.864686628Z"}
+{"message":"[Auth Debug] Session ID: 8RcCkro0a_AZmPlVO1mDugqdLYQT24lZ","attributes":{"level":"info"},"timestamp":"2026-02-26T08:04:51.864693398Z"}
+{"message":"[Auth Debug] Session userId: undefined","attributes":{"level":"info"},"timestamp":"2026-02-26T08:04:51.864696818Z"}
+{"message":"8:04:43 AM [express] GET /api/auth/me 401 in 0ms :: {\"error\":\"Not authenticated\"}","attributes":{"level":"info"},"timestamp":"2026-02-26T08:04:51.864699788Z"}
+{"message":"[Auth Debug] Cookie header: undefined","attributes":{"level":"info"},"timestamp":"2026-02-26T08:04:51.864702668Z"}
+{"message":"[Auth Debug] Session ID: Kwod24MO43qLWyLiSobo2WKzwkMDKsyC","attributes":{"level":"info"},"timestamp":"2026-02-26T08:04:51.864705457Z"}
+{"message":"[Auth Debug] Session userId: undefined","attributes":{"level":"info"},"timestamp":"2026-02-26T08:04:51.864708317Z"}
+{"message":"8:04:43 AM [express] GET /api/auth/me 401 in 1ms :: {\"error\":\"Not authenticated\"}","attributes":{"level":"info"},"timestamp":"2026-02-26T08:04:51.864710797Z"}
+{"message":"[Auth Debug] Cookie header: connect.sid=s:SJibp6hFsjsnKx5ba2yDoyWTfG-Gzm7R.0Yzx8jOy/Zkh00B1XNWx5zqmfKoDqSEX7F6zKwMs7C4","attributes":{"level":"info"},"timestamp":"2026-02-26T09:34:27.426789623Z"}
+{"message":"[Auth Debug] Session ID: SJibp6hFsjsnKx5ba2yDoyWTfG-Gzm7R","attributes":{"level":"info"},"timestamp":"2026-02-26T09:34:27.426806243Z"}
+{"message":"[Auth Debug] Session userId: 13","attributes":{"level":"info"},"timestamp":"2026-02-26T09:34:27.426815373Z"}
+{"message":"9:34:19 AM [express] GET /api/user/profile 304 in 9ms :: {\"id\":13,\"username\":\"dakshayani Pawar\",\"email\":\"pawardakshayani1995@gmail.com\",\"rating\":1000,\"gamesPlayed\":0,\"gamesWon\":0,\"removeAds\":false}","attributes":{"level":"info"},"timestamp":"2026-02-26T09:34:27.426821183Z"}
+{"message":"[Auth Debug] Cookie header: connect.sid=s:SJibp6hFsjsnKx5ba2yDoyWTfG-Gzm7R.0Yzx8jOy/Zkh00B1XNWx5zqmfKoDqSEX7F6zKwMs7C4","attributes":{"level":"info"},"timestamp":"2026-02-26T09:34:27.426827352Z"}
+{"message":"[Auth Debug] Session ID: SJibp6hFsjsnKx5ba2yDoyWTfG-Gzm7R","attributes":{"level":"info"},"timestamp":"2026-02-26T09:34:27.426835912Z"}
+{"message":"[Auth Debug] Session userId: 13","attributes":{"level":"info"},"timestamp":"2026-02-26T09:34:27.426841722Z"}
+{"message":"9:34:20 AM [express] GET /api/user/profile 304 in 7ms :: {\"id\":13,\"username\":\"dakshayani Pawar\",\"email\":\"pawardakshayani1995@gmail.com\",\"rating\":1000,\"gamesPlayed\":0,\"gamesWon\":0,\"removeAds\":false}","attributes":{"level":"info"},"timestamp":"2026-02-26T09:34:27.426849102Z"}
+{"message":"[Auth Debug] Cookie header: connect.sid=s:SJibp6hFsjsnKx5ba2yDoyWTfG-Gzm7R.0Yzx8jOy/Zkh00B1XNWx5zqmfKoDqSEX7F6zKwMs7C4","attributes":{"level":"info"},"timestamp":"2026-02-26T09:34:27.426855152Z"}
+{"message":"[Auth Debug] Session ID: SJibp6hFsjsnKx5ba2yDoyWTfG-Gzm7R","attributes":{"level":"info"},"timestamp":"2026-02-26T09:34:27.426860932Z"}
+{"message":"[Auth Debug] Session userId: 13","attributes":{"level":"info"},"timestamp":"2026-02-26T09:34:27.426865552Z"}
+{"message":"9:34:24 AM [express] GET /api/user/profile 304 in 24ms :: {\"id\":13,\"username\":\"dakshayani Pawar\",\"email\":\"pawardakshayani1995@gmail.com\",\"rating\":1000,\"gamesPlayed\":0,\"gamesWon\":0,\"removeAds\":false}","attributes":{"level":"info"},"timestamp":"2026-02-26T09:34:27.426870282Z"}
+{"message":"9:34:26 AM [express] POST /api/auth/logout 200 in 4ms :: {\"message\":\"Logged out successfully\"}","attributes":{"level":"info"},"timestamp":"2026-02-26T09:34:27.426875322Z"}
+{"message":"[Auth Debug] Cookie header: undefined","attributes":{"level":"info"},"timestamp":"2026-02-26T09:34:31.416288622Z"}
+{"message":"[Auth Debug] Session ID: wHb4jMrvRgT3DljC5x2cAs4KwkW6GVI2","attributes":{"level":"info"},"timestamp":"2026-02-26T09:34:31.416297372Z"}
+{"message":"[Auth Debug] Session userId: undefined","attributes":{"level":"info"},"timestamp":"2026-02-26T09:34:31.416301192Z"}
+{"message":"9:34:31 AM [express] GET /api/user/profile 401 in 1ms :: {\"error\":\"Not authenticated\"}","attributes":{"level":"info"},"timestamp":"2026-02-26T09:34:31.416305142Z"}
+{"message":"2026-02-26 09:37:00.912 UTC [78] LOG:  checkpoint starting: time","attributes":{"level":"error"},"timestamp":"2026-02-26T09:37:06.349684018Z"}
+{"message":"2026-02-26 09:37:01.406 UTC [78] LOG:  checkpoint complete: wrote 4 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.320 s, sync=0.036 s, total=0.495 s; sync files=4, longest=0.032 s, average=0.009 s; distance=11 kB, estimate=19 kB; lsn=0/1B240D0, redo lsn=0/1B24078","attributes":{"level":"error"},"timestamp":"2026-02-26T09:37:06.349693405Z"}
+{"message":"2026-02-26 11:27:02.594 UTC [78] LOG:  checkpoint starting: time","attributes":{"level":"error"},"timestamp":"2026-02-26T11:27:09.050568935Z"}
+{"message":"2026-02-26 11:27:02.755 UTC [78] LOG:  checkpoint complete: wrote 2 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.110 s, sync=0.022 s, total=0.161 s; sync files=2, longest=0.017 s, average=0.011 s; distance=7 kB, estimate=18 kB; lsn=0/1B25CD0, redo lsn=0/1B25C78","attributes":{"level":"error"},"timestamp":"2026-02-26T11:27:09.050580504Z"}
+{"message":"[Auth Debug] Session userId: undefined","attributes":{"level":"info"},"timestamp":"2026-02-26T15:26:33.811833714Z"}
+{"message":"3:26:24 PM [express] GET /api/user/profile 401 in 1ms :: {\"error\":\"Not authenticated\"}","attributes":{"level":"info"},"timestamp":"2026-02-26T15:26:33.811837914Z"}
+{"message":"[Auth Debug] Cookie header: undefined","attributes":{"level":"info"},"timestamp":"2026-02-26T15:26:33.812138199Z"}
+{"message":"[Auth Debug] Session ID: SDttgX-CM-xMvkOfFLnnOSMBVAmN7_gt","attributes":{"level":"info"},"timestamp":"2026-02-26T15:26:33.812161698Z"}
+{"message":"[Auth Debug] Cookie header: undefined","attributes":{"level":"info"},"timestamp":"2026-02-26T18:28:48.638709440Z"}
+{"message":"[Auth Debug] Session ID: IxGyCyUggE2YwZVU_rmt7FNDtJUfNtyV","attributes":{"level":"info"},"timestamp":"2026-02-26T18:28:48.638720970Z"}
+{"message":"[Auth Debug] Session userId: undefined","attributes":{"level":"info"},"timestamp":"2026-02-26T18:28:48.638727040Z"}
+{"message":"6:28:41 PM [express] GET /api/auth/me 401 in 1ms :: {\"error\":\"Not authenticated\"}","attributes":{"level":"info"},"timestamp":"2026-02-26T18:28:48.638731650Z"}
