@@ -2,7 +2,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import type { Server } from "http";
 import type { GameState, WSMessage, GameMode, PointGoal } from "@shared/schema";
 import { GameEngine } from "./gameEngine";
-import { BotAI } from "./botAI";
+import { BotAI, getDifficultyFromRating, type BotDifficulty } from "./botAI";
 import { storage } from "./storage";
 import { matchmaking, calculateRatingChange } from "./matchmaking";
 
@@ -20,7 +20,8 @@ interface GameRoom {
   botTimer: NodeJS.Timeout | null;
   idleTimer: NodeJS.Timeout | null;
   statsSaved: boolean;
-  isRanked: boolean; // Only true for multiplayer (2+ authenticated humans)
+  isRanked: boolean;
+  botDifficulty: BotDifficulty;
 }
 
 const IDLE_TIMEOUT_MS = 60000; // 60 seconds idle timeout for human players
@@ -72,9 +73,16 @@ export class GameWebSocketServer {
       }));
 
       const gameState = GameEngine.createGame(gamePlayers, match.gameMode, match.pointGoal);
+      BotAI.resetTracking(gameState.id);
       
       const authenticatedHumans = gamePlayers.filter(p => !p.isBot && p.userId).length;
       const isRanked = authenticatedHumans >= 2;
+      
+      const avgRating = connectedHumanPlayers.length > 0
+        ? Math.round(connectedHumanPlayers.reduce((sum, p) => sum + p.rating, 0) / connectedHumanPlayers.length)
+        : 1000;
+      const botDifficulty = getDifficultyFromRating(avgRating);
+      console.log(`[Matchmaking] Bot difficulty set to '${botDifficulty}' for avg rating ${avgRating}`);
       
       const gameRoom: GameRoom = {
         gameState,
@@ -83,6 +91,7 @@ export class GameWebSocketServer {
         idleTimer: null,
         statsSaved: false,
         isRanked,
+        botDifficulty,
       };
 
       for (const client of clients) {
@@ -266,11 +275,15 @@ export class GameWebSocketServer {
       });
 
       const gameState = GameEngine.createGame(updatedPlayers, mode, pointGoal);
+      BotAI.resetTracking(gameState.id);
       
       // Count authenticated human players to determine if this is a ranked game
       // Ranked games require 2+ authenticated (non-bot) players
       const authenticatedHumans = updatedPlayers.filter(p => !p.isBot && p.userId).length;
       const isRanked = authenticatedHumans >= 2;
+      
+      const isSoloGame = updatedPlayers.filter(p => !p.isBot).length <= 1;
+      const botDifficulty: BotDifficulty = isSoloGame ? 'hard_plus' : 'medium';
       
       const gameRoom: GameRoom = {
         gameState,
@@ -279,15 +292,14 @@ export class GameWebSocketServer {
         idleTimer: null,
         statsSaved: false,
         isRanked,
+        botDifficulty,
       };
 
-      // Add human players to room
       gameRoom.clients.set(client.playerId, client);
       client.gameId = gameState.id;
 
       this.gameRooms.set(gameState.id, gameRoom);
 
-      // Send initial state
       this.broadcastGameState(gameState.id);
 
       // Start bot logic if first player is bot, or idle timer if human
@@ -323,7 +335,9 @@ export class GameWebSocketServer {
     if (!room) return;
 
     try {
+      const playedCard = room.gameState.players.find(p => p.id === client.playerId)?.hand.find(c => c.id === payload.cardId);
       room.gameState = GameEngine.playCard(room.gameState, client.playerId, payload.cardId);
+      if (playedCard) BotAI.trackCard(client.gameId, playedCard);
       this.broadcastGameState(client.gameId);
 
       // Clear trick after delay if complete
@@ -405,6 +419,7 @@ export class GameWebSocketServer {
           if (!hasPendingReconnect) {
             console.log(`[Game ${client.gameId}] No human clients remaining, cleaning up room`);
             this.clearGameTimers(room);
+            BotAI.cleanupGame(client.gameId);
             this.gameRooms.delete(client.gameId);
           }
         }
@@ -486,17 +501,18 @@ export class GameWebSocketServer {
       if (!bot || !bot.isBot) return;
 
       try {
+        const diff = currentRoom.botDifficulty;
         if (state.phase === "bidding") {
-          const bid = BotAI.calculateBid(bot.hand, state.mode);
+          const bid = BotAI.calculateBid(bot.hand, state.mode, diff);
           currentRoom.gameState = GameEngine.placeBid(state, bot.id, bid);
         } else if (state.phase === "playing") {
-          const card = BotAI.selectCard(state, state.currentPlayerIndex);
+          const card = BotAI.selectCard(state, state.currentPlayerIndex, diff);
           currentRoom.gameState = GameEngine.playCard(state, bot.id, card.id);
+          BotAI.trackCard(gameId, card);
         }
 
         this.broadcastGameState(gameId);
 
-        // Handle trick completion
         if (currentRoom.gameState.currentTrick.cards.length === 4) {
           setTimeout(() => {
             const r = this.gameRooms.get(gameId);
@@ -546,14 +562,14 @@ export class GameWebSocketServer {
       console.log(`[Idle Timeout] Player ${player.name} timed out, auto-playing`);
 
       try {
+        const diff = currentRoom.botDifficulty;
         if (state.phase === "bidding") {
-          // Auto-bid using bot AI logic
-          const bid = BotAI.calculateBid(player.hand, state.mode);
+          const bid = BotAI.calculateBid(player.hand, state.mode, diff);
           currentRoom.gameState = GameEngine.placeBid(state, player.id, bid);
         } else if (state.phase === "playing") {
-          // Auto-play using bot AI logic
-          const card = BotAI.selectCard(state, state.currentPlayerIndex);
+          const card = BotAI.selectCard(state, state.currentPlayerIndex, diff);
           currentRoom.gameState = GameEngine.playCard(state, player.id, card.id);
+          BotAI.trackCard(gameId, card);
         }
 
         this.broadcastGameState(gameId);
@@ -604,8 +620,8 @@ export class GameWebSocketServer {
 
     // Check if game is over and save stats (only once, only for ranked multiplayer games)
     if (room.gameState.phase === "game_over") {
-      // Clear all timers when game ends
       this.clearGameTimers(room);
+      BotAI.cleanupGame(room.gameState.id);
       
       if (!room.statsSaved && room.isRanked) {
         room.statsSaved = true;
