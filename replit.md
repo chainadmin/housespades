@@ -28,7 +28,7 @@ House Spades is an online multiplayer Spades card game with both web and mobile 
     - Bots fill empty slots after a 30-second wait if a match is not full.
     - If a player disconnects mid-game, a bot replaces them, and the disconnected player incurs a rating penalty.
     - An idle timer (60 seconds) automatically plays for human players who become unresponsive.
-- **Real-time Communication:** Utilizes WebSockets for live gameplay, chat, and matchmaking updates.
+- **Real-time Communication:** Utilizes WebSockets for live gameplay, chat, and matchmaking updates. The mobile WebSocket hook (`mobile/hooks/useWebSocket.ts`) uses an `intentionalDisconnectRef` flag to prevent zombie auto-reconnect when `disconnect()` is called explicitly (e.g., matchmaking→game screen transition). The server (`server/websocket.ts`) verifies the disconnecting WebSocket is the active client before removing from the game room, preventing stale connections from evicting real players.
 - **Authentication & User Management:**
     - Standard registration, login, password reset flow.
     - Account deletion functionality is provided.

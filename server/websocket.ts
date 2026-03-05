@@ -380,7 +380,13 @@ export class GameWebSocketServer {
     if (client.gameId) {
       const room = this.gameRooms.get(client.gameId);
       if (room) {
-        room.clients.delete(client.playerId);
+        const currentClient = room.clients.get(client.playerId);
+        if (currentClient && currentClient.ws === ws) {
+          room.clients.delete(client.playerId);
+        } else {
+          console.log(`[WebSocket] Stale connection for player ${client.playerId} disconnected, ignoring (active client exists)`);
+          return;
+        }
         
         // Replace disconnected player with bot after a grace period (5 seconds)
         // This allows time for screen transitions/reconnections

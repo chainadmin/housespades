@@ -82,13 +82,18 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [gameState, setGameState] = useState<GameState | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const intentionalDisconnectRef = useRef(false);
   const optionsRef = useRef(options);
   
   useEffect(() => {
     optionsRef.current = options;
   }, [options]);
 
-  const connect = useCallback(() => {
+  const connect = useCallback((isExplicit?: boolean) => {
+    if (isExplicit) {
+      intentionalDisconnectRef.current = false;
+    }
+    if (intentionalDisconnectRef.current) return;
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
     if (wsRef.current?.readyState === WebSocket.CONNECTING) return;
 
@@ -98,6 +103,10 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     wsRef.current = ws;
 
     ws.onopen = () => {
+      if (intentionalDisconnectRef.current) {
+        ws.close();
+        return;
+      }
       setIsConnected(true);
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
@@ -114,6 +123,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     };
 
     ws.onmessage = (event) => {
+      if (intentionalDisconnectRef.current) return;
       try {
         const message = JSON.parse(event.data) as WSMessage;
         
@@ -145,9 +155,12 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
     ws.onclose = () => {
       setIsConnected(false);
-      wsRef.current = null;
+      if (wsRef.current === ws) {
+        wsRef.current = null;
+      }
       
-      // Auto-reconnect after 2 seconds
+      if (intentionalDisconnectRef.current) return;
+      
       if (!reconnectTimeoutRef.current) {
         reconnectTimeoutRef.current = setTimeout(() => {
           reconnectTimeoutRef.current = null;
@@ -162,6 +175,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   }, []);
 
   const disconnect = useCallback(() => {
+    intentionalDisconnectRef.current = true;
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
       reconnectTimeoutRef.current = null;

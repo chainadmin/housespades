@@ -179,7 +179,7 @@ export default function GameScreen() {
   // Connect to WebSocket after userId is available (for multiplayer only)
   useEffect(() => {
     if (isMultiplayer && userId) {
-      connect();
+      connect(true);
       return () => {
         disconnect();
       };

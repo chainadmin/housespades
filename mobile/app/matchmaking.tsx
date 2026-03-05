@@ -89,7 +89,7 @@ export default function MatchmakingScreen() {
   useEffect(() => {
     if (userId && !isConnected) {
       setStatus('Connecting...');
-      connect();
+      connect(true);
     }
   }, [userId, isConnected, connect]);
 
