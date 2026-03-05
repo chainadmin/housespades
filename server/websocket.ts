@@ -312,10 +312,20 @@ export class GameWebSocketServer {
 
   private handleBid(ws: WebSocket, payload: { bid: number }) {
     const client = this.clients.get(ws);
-    if (!client || !client.gameId) return;
+    if (!client || !client.gameId) {
+      console.log(`[Bid] Rejected: client=${!!client}, gameId=${client?.gameId}`);
+      return;
+    }
 
     const room = this.gameRooms.get(client.gameId);
-    if (!room) return;
+    if (!room) {
+      console.log(`[Bid] Room not found for gameId=${client.gameId}`);
+      return;
+    }
+
+    const { gameState } = room;
+    const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+    console.log(`[Bid] Player ${client.playerId} bidding ${payload.bid} in game ${client.gameId}. Phase: ${gameState.phase}, currentPlayer: ${currentPlayer?.id}, isMatch: ${currentPlayer?.id === client.playerId}`);
 
     try {
       room.gameState = GameEngine.placeBid(room.gameState, client.playerId, payload.bid);
@@ -323,6 +333,7 @@ export class GameWebSocketServer {
       this.scheduleBotMove(client.gameId);
       this.scheduleIdleTimeout(client.gameId);
     } catch (error) {
+      console.error(`[Bid] Error: ${(error as Error).message}`);
       this.sendError(ws, (error as Error).message);
     }
   }

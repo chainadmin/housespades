@@ -192,17 +192,45 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   }, [sendMessage]);
 
   const placeBid = useCallback((bid: number) => {
-    sendMessage({
+    console.log(`[WebSocket] Sending place_bid: ${bid}, wsReady: ${wsRef.current?.readyState === WebSocket.OPEN}`);
+    const sent = sendMessage({
       type: 'place_bid',
       payload: { bid },
     });
+    if (!sent) {
+      console.error('[WebSocket] Failed to send bid - WebSocket not open, retrying...');
+      setTimeout(() => {
+        const retrySent = sendMessage({
+          type: 'place_bid',
+          payload: { bid },
+        });
+        if (!retrySent) {
+          console.error('[WebSocket] Retry failed - WebSocket still not open');
+          optionsRef.current.onError?.('Connection lost. Please wait for reconnection.');
+        }
+      }, 1000);
+    }
   }, [sendMessage]);
 
   const playCard = useCallback((cardId: string) => {
-    sendMessage({
+    console.log(`[WebSocket] Sending play_card: ${cardId}, wsReady: ${wsRef.current?.readyState === WebSocket.OPEN}`);
+    const sent = sendMessage({
       type: 'play_card',
       payload: { cardId },
     });
+    if (!sent) {
+      console.error('[WebSocket] Failed to send play_card - WebSocket not open, retrying...');
+      setTimeout(() => {
+        const retrySent = sendMessage({
+          type: 'play_card',
+          payload: { cardId },
+        });
+        if (!retrySent) {
+          console.error('[WebSocket] Retry failed - WebSocket still not open');
+          optionsRef.current.onError?.('Connection lost. Please wait for reconnection.');
+        }
+      }, 1000);
+    }
   }, [sendMessage]);
 
   const leaveLobby = useCallback(() => {

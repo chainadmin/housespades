@@ -170,7 +170,7 @@ export class BotAI {
       const totalTrump = state.mode === 'joker_joker_deuce_deuce' ? 15 : 13;
       const myTrump = hand.filter(c => isTrump(c, state.mode));
 
-      if (myTrump.length >= 3 && trumpPlayed >= totalTrump * 0.4 && state.spadesPlayed) {
+      if (myTrump.length >= 3 && trumpPlayed >= totalTrump * 0.4 && state.spadesBroken) {
         const highTrump = myTrump.sort((a, b) =>
           getCardPower(b, state.mode, null) - getCardPower(a, state.mode, null)
         );

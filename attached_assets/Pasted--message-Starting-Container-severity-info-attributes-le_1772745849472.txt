@@ -1,0 +1,73 @@
+{"message":"Starting Container","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T20:59:30.933503189Z"}
+{"message":"npm warn config production Use `--omit=dev` instead.","severity":"error","attributes":{"level":"error"},"timestamp":"2026-03-05T20:59:32.638389055Z"}
+{"message":"","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T20:59:32.638395222Z"}
+{"message":"> rest-express@1.0.0 start","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T20:59:32.638399471Z"}
+{"message":"> NODE_ENV=production node dist/index.cjs","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T20:59:32.638404234Z"}
+{"message":"","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T20:59:32.638421345Z"}
+{"message":"Running database migration...","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T20:59:32.638425337Z"}
+{"message":"Database migration complete","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T20:59:32.638429924Z"}
+{"message":"8:59:30 PM [express] serving on port 8080","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T20:59:32.638435425Z"}
+{"message":"[Auth Debug] Cookie header: connect.sid=s:ZmtDF6oXOr7NQ_EzAv5ivjAuKzKxr_Bm.YxdLPKF1Gobw6WNKzPP+C2qrkkTekCVu57ssdtPz44Q","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:15:57.031959320Z"}
+{"message":"[Auth Debug] Session ID: ZLg2pdb6dZt3exU0CSdldXncVk2B4eSG","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:15:57.031965935Z"}
+{"message":"[Auth Debug] Session userId: undefined","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:15:57.031972724Z"}
+{"message":"9:15:56 PM [express] GET /api/user/profile 401 in 4ms :: {\"error\":\"Not authenticated\"}","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:15:57.031980736Z"}
+{"message":"[Auth Debug] Cookie header: connect.sid=s:ZmtDF6oXOr7NQ_EzAv5ivjAuKzKxr_Bm.YxdLPKF1Gobw6WNKzPP+C2qrkkTekCVu57ssdtPz44Q","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:15:59.943114881Z"}
+{"message":"[Auth Debug] Session ID: O9_WktyL43vRodz0HOQfZMvE7MLl3YQG","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:15:59.943121561Z"}
+{"message":"[Auth Debug] Session userId: undefined","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:15:59.943130959Z"}
+{"message":"9:15:57 PM [express] GET /api/user/profile 401 in 3ms :: {\"error\":\"Not authenticated\"}","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:15:59.943137497Z"}
+{"message":"9:16:08 PM [express] POST /api/matchmaking/leave 401 in 6ms :: {\"error\":\"Not authenticated\"}","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:16:19.711859332Z"}
+{"message":"9:16:33 PM [express] POST /api/auth/login 401 in 218ms :: {\"error\":\"Invalid email or password\"}","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:16:36.808373570Z"}
+{"message":"9:16:53 PM [express] POST /api/auth/login 200 in 192ms :: {\"id\":1,\"username\":\"Jacobbi2025\",\"email\":\"jacobbimccant@gmail.com\",\"rating\":1000,\"gamesPlayed\":0,\"gamesWon\":0,\"sessionCookie\":\"connect.sid=s:axHvGqQvYvwHH2q2nP8O96vP9g1amuKb.TaW8oXe5Sl9kdyMsrL/uXHreh1lI5UjailrOI5yr2S0\"}","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:16:56.294675265Z"}
+{"message":"[Auth Debug] Cookie header: connect.sid=s:axHvGqQvYvwHH2q2nP8O96vP9g1amuKb.TaW8oXe5Sl9kdyMsrL/uXHreh1lI5UjailrOI5yr2S0","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:16:56.294680711Z"}
+{"message":"[Auth Debug] Session ID: axHvGqQvYvwHH2q2nP8O96vP9g1amuKb","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:16:56.294687270Z"}
+{"message":"[Auth Debug] Session userId: 1","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:16:56.294692840Z"}
+{"message":"9:16:53 PM [express] GET /api/user/profile 200 in 19ms :: {\"id\":1,\"username\":\"Jacobbi2025\",\"email\":\"jacobbimccant@gmail.com\",\"rating\":1000,\"gamesPlayed\":0,\"gamesWon\":0,\"removeAds\":false}","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:16:56.294699613Z"}
+{"message":"[WebSocket] Client player-1772745416870-1v7icodee authenticated as user 1","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:16:57.950395492Z"}
+{"message":"[Routes] User Jacobbi2025 (id: 1) joined queue for ace_high-300. Queue size: 1","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:16:57.950402278Z"}
+{"message":"9:16:57 PM [express] POST /api/matchmaking/join 200 in 13ms :: {\"message\":\"Added to matchmaking queue\",\"queueSize\":1}","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:16:57.950408694Z"}
+{"message":"[Matchmaking] tryMatch - 1 players in queue: [ 'Jacobbi2025 (ace_high-300, wait: 4s)' ]","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:17:02.828855000Z"}
+{"message":"[Matchmaking] tryMatch - 1 players in queue: [ 'Jacobbi2025 (ace_high-300, wait: 9s)' ]","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:17:06.637186659Z"}
+{"message":"[Matchmaking] Bot difficulty set to 'easy_plus' for avg rating 1000","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:17:12.018663398Z"}
+{"message":"[Matchmaking] Game bb705bfe-f5cf-4be1-826e-8bbc0077a7af created with 1 humans and 3 bots","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:17:12.018674236Z"}
+{"message":"[Matchmaking] tryMatch - 1 players in queue: [ 'Jacobbi2025 (ace_high-300, wait: 14s)' ]","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:17:12.019280272Z"}
+{"message":"[Matchmaking] Filling match with bots after 14s wait (1 players in queue for ace_high-300)","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:17:12.019286639Z"}
+{"message":"[Matchmaking] Match found with 4 players","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:17:12.019293716Z"}
+{"message":"[Game bb705bfe-f5cf-4be1-826e-8bbc0077a7af] Player Jacobbi2025 disconnected, waiting 5s for reconnection...","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:17:14.778728425Z"}
+{"message":"[WebSocket] User 1 disconnected and removed from matchmaking queue","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:17:14.778735376Z"}
+{"message":"[WebSocket] Client player-1772745433762-ppc4njpk9 authenticated as user 1","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:17:14.779052406Z"}
+{"message":"[WebSocket] Reconnecting user 1 to game bb705bfe-f5cf-4be1-826e-8bbc0077a7af as player player-1772745416870-1v7icodee","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:17:14.779063083Z"}
+{"message":"[WebSocket] Cancelled pending bot replacement for user 1","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:17:14.779070159Z"}
+{"message":"[WebSocket] Client player-1772745435572-z7b25i5vu authenticated as user 1","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:17:17.374865841Z"}
+{"message":"[WebSocket] Reconnecting user 1 to game bb705bfe-f5cf-4be1-826e-8bbc0077a7af as player player-1772745416870-1v7icodee","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:17:17.374873318Z"}
+{"message":"[Game bb705bfe-f5cf-4be1-826e-8bbc0077a7af] Player Jacobbi2025 disconnected, waiting 5s for reconnection...","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:18:32.369618526Z"}
+{"message":"[WebSocket] User 1 disconnected and removed from matchmaking queue","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:18:32.369624729Z"}
+{"message":"[Game bb705bfe-f5cf-4be1-826e-8bbc0077a7af] Player Jacobbi2025 disconnected, replacing with bot AceHunter","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:18:32.369632140Z"}
+{"message":"[WebSocket] Client player-1772745552501-1nx9dd8tw authenticated as user 1","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:19:15.994514716Z"}
+{"message":"[WebSocket] Client player-1772745558900-8w2y8fxmi authenticated as user 1","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:19:21.291389132Z"}
+{"message":"[Routes] User Jacobbi2025 (id: 1) joined queue for ace_high-300. Queue size: 1","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:19:21.291395834Z"}
+{"message":"9:19:19 PM [express] POST /api/matchmaking/join 200 in 23ms :: {\"message\":\"Added to matchmaking queue\",\"queueSize\":1}","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:19:21.291559108Z"}
+{"message":"[Matchmaking] tryMatch - 1 players in queue: [ 'Jacobbi2025 (ace_high-300, wait: 2s)' ]","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:19:23.148288271Z"}
+{"message":"[Matchmaking] tryMatch - 1 players in queue: [ 'Jacobbi2025 (ace_high-300, wait: 7s)' ]","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:19:27.755861533Z"}
+{"message":"[WebSocket] Reconnecting user 1 to game 5e4614d3-52d2-4d5d-a343-5b53f13458a9 as player player-1772745558900-8w2y8fxmi","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:19:33.722650245Z"}
+{"message":"[WebSocket] Cancelled pending bot replacement for user 1","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:19:33.722661271Z"}
+{"message":"[Matchmaking] tryMatch - 1 players in queue: [ 'Jacobbi2025 (ace_high-300, wait: 12s)' ]","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:19:33.722853033Z"}
+{"message":"[Matchmaking] Filling match with bots after 12s wait (1 players in queue for ace_high-300)","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:19:33.722859597Z"}
+{"message":"[Matchmaking] Match found with 4 players","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:19:33.722867603Z"}
+{"message":"[Matchmaking] Bot difficulty set to 'easy_plus' for avg rating 1000","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:19:33.722874820Z"}
+{"message":"[Matchmaking] Game 5e4614d3-52d2-4d5d-a343-5b53f13458a9 created with 1 humans and 3 bots","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:19:33.722881727Z"}
+{"message":"[Game 5e4614d3-52d2-4d5d-a343-5b53f13458a9] Player Jacobbi2025 disconnected, waiting 5s for reconnection...","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:19:33.722888345Z"}
+{"message":"[WebSocket] User 1 disconnected and removed from matchmaking queue","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:19:33.722896075Z"}
+{"message":"[WebSocket] Client player-1772745573539-tnysvxdoj authenticated as user 1","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:19:33.722903544Z"}
+{"message":"[WebSocket] Client player-1772745575207-tb35p227f authenticated as user 1","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:19:36.161883643Z"}
+{"message":"[WebSocket] Reconnecting user 1 to game 5e4614d3-52d2-4d5d-a343-5b53f13458a9 as player player-1772745558900-8w2y8fxmi","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:19:36.161892765Z"}
+{"message":"[Idle Timeout] Player Jacobbi2025 timed out, auto-playing","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:20:49.069125419Z"}
+{"message":"[Game 5e4614d3-52d2-4d5d-a343-5b53f13458a9] Player Jacobbi2025 disconnected, waiting 5s for reconnection...","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:20:49.069135179Z"}
+{"message":"[WebSocket] User 1 disconnected and removed from matchmaking queue","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:20:49.069144478Z"}
+{"message":"[Game 5e4614d3-52d2-4d5d-a343-5b53f13458a9] Player Jacobbi2025 disconnected, replacing with bot AceHunter","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:20:54.246078332Z"}
+{"message":"[WebSocket] Client player-1772745655999-f3rwxj7h0 authenticated as user 1","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:20:56.321470721Z"}
+{"message":"[WebSocket] User 1 disconnected and removed from matchmaking queue","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:22:08.184476825Z"}
+{"message":"[WebSocket] User 1 disconnected and removed from matchmaking queue","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:22:08.184484784Z"}
+{"message":"[Game 5e4614d3-52d2-4d5d-a343-5b53f13458a9] No human clients remaining, cleaning up room","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:22:08.184492064Z"}
+{"message":"[WebSocket] User 1 disconnected and removed from matchmaking queue","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:22:08.184499797Z"}
+{"message":"[Game bb705bfe-f5cf-4be1-826e-8bbc0077a7af] No human clients remaining, cleaning up room","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:22:08.184506916Z"}
+{"message":"[WebSocket] User 1 disconnected and removed from matchmaking queue","severity":"info","attributes":{"level":"info"},"timestamp":"2026-03-05T21:22:08.184514063Z"}

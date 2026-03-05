@@ -277,6 +277,11 @@ export default function GameScreen() {
 
   const handleBid = useCallback((bid: number) => {
     if (isMultiplayer) {
+      console.log(`[Game] Multiplayer bid: ${bid}, playerId: ${playerId}, isConnected: ${isConnected}`);
+      if (!isConnected) {
+        console.error('[Game] Cannot bid - WebSocket not connected');
+        return;
+      }
       wsPlaceBid(bid);
       return;
     }
@@ -314,7 +319,7 @@ export default function GameScreen() {
         currentPlayerIndex: allBid ? (prev.roundStarterIndex ?? 0) : (prev.currentPlayerIndex + 1) % 4,
       };
     });
-  }, [localGameState, isMultiplayer, wsPlaceBid]);
+  }, [localGameState, isMultiplayer, wsPlaceBid, isConnected, playerId]);
 
   const handlePlayCard = useCallback((card: Card) => {
     if (playedCardIds.has(card.id)) return;
