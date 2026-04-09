@@ -118,7 +118,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
           type: 'authenticate',
           payload: { userId: optionsRef.current.userId },
         }));
-        console.log('[WebSocket] Sent authenticate message for user', optionsRef.current.userId);
+        if (__DEV__) console.log('[WebSocket] Sent authenticate message for user', optionsRef.current.userId);
       }
     };
 
@@ -132,7 +132,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
             setPlayerId(message.payload.playerId);
             optionsRef.current.onPlayerJoined?.(message.payload.playerId);
             if (message.payload.authenticated) {
-              console.log('[WebSocket] Authentication confirmed');
+              if (__DEV__) console.log('[WebSocket] Authentication confirmed');
               optionsRef.current.onAuthenticated?.();
             }
             break;
@@ -141,7 +141,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
             optionsRef.current.onGameStateUpdate?.(message.payload);
             break;
           case 'match_found':
-            console.log('[WebSocket] Match found:', message.payload.gameId);
+            if (__DEV__) console.log('[WebSocket] Match found:', message.payload.gameId);
             optionsRef.current.onMatchFound?.(message.payload.gameId);
             break;
           case 'error':
@@ -149,7 +149,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
             break;
         }
       } catch (error) {
-        console.error('Failed to parse WebSocket message:', error);
+        if (__DEV__) console.error('Failed to parse WebSocket message:', error);
       }
     };
 
@@ -170,7 +170,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     };
 
     ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
+      if (__DEV__) console.error('WebSocket error:', error);
     };
   }, []);
 
@@ -206,20 +206,20 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   }, [sendMessage]);
 
   const placeBid = useCallback((bid: number) => {
-    console.log(`[WebSocket] Sending place_bid: ${bid}, wsReady: ${wsRef.current?.readyState === WebSocket.OPEN}`);
+    if (__DEV__) console.log(`[WebSocket] Sending place_bid: ${bid}, wsReady: ${wsRef.current?.readyState === WebSocket.OPEN}`);
     const sent = sendMessage({
       type: 'place_bid',
       payload: { bid },
     });
     if (!sent) {
-      console.error('[WebSocket] Failed to send bid - WebSocket not open, retrying...');
+      if (__DEV__) console.error('[WebSocket] Failed to send bid - WebSocket not open, retrying...');
       setTimeout(() => {
         const retrySent = sendMessage({
           type: 'place_bid',
           payload: { bid },
         });
         if (!retrySent) {
-          console.error('[WebSocket] Retry failed - WebSocket still not open');
+          if (__DEV__) console.error('[WebSocket] Retry failed - WebSocket still not open');
           optionsRef.current.onError?.('Connection lost. Please wait for reconnection.');
         }
       }, 1000);
@@ -227,20 +227,20 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   }, [sendMessage]);
 
   const playCard = useCallback((cardId: string) => {
-    console.log(`[WebSocket] Sending play_card: ${cardId}, wsReady: ${wsRef.current?.readyState === WebSocket.OPEN}`);
+    if (__DEV__) console.log(`[WebSocket] Sending play_card: ${cardId}, wsReady: ${wsRef.current?.readyState === WebSocket.OPEN}`);
     const sent = sendMessage({
       type: 'play_card',
       payload: { cardId },
     });
     if (!sent) {
-      console.error('[WebSocket] Failed to send play_card - WebSocket not open, retrying...');
+      if (__DEV__) console.error('[WebSocket] Failed to send play_card - WebSocket not open, retrying...');
       setTimeout(() => {
         const retrySent = sendMessage({
           type: 'play_card',
           payload: { cardId },
         });
         if (!retrySent) {
-          console.error('[WebSocket] Retry failed - WebSocket still not open');
+          if (__DEV__) console.error('[WebSocket] Retry failed - WebSocket still not open');
           optionsRef.current.onError?.('Connection lost. Please wait for reconnection.');
         }
       }, 1000);

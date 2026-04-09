@@ -43,11 +43,11 @@ export function AdBanner({
           requestNonPersonalizedAdsOnly: !isTrackingAllowed,
         }}
         onAdLoaded={() => {
-          console.log('Banner ad loaded successfully');
+          if (__DEV__) console.log('Banner ad loaded successfully');
           setAdError(false);
         }}
         onAdFailedToLoad={(error) => {
-          console.error('Banner ad failed to load:', error);
+          if (__DEV__) console.error('Banner ad failed to load:', error);
           setAdError(true);
         }}
       />

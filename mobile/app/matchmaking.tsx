@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import Animated, { 
@@ -17,14 +17,16 @@ import { AdBanner } from '@/components/AdBanner';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { useAds } from '@/hooks/useAds';
 
+type MatchmakingPhase = 'connecting' | 'authenticating' | 'joining' | 'searching' | 'found' | 'error';
+
 export default function MatchmakingScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ mode: GameMode; points: PointGoal }>();
   const colors = useColors();
   const { showInterstitialAd, hasRemoveAds } = useAds();
   
-  const [playersFound, setPlayersFound] = useState(1);
-  const [status, setStatus] = useState('Joining matchmaking queue...');
+  const [phase, setPhase] = useState<MatchmakingPhase>('connecting');
+  const [errorMessage, setErrorMessage] = useState('');
   const [userId, setUserId] = useState<number | null>(null);
   const rotation = useSharedValue(0);
   
@@ -38,8 +40,7 @@ export default function MatchmakingScreen() {
       if (matchFoundRef.current) return;
       matchFoundRef.current = true;
       inQueueRef.current = false;
-      setStatus('Match found! Starting game...');
-      setPlayersFound(4);
+      setPhase('found');
       
       setTimeout(() => {
         router.replace(`/game?mode=${params.mode}&points=${params.points}&type=multiplayer&gameId=${gameId}`);
@@ -49,7 +50,9 @@ export default function MatchmakingScreen() {
       setIsAuthenticated(true);
     },
     onError: (message) => {
-      console.error('[Matchmaking] WebSocket error:', message);
+      if (__DEV__) console.error('[Matchmaking] WebSocket error:', message);
+      setPhase('error');
+      setErrorMessage(message || 'Connection error');
     },
   });
 
@@ -67,7 +70,8 @@ export default function MatchmakingScreen() {
       if (user) {
         setUserId(user.id);
       } else {
-        setStatus('Sign in required for online play');
+        setPhase('error');
+        setErrorMessage('Sign in required for online play');
         setTimeout(() => {
           router.replace('/auth/login');
         }, 2000);
@@ -77,8 +81,6 @@ export default function MatchmakingScreen() {
     initMatchmaking();
 
     return () => {
-      // Only leave matchmaking if we didn't find a match
-      // If match was found, the game screen will handle the connection
       if (!matchFoundRef.current) {
         leaveMatchmaking();
       }
@@ -88,19 +90,20 @@ export default function MatchmakingScreen() {
 
   useEffect(() => {
     if (userId && !isConnected) {
-      setStatus('Connecting...');
+      setPhase('connecting');
       connect(true);
     }
   }, [userId, isConnected, connect]);
 
   useEffect(() => {
     if (isConnected && !isAuthenticated) {
-      setStatus('Authenticating...');
+      setPhase('authenticating');
     }
   }, [isConnected, isAuthenticated]);
 
   useEffect(() => {
     if (isAuthenticated && !inQueueRef.current) {
+      setPhase('joining');
       joinMatchmaking();
     }
   }, [isAuthenticated]);
@@ -118,14 +121,16 @@ export default function MatchmakingScreen() {
 
       if (response.ok) {
         inQueueRef.current = true;
-        setStatus('Searching for players...');
+        setPhase('searching');
       } else {
         const data = await response.json();
-        setStatus(data.message || 'Failed to join queue');
+        setPhase('error');
+        setErrorMessage(data.message || 'Failed to join queue');
       }
     } catch (err) {
-      console.error('Failed to join matchmaking:', err);
-      setStatus('Connection error. Please try again.');
+      if (__DEV__) console.error('Failed to join matchmaking:', err);
+      setPhase('error');
+      setErrorMessage('Connection error. Please try again.');
     }
   };
 
@@ -135,7 +140,7 @@ export default function MatchmakingScreen() {
     try {
       await authenticatedFetch('/api/matchmaking/leave', { method: 'POST' });
     } catch (err) {
-      console.error('Failed to leave matchmaking:', err);
+      if (__DEV__) console.error('Failed to leave matchmaking:', err);
     }
   };
 
@@ -147,11 +152,22 @@ export default function MatchmakingScreen() {
       try {
         await showInterstitialAd();
       } catch (err) {
-        console.log('[Matchmaking] Interstitial ad failed, continuing to navigate back');
+        if (__DEV__) console.log('[Matchmaking] Interstitial ad failed, continuing');
       }
     }
     
     router.back();
+  };
+
+  const getStatusText = () => {
+    switch (phase) {
+      case 'connecting': return 'Connecting to server...';
+      case 'authenticating': return 'Authenticating...';
+      case 'joining': return 'Joining matchmaking queue...';
+      case 'searching': return 'Searching for opponents...';
+      case 'found': return 'Match found! Starting game...';
+      case 'error': return errorMessage || 'Something went wrong';
+    }
   };
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -162,37 +178,56 @@ export default function MatchmakingScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={handleCancel}>
+      <TouchableOpacity style={styles.closeButton} onPress={handleCancel}>
         <Ionicons name="close" size={28} color={colors.text} />
       </TouchableOpacity>
 
       <View style={styles.content}>
-        <Animated.View style={[styles.spinner, animatedStyle]}>
-          <View style={[styles.spinnerArc, { borderColor: colors.primary }]} />
-        </Animated.View>
+        {phase !== 'found' && phase !== 'error' ? (
+          <Animated.View style={[styles.spinner, animatedStyle]}>
+            <View style={[styles.spinnerArc, { borderColor: colors.primary }]} />
+          </Animated.View>
+        ) : phase === 'found' ? (
+          <View style={[styles.foundIcon, { backgroundColor: `${colors.success}20` }]}>
+            <Ionicons name="checkmark-circle" size={64} color={colors.success} />
+          </View>
+        ) : (
+          <View style={[styles.foundIcon, { backgroundColor: `${colors.error}20` }]}>
+            <Ionicons name="alert-circle-outline" size={64} color={colors.error} />
+          </View>
+        )}
 
-        <Text style={styles.title}>Finding Match</Text>
-        <Text style={styles.status}>{status}</Text>
+        <Text style={styles.title}>
+          {phase === 'found' ? 'Match Found!' : phase === 'error' ? 'Connection Issue' : 'Finding Match'}
+        </Text>
+        <Text style={styles.status}>{getStatusText()}</Text>
 
-        <View style={styles.playersContainer}>
-          {[0, 1, 2, 3].map((index) => (
-            <View 
-              key={index} 
-              style={[
-                styles.playerSlot,
-                { backgroundColor: index < playersFound ? colors.primary : colors.muted },
-              ]}
-            >
-              <Ionicons 
-                name={index < playersFound ? 'person' : 'person-outline'} 
-                size={24} 
-                color={index < playersFound ? colors.primaryForeground : colors.textTertiary} 
-              />
-            </View>
-          ))}
+        <View style={styles.stepsContainer}>
+          <StepIndicator
+            label="Connected"
+            isComplete={isConnected || phase === 'found'}
+            isActive={phase === 'connecting'}
+            colors={colors}
+          />
+          <StepIndicator
+            label="Authenticated"
+            isComplete={isAuthenticated || phase === 'found'}
+            isActive={phase === 'authenticating'}
+            colors={colors}
+          />
+          <StepIndicator
+            label="In Queue"
+            isComplete={inQueueRef.current || phase === 'found'}
+            isActive={phase === 'joining' || phase === 'searching'}
+            colors={colors}
+          />
+          <StepIndicator
+            label="Match Ready"
+            isComplete={phase === 'found'}
+            isActive={false}
+            colors={colors}
+          />
         </View>
-
-        <Text style={styles.playersText}>{playersFound}/4 Players</Text>
 
         <View style={styles.modeInfo}>
           <Text style={styles.modeLabel}>Mode</Text>
@@ -203,6 +238,31 @@ export default function MatchmakingScreen() {
           <Text style={styles.modeValue}>{params.points} Points</Text>
         </View>
       </View>
+
+      {phase === 'error' && (
+        <TouchableOpacity style={[styles.retryButton, { backgroundColor: colors.primary }]} onPress={() => {
+          setErrorMessage('');
+          inQueueRef.current = false;
+
+          if (!isConnected) {
+            setPhase('connecting');
+            if (userId) {
+              disconnect();
+              setTimeout(() => connect(true), 300);
+            }
+          } else if (!isAuthenticated) {
+            setPhase('authenticating');
+            disconnect();
+            setTimeout(() => connect(true), 300);
+          } else {
+            setPhase('joining');
+            joinMatchmaking();
+          }
+        }}>
+          <Ionicons name="refresh-outline" size={20} color={colors.primaryForeground} />
+          <Text style={[styles.retryText, { color: colors.primaryForeground }]}>Retry</Text>
+        </TouchableOpacity>
+      )}
 
       <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
         <Text style={styles.cancelText}>Cancel</Text>
@@ -215,13 +275,67 @@ export default function MatchmakingScreen() {
   );
 }
 
-const createStyles = (colors: ReturnType<typeof useColors>) =>
+function StepIndicator({ label, isComplete, isActive, colors }: {
+  label: string;
+  isComplete: boolean;
+  isActive: boolean;
+  colors: ReturnType<typeof import('@/hooks/useColorScheme').useColors>;
+}) {
+  return (
+    <View style={stepStyles.row}>
+      <View style={[
+        stepStyles.dot,
+        {
+          backgroundColor: isComplete ? colors.success : isActive ? colors.primary : colors.muted,
+          borderColor: isComplete ? colors.success : isActive ? colors.primary : colors.border,
+        }
+      ]}>
+        {isComplete ? (
+          <Ionicons name="checkmark" size={12} color="#ffffff" />
+        ) : isActive ? (
+          <ActivityIndicator size="small" color="#ffffff" style={{ transform: [{ scale: 0.6 }] }} />
+        ) : null}
+      </View>
+      <Text style={[
+        stepStyles.label,
+        {
+          color: isComplete ? colors.success : isActive ? colors.text : colors.textTertiary,
+          fontWeight: isActive ? '600' : '400',
+        }
+      ]}>
+        {label}
+      </Text>
+    </View>
+  );
+}
+
+const stepStyles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 6,
+  },
+  dot: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  label: {
+    fontSize: 15,
+  },
+});
+
+const createStyles = (colors: ReturnType<typeof import('@/hooks/useColorScheme').useColors>) =>
   StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: colors.background,
     },
-    backButton: {
+    closeButton: {
       position: 'absolute',
       top: 60,
       right: 20,
@@ -247,6 +361,14 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       borderTopColor: 'transparent',
       borderRightColor: 'transparent',
     },
+    foundIcon: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 32,
+    },
     title: {
       fontSize: 28,
       fontWeight: 'bold',
@@ -257,22 +379,11 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       fontSize: 16,
       color: colors.textSecondary,
       marginBottom: 32,
+      textAlign: 'center',
     },
-    playersContainer: {
-      flexDirection: 'row',
-      gap: 16,
-      marginBottom: 16,
-    },
-    playerSlot: {
-      width: 56,
-      height: 56,
-      borderRadius: 28,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    playersText: {
-      fontSize: 16,
-      color: colors.textSecondary,
+    stepsContainer: {
+      alignSelf: 'stretch',
+      paddingHorizontal: 48,
       marginBottom: 32,
     },
     modeInfo: {
@@ -288,6 +399,20 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       fontSize: 16,
       fontWeight: '600',
       color: colors.text,
+    },
+    retryButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      marginHorizontal: 24,
+      marginBottom: 12,
+      borderRadius: 12,
+      padding: 16,
+    },
+    retryText: {
+      fontSize: 16,
+      fontWeight: '600',
     },
     cancelButton: {
       marginHorizontal: 24,

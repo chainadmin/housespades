@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { useState, useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,12 +20,15 @@ export default function ProfileScreen() {
   const colors = useColors();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchProfile();
   }, []);
 
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     try {
       const storedUser = await getStoredUser();
       if (!storedUser) {
@@ -39,13 +42,18 @@ export default function ProfileScreen() {
       if (response.ok) {
         const data = await response.json();
         setProfile(data);
+      } else {
+        setError('Unable to load latest profile data.');
       }
     } catch (err) {
-      console.error('Failed to fetch profile:', err);
+      if (__DEV__) console.error('Failed to fetch profile:', err);
+      if (!profile) {
+        setError('Failed to load profile. Please check your connection and try again.');
+      }
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -53,7 +61,9 @@ export default function ProfileScreen() {
       await clearAuth();
       router.replace('/auth/login');
     } catch (err) {
-      console.error('Logout failed:', err);
+      if (__DEV__) console.error('Logout failed:', err);
+      await clearAuth();
+      router.replace('/auth/login');
     }
   };
 
@@ -77,7 +87,31 @@ export default function ProfileScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Loading...</Text>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={[styles.loadingText, { color: colors.textSecondary, marginTop: 12 }]}>Loading profile...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (error && !profile) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButtonTop}>
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Profile</Text>
+          <View style={{ width: 40 }} />
+        </View>
+        <View style={styles.errorContainer}>
+          <Ionicons name="cloud-offline-outline" size={48} color={colors.textSecondary} />
+          <Text style={styles.errorTitle}>Something went wrong</Text>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={fetchProfile}>
+            <Ionicons name="refresh-outline" size={20} color={colors.primaryForeground} />
+            <Text style={styles.retryButtonText}>Try Again</Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
@@ -204,6 +238,40 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
     },
     loadingText: {
       fontSize: 16,
+    },
+    errorContainer: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 32,
+      gap: 12,
+    },
+    errorTitle: {
+      fontSize: 20,
+      fontWeight: '600',
+      color: colors.text,
+      marginTop: 8,
+    },
+    errorText: {
+      fontSize: 15,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 22,
+    },
+    retryButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      backgroundColor: colors.primary,
+      borderRadius: 12,
+      paddingHorizontal: 24,
+      paddingVertical: 12,
+      marginTop: 16,
+    },
+    retryButtonText: {
+      color: colors.primaryForeground,
+      fontSize: 16,
+      fontWeight: '600',
     },
     guestContainer: {
       flex: 1,

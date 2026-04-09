@@ -35,14 +35,14 @@ export default function RootLayout() {
           tagForUnderAgeOfConsent: true,
         })
         .then(() => {
-          console.log('AdMob configured for family-friendly content');
+          if (__DEV__) console.log('AdMob configured for family-friendly content');
           return mobileAds().initialize();
         })
         .then((adapterStatuses) => {
-          console.log('AdMob initialized:', adapterStatuses);
+          if (__DEV__) console.log('AdMob initialized:', adapterStatuses);
         })
         .catch((error) => {
-          console.error('AdMob initialization error:', error);
+          if (__DEV__) console.error('AdMob initialization error:', error);
         });
     }
   }, []);
@@ -63,7 +63,7 @@ export default function RootLayout() {
       const { isAuthenticated: apiAuth } = await checkAuthStatus();
       setIsAuthenticated(apiAuth);
     } catch (err) {
-      console.log('Auth check error:', err);
+      if (__DEV__) console.log('Auth check error:', err);
       setIsAuthenticated(false);
     } finally {
       setIsReady(true);

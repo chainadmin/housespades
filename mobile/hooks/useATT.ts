@@ -32,7 +32,7 @@ export function useATT(): UseATTReturn {
       const { status } = await getTrackingPermissionsAsync();
       setTrackingStatus(status);
     } catch (err) {
-      console.error('Failed to get tracking status:', err);
+      if (__DEV__) console.error('Failed to get tracking status:', err);
     } finally {
       setIsLoading(false);
     }
@@ -48,7 +48,7 @@ export function useATT(): UseATTReturn {
       setTrackingStatus(status);
       return status;
     } catch (err) {
-      console.error('Failed to request tracking:', err);
+      if (__DEV__) console.error('Failed to request tracking:', err);
       return 'denied';
     }
   }, []);

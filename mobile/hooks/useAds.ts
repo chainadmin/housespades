@@ -60,18 +60,18 @@ export function useAds(): UseAdsReturn {
 
   const loadAd = useCallback(async () => {
     if (hasRemoveAds || isAdLoading || isAdLoaded) {
-      console.log('[Ads] Skip load - hasRemoveAds:', hasRemoveAds, 'isAdLoading:', isAdLoading, 'isAdLoaded:', isAdLoaded);
+      if (__DEV__) console.log('[Ads] Skip load - hasRemoveAds:', hasRemoveAds, 'isAdLoading:', isAdLoading, 'isAdLoaded:', isAdLoaded);
       return;
     }
 
     if (canRequestTracking) {
-      console.log('[Ads] Requesting tracking permission...');
+      if (__DEV__) console.log('[Ads] Requesting tracking permission...');
       await requestTracking();
     }
 
     setIsAdLoading(true);
-    console.log('[Ads] Loading interstitial ad with unit ID:', INTERSTITIAL_AD_UNIT_ID);
-    console.log('[Ads] Platform:', Platform.OS, '| Tracking allowed:', isTrackingAllowed);
+    if (__DEV__) console.log('[Ads] Loading interstitial ad with unit ID:', INTERSTITIAL_AD_UNIT_ID);
+    if (__DEV__) console.log('[Ads] Platform:', Platform.OS, '| Tracking allowed:', isTrackingAllowed);
 
     try {
       const interstitial = InterstitialAd.createForAdRequest(INTERSTITIAL_AD_UNIT_ID, {
@@ -82,12 +82,12 @@ export function useAds(): UseAdsReturn {
       interstitialRef.current = interstitial;
 
       interstitial.addAdEventListener(AdEventType.LOADED, async () => {
-        console.log('[Ads] Interstitial ad loaded successfully');
+        if (__DEV__) console.log('[Ads] Interstitial ad loaded successfully');
         setIsAdLoaded(true);
         setIsAdLoading(false);
         
         if (pendingShowRef.current && interstitialRef.current) {
-          console.log('[Ads] Pending show detected, showing ad now');
+          if (__DEV__) console.log('[Ads] Pending show detected, showing ad now');
           pendingShowRef.current = false;
           try {
             await interstitialRef.current.show();
@@ -96,7 +96,7 @@ export function useAds(): UseAdsReturn {
               pendingResolveRef.current = null;
             }
           } catch (err) {
-            console.error('[Ads] Failed to show pending ad:', err);
+            if (__DEV__) console.error('[Ads] Failed to show pending ad:', err);
             if (pendingResolveRef.current) {
               pendingResolveRef.current(false);
               pendingResolveRef.current = null;
@@ -106,7 +106,7 @@ export function useAds(): UseAdsReturn {
       });
 
       interstitial.addAdEventListener(AdEventType.ERROR, (error) => {
-        console.error('[Ads] Interstitial ad failed to load:', error);
+        if (__DEV__) console.error('[Ads] Interstitial ad failed to load:', error);
         setIsAdLoading(false);
         if (pendingShowRef.current) {
           pendingShowRef.current = false;
@@ -119,14 +119,14 @@ export function useAds(): UseAdsReturn {
       });
 
       interstitial.addAdEventListener(AdEventType.CLOSED, () => {
-        console.log('[Ads] Interstitial ad closed');
+        if (__DEV__) console.log('[Ads] Interstitial ad closed');
         setIsAdLoaded(false);
         loadAd();
       });
 
       await interstitial.load();
     } catch (err) {
-      console.error('[Ads] Failed to create interstitial ad:', err);
+      if (__DEV__) console.error('[Ads] Failed to create interstitial ad:', err);
       setIsAdLoading(false);
     }
   }, [hasRemoveAds, isAdLoading, isAdLoaded, isTrackingAllowed, canRequestTracking, requestTracking]);
@@ -135,14 +135,14 @@ export function useAds(): UseAdsReturn {
     if (hasRemoveAds) return false;
     
     if (!isAdLoaded || !interstitialRef.current) {
-      console.log('[Ads] Ad not loaded, setting pending show flag');
+      if (__DEV__) console.log('[Ads] Ad not loaded, setting pending show flag');
       pendingShowRef.current = true;
       loadAd();
       return new Promise((resolve) => {
         pendingResolveRef.current = resolve;
         setTimeout(() => {
           if (pendingShowRef.current) {
-            console.log('[Ads] Pending show timed out after 5s');
+            if (__DEV__) console.log('[Ads] Pending show timed out after 5s');
             pendingShowRef.current = false;
             pendingResolveRef.current = null;
             resolve(false);
@@ -155,7 +155,7 @@ export function useAds(): UseAdsReturn {
       await interstitialRef.current.show();
       return true;
     } catch (err) {
-      console.error('Failed to show ad:', err);
+      if (__DEV__) console.error('Failed to show ad:', err);
       loadAd();
       return false;
     }

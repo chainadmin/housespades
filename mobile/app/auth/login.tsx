@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Image, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,6 +8,9 @@ import { apiUrl } from '@/config/api';
 import { storeSessionCookie, storeUser, extractSessionCookie } from '@/lib/auth';
 
 const logoImage = require('@/assets/house-card-logo.png');
+
+const PRIVACY_POLICY_URL = 'https://housespades.com/privacy';
+const TERMS_OF_SERVICE_URL = 'https://housespades.com/terms';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -28,7 +31,6 @@ export default function LoginScreen() {
     setError('');
 
     try {
-      console.log('[Login] Attempting login for:', email);
       const response = await fetch(apiUrl('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -36,29 +38,21 @@ export default function LoginScreen() {
         credentials: 'include',
       });
 
-      console.log('[Login] Response status:', response.status);
       const data = await response.json();
-      console.log('[Login] Response data keys:', Object.keys(data));
 
       if (!response.ok) {
         throw new Error(data.error || data.message || 'Login failed');
       }
 
-      // Try to get session from headers first, fallback to response body
       let sessionCookie = extractSessionCookie(response);
       if (!sessionCookie && data.sessionCookie) {
-        // The server returns the full cookie string directly
         sessionCookie = data.sessionCookie;
       }
-      console.log('[Login] Session cookie:', sessionCookie ? 'received' : 'missing');
       
       if (sessionCookie) {
         await storeSessionCookie(sessionCookie);
-        console.log('[Login] Session cookie stored');
       }
 
-      // Store user data (response has user fields at root level)
-      console.log('[Login] Storing user:', data.username);
       await storeUser({
         id: data.id,
         username: data.username,
@@ -67,14 +61,20 @@ export default function LoginScreen() {
         gamesPlayed: data.gamesPlayed,
         gamesWon: data.gamesWon,
       });
-      console.log('[Login] User stored, navigating to home...');
 
       router.replace('/');
-      console.log('[Login] Navigation called');
     } catch (err: any) {
       setError(err.message || 'An error occurred');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const openURL = async (url: string) => {
+    try {
+      await Linking.openURL(url);
+    } catch (err) {
+      if (__DEV__) console.error('Failed to open URL:', err);
     }
   };
 
@@ -163,9 +163,13 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.legalLinks}>
-            <Text style={styles.legalText}>Privacy Policy</Text>
+            <TouchableOpacity onPress={() => openURL(PRIVACY_POLICY_URL)}>
+              <Text style={styles.legalText}>Privacy Policy</Text>
+            </TouchableOpacity>
             <Text style={styles.legalDivider}>|</Text>
-            <Text style={styles.legalText}>Terms of Service</Text>
+            <TouchableOpacity onPress={() => openURL(TERMS_OF_SERVICE_URL)}>
+              <Text style={styles.legalText}>Terms of Service</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -320,6 +324,7 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
     legalText: {
       fontSize: 12,
       color: colors.textTertiary,
+      textDecorationLine: 'underline',
     },
     legalDivider: {
       fontSize: 12,

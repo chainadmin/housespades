@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Alert, Linking, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
 import { authenticatedFetch, clearAuth, getStoredUser } from '@/lib/auth';
+import Constants from 'expo-constants';
+
+const PRIVACY_POLICY_URL = 'https://housespades.com/privacy';
+const TERMS_OF_SERVICE_URL = 'https://housespades.com/terms';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -17,6 +21,20 @@ export default function SettingsScreen() {
   useEffect(() => {
     getStoredUser().then(user => setIsLoggedIn(!!user));
   }, []);
+
+  const openURL = async (url: string) => {
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert('Error', 'Unable to open this link. Please visit ' + url + ' in your browser.');
+      }
+    } catch (err) {
+      if (__DEV__) console.error('Failed to open URL:', err);
+      Alert.alert('Error', 'Unable to open this link. Please visit ' + url + ' in your browser.');
+    }
+  };
 
   const handleDeleteAccount = async () => {
     if (deleteText.toLowerCase() !== 'delete') {
@@ -37,12 +55,14 @@ export default function SettingsScreen() {
         Alert.alert('Error', data.message || 'Failed to delete account');
       }
     } catch (err) {
-      console.error('Delete account error:', err);
+      if (__DEV__) console.error('Delete account error:', err);
       Alert.alert('Error', 'Failed to delete account. Please try again.');
     } finally {
       setDeleting(false);
     }
   };
+
+  const appVersion = Constants.expoConfig?.version || '1.0.0';
 
   const styles = createStyles(colors);
 
@@ -57,6 +77,27 @@ export default function SettingsScreen() {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
+        {!isLoggedIn && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Account</Text>
+            <TouchableOpacity
+              style={[styles.menuItem, { backgroundColor: colors.card }]}
+              onPress={() => router.push('/auth/login')}
+            >
+              <View style={styles.menuItemLeft}>
+                <Ionicons name="log-in-outline" size={22} color={colors.primary} />
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.menuItemText, { color: colors.primary }]}>Sign In</Text>
+                  <Text style={[styles.menuItemSubtext, { color: colors.textSecondary }]}>
+                    Sign in to play online and track your stats
+                  </Text>
+                </View>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+            </TouchableOpacity>
+          </View>
+        )}
+
         {isLoggedIn && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Account</Text>
@@ -111,9 +152,11 @@ export default function SettingsScreen() {
                     onPress={handleDeleteAccount}
                     disabled={deleting || deleteText.toLowerCase() !== 'delete'}
                   >
-                    <Text style={styles.confirmDeleteButtonText}>
-                      {deleting ? 'Deleting...' : 'Delete Account'}
-                    </Text>
+                    {deleting ? (
+                      <ActivityIndicator size="small" color="#ffffff" />
+                    ) : (
+                      <Text style={styles.confirmDeleteButtonText}>Delete Account</Text>
+                    )}
                   </TouchableOpacity>
                 </View>
               </View>
@@ -125,25 +168,36 @@ export default function SettingsScreen() {
           <Text style={styles.sectionTitle}>Legal</Text>
           <TouchableOpacity 
             style={[styles.menuItem, { backgroundColor: colors.card }]}
-            onPress={() => Alert.alert('Privacy Policy', 'View our privacy policy at housespades.com/privacy')}
+            onPress={() => openURL(PRIVACY_POLICY_URL)}
           >
             <View style={styles.menuItemLeft}>
               <Ionicons name="document-text-outline" size={22} color={colors.text} />
               <Text style={styles.menuItemText}>Privacy Policy</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+            <Ionicons name="open-outline" size={18} color={colors.textSecondary} />
           </TouchableOpacity>
 
           <TouchableOpacity 
             style={[styles.menuItem, { backgroundColor: colors.card }]}
-            onPress={() => Alert.alert('Terms of Service', 'View our terms of service at housespades.com/terms')}
+            onPress={() => openURL(TERMS_OF_SERVICE_URL)}
           >
             <View style={styles.menuItemLeft}>
               <Ionicons name="reader-outline" size={22} color={colors.text} />
               <Text style={styles.menuItemText}>Terms of Service</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+            <Ionicons name="open-outline" size={18} color={colors.textSecondary} />
           </TouchableOpacity>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>About</Text>
+          <View style={[styles.menuItem, { backgroundColor: colors.card }]}>
+            <View style={styles.menuItemLeft}>
+              <Ionicons name="information-circle-outline" size={22} color={colors.text} />
+              <Text style={styles.menuItemText}>Version</Text>
+            </View>
+            <Text style={[styles.versionText, { color: colors.textSecondary }]}>{appVersion}</Text>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -201,6 +255,13 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
     menuItemText: {
       fontSize: 16,
       color: colors.text,
+    },
+    menuItemSubtext: {
+      fontSize: 13,
+      marginTop: 2,
+    },
+    versionText: {
+      fontSize: 14,
     },
     deleteConfirmCard: {
       padding: 16,

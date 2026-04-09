@@ -28,17 +28,24 @@ export default function HomeScreen() {
       const storedUser = await getStoredUser();
       if (storedUser) {
         setUser(storedUser);
-        // Only fetch from server if we have a stored user (authenticated)
-        const response = await authenticatedFetch('/api/user/profile');
-        if (response.ok) {
-          const data = await response.json();
-          setUser(data);
+        try {
+          const response = await authenticatedFetch('/api/user/profile');
+          if (response.ok) {
+            const data = await response.json();
+            setUser(data);
+          } else {
+            setUser(null);
+          }
+        } catch (fetchErr: any) {
+          if (fetchErr?.name === 'AuthError') {
+            setUser(null);
+          }
+          if (__DEV__) console.log('Profile fetch failed:', fetchErr);
         }
       }
-      // If no stored user, just continue as guest (no API call needed)
     } catch (err) {
-      // Silently handle errors for guests
-      console.log('Profile fetch skipped or failed');
+      if (__DEV__) console.log('Profile check failed');
+      setUser(null);
     } finally {
       setIsCheckingAuth(false);
     }

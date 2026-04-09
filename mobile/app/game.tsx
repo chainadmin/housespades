@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { View, StyleSheet, Dimensions, Modal, AppState, AppStateStatus } from 'react-native';
+import { View, StyleSheet, Dimensions, Modal, AppState, AppStateStatus, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -43,6 +43,7 @@ export default function GameScreen() {
   const [showGameOverModal, setShowGameOverModal] = useState(false);
   const [playedCardIds, setPlayedCardIds] = useState<Set<string>>(new Set());
   const [userId, setUserId] = useState<number | null>(null);
+  const [showDisconnectOverlay, setShowDisconnectOverlay] = useState(false);
   
   const localPlayerId = 'player-1';
   const gameStateRef = useRef<GameState | null>(null);
@@ -50,8 +51,8 @@ export default function GameScreen() {
   const gameCompletedRef = useRef(false);
   const isMountedRef = useRef(true);
   const gameOverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const wasConnectedRef = useRef(false);
 
-  // WebSocket for multiplayer
   const {
     connect,
     disconnect,
@@ -65,11 +66,10 @@ export default function GameScreen() {
   } = useWebSocket({
     userId,
     onError: (message) => {
-      console.error('WebSocket error:', message);
+      if (__DEV__) console.error('WebSocket error:', message);
     },
   });
 
-  // Use WebSocket state for multiplayer, local state for solo
   const gameState = isMultiplayer && wsGameState ? wsGameState as unknown as GameState : localGameState;
   const playerId = isMultiplayer && wsPlayerId ? wsPlayerId : localPlayerId;
 
@@ -83,7 +83,6 @@ export default function GameScreen() {
     }
   }, [gameState?.currentPlayerIndex, gameState?.roundNumber, gameState?.phase]);
 
-  // Cleanup on unmount
   useEffect(() => {
     isMountedRef.current = true;
     return () => {
@@ -93,6 +92,18 @@ export default function GameScreen() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (isMultiplayer) {
+      if (wasConnectedRef.current && !isConnected && gameState && gameState.phase !== 'game_over') {
+        setShowDisconnectOverlay(true);
+      }
+      if (isConnected && showDisconnectOverlay) {
+        setShowDisconnectOverlay(false);
+      }
+      wasConnectedRef.current = isConnected;
+    }
+  }, [isConnected, isMultiplayer, gameState?.phase]);
 
   const GAME_STATE_KEY = 'house_spades_game_state';
 
@@ -110,9 +121,8 @@ export default function GameScreen() {
         savedAt: Date.now(),
       };
       await SecureStore.setItemAsync(GAME_STATE_KEY, JSON.stringify(saveData));
-      console.log('[Game] Saved game state');
     } catch (err) {
-      console.error('[Game] Failed to save game state:', err);
+      if (__DEV__) console.error('[Game] Failed to save game state:', err);
     }
   }, [isMultiplayer, selectedCard, mode, pointGoal]);
 
@@ -135,12 +145,11 @@ export default function GameScreen() {
         return false;
       }
       
-      console.log('[Game] Restoring saved game state');
       setLocalGameState(parsed.gameState);
       if (parsed.selectedCard) setSelectedCard(parsed.selectedCard);
       return true;
     } catch (err) {
-      console.error('[Game] Failed to load game state:', err);
+      if (__DEV__) console.error('[Game] Failed to load game state:', err);
       return false;
     }
   }, [isMultiplayer, mode, pointGoal]);
@@ -160,7 +169,6 @@ export default function GameScreen() {
     };
   }, [saveGameState, isMultiplayer]);
 
-  // Get userId for multiplayer authentication
   useEffect(() => {
     if (isMultiplayer) {
       const initUser = async () => {
@@ -168,7 +176,6 @@ export default function GameScreen() {
         if (user) {
           setUserId(user.id);
         } else {
-          console.error('[Game] No user found for multiplayer');
           router.replace('/auth/login');
         }
       };
@@ -176,7 +183,6 @@ export default function GameScreen() {
     }
   }, [isMultiplayer]);
 
-  // Connect to WebSocket after userId is available (for multiplayer only)
   useEffect(() => {
     if (isMultiplayer && userId) {
       connect(true);
@@ -186,7 +192,6 @@ export default function GameScreen() {
     }
   }, [isMultiplayer, userId]);
 
-  // Initialize local game for solo play
   useEffect(() => {
     if (!isMultiplayer) {
       loadGameState().then((restored) => {
@@ -196,6 +201,32 @@ export default function GameScreen() {
       });
     }
   }, [isMultiplayer, mode, pointGoal]);
+
+  const handleExitGame = useCallback(() => {
+    const state = gameStateRef.current;
+    const isActiveGame = state && state.phase !== 'game_over' && state.phase !== 'waiting';
+    
+    if (isActiveGame) {
+      Alert.alert(
+        'Leave Game?',
+        'You have a game in progress. Leaving now will count as a forfeit.',
+        [
+          { text: 'Stay', style: 'cancel' },
+          {
+            text: 'Leave',
+            style: 'destructive',
+            onPress: async () => {
+              await recordGameAbandoned();
+              await SecureStore.deleteItemAsync(GAME_STATE_KEY);
+              router.back();
+            },
+          },
+        ]
+      );
+    } else {
+      SecureStore.deleteItemAsync(GAME_STATE_KEY).then(() => router.back());
+    }
+  }, [recordGameAbandoned, router]);
 
   const initializeLocalGame = () => {
     const deck = mode === 'ace_high' ? generateStandardDeck() : generateJJDDDeck();
@@ -222,9 +253,7 @@ export default function GameScreen() {
       { id: 1, name: 'Opponents', players: [players[1].id, players[3].id], score: 0, bags: 0, tricksWon: 0, totalBid: null },
     ];
 
-    // Random starter for first round (0-3)
     const randomStarter = Math.floor(Math.random() * 4);
-    // Dealer is clockwise behind the starter
     const dealerIndex = (randomStarter + 3) % 4;
 
     setLocalGameState({
@@ -246,7 +275,6 @@ export default function GameScreen() {
   const calculateBotBid = useCallback((hand: Card[], gameMode: GameMode): number => {
     let bid = 0;
     hand.forEach((card) => {
-      // Jokers are now suit 'spades' with value 'BJ' or 'LJ'
       if (card.value === 'BJ') bid += 1.5;
       else if (card.value === 'LJ') bid += 1.2;
       else if (card.suit === 'spades' && card.value === '2' && gameMode === 'joker_joker_deuce_deuce') bid += 1;
@@ -262,24 +290,115 @@ export default function GameScreen() {
     const player = state.players[playerIndex];
     const hand = player.hand;
     
-    // Use the shared getPlayableCards function - same logic as server
     const playableCards = getPlayableCards(hand, state.currentTrick.leadSuit, state.spadesBroken, state.mode);
     
     if (playableCards.length === 0) {
-      // Fallback - shouldn't happen
       return hand[0];
     }
-    
-    // Simple bot strategy: pick a random playable card
-    // Could be improved with smarter AI later
-    return playableCards[Math.floor(Math.random() * playableCards.length)];
+
+    if (playableCards.length === 1) {
+      return playableCards[0];
+    }
+
+    const leadSuit = state.currentTrick.leadSuit;
+    const trickCards = state.currentTrick.cards;
+    const isLeading = trickCards.length === 0;
+    const partnerIndex = (playerIndex + 2) % 4;
+    const partnerId = state.players[partnerIndex].id;
+
+    const sortedByPower = [...playableCards].sort(
+      (a, b) => getCardPower(b, state.mode, leadSuit) - getCardPower(a, state.mode, leadSuit)
+    );
+
+    let currentWinnerId: string | null = null;
+    let currentHighestPower = 0;
+    for (const tc of trickCards) {
+      const power = getCardPower(tc.card, state.mode, leadSuit);
+      if (power > currentHighestPower) {
+        currentHighestPower = power;
+        currentWinnerId = tc.playerId;
+      }
+    }
+    const partnerIsWinning = currentWinnerId === partnerId;
+
+    if (isLeading) {
+      const nonTrumps = playableCards.filter(c => !isTrump(c, state.mode));
+      if (nonTrumps.length > 0) {
+        const highNonTrumps = nonTrumps.filter(c => c.numericValue >= 14);
+        if (highNonTrumps.length > 0) {
+          return highNonTrumps[0];
+        }
+        const midCards = nonTrumps.filter(c => c.numericValue >= 10 && c.numericValue <= 12);
+        if (midCards.length > 0) {
+          return midCards[Math.floor(Math.random() * midCards.length)];
+        }
+        return nonTrumps[nonTrumps.length - 1];
+      }
+      return sortedByPower[sortedByPower.length - 1];
+    }
+
+    if (leadSuit) {
+      const followingSuit = playableCards.filter(c => {
+        if (leadSuit === 'spades') return actsAsSpade(c, state.mode);
+        return c.suit === leadSuit && !actsAsSpade(c, state.mode);
+      });
+
+      if (followingSuit.length > 0) {
+        if (partnerIsWinning) {
+          const lowestFollowing = [...followingSuit].sort(
+            (a, b) => getCardPower(a, state.mode, leadSuit) - getCardPower(b, state.mode, leadSuit)
+          );
+          return lowestFollowing[0];
+        }
+
+        const winningCards = followingSuit.filter(
+          c => getCardPower(c, state.mode, leadSuit) > currentHighestPower
+        );
+        if (winningCards.length > 0) {
+          const lowestWinner = [...winningCards].sort(
+            (a, b) => getCardPower(a, state.mode, leadSuit) - getCardPower(b, state.mode, leadSuit)
+          );
+          return lowestWinner[0];
+        }
+
+        const lowestFollowing = [...followingSuit].sort(
+          (a, b) => getCardPower(a, state.mode, leadSuit) - getCardPower(b, state.mode, leadSuit)
+        );
+        return lowestFollowing[0];
+      }
+
+      if (partnerIsWinning) {
+        const lowestPlayable = [...playableCards].sort(
+          (a, b) => getCardPower(a, state.mode, leadSuit) - getCardPower(b, state.mode, leadSuit)
+        );
+        return lowestPlayable[0];
+      }
+
+      const trumpCards = playableCards.filter(c => isTrump(c, state.mode));
+      if (trumpCards.length > 0) {
+        const winningTrumps = trumpCards.filter(
+          c => getCardPower(c, state.mode, leadSuit) > currentHighestPower
+        );
+        if (winningTrumps.length > 0) {
+          const lowestWinningTrump = [...winningTrumps].sort(
+            (a, b) => getCardPower(a, state.mode, leadSuit) - getCardPower(b, state.mode, leadSuit)
+          );
+          return lowestWinningTrump[0];
+        }
+      }
+
+      const lowestPlayable = [...playableCards].sort(
+        (a, b) => getCardPower(a, state.mode, leadSuit) - getCardPower(b, state.mode, leadSuit)
+      );
+      return lowestPlayable[0];
+    }
+
+    return sortedByPower[sortedByPower.length - 1];
   }, []);
 
   const handleBid = useCallback((bid: number) => {
     if (isMultiplayer) {
-      console.log(`[Game] Multiplayer bid: ${bid}, playerId: ${playerId}, isConnected: ${isConnected}`);
       if (!isConnected) {
-        console.error('[Game] Cannot bid - WebSocket not connected');
         return;
       }
       wsPlaceBid(bid);
@@ -354,7 +473,6 @@ export default function GameScreen() {
       });
       
       const newTrickCards = [...prev.currentTrick.cards, { playerId: currentPlayer.id, card }];
-      // When a trump card leads (joker, 2♦ in JJDD), treat it as spades lead
       let leadSuit = prev.currentTrick.leadSuit;
       if (!leadSuit) {
         if (actsAsSpade(card, prev.mode)) {
@@ -438,7 +556,6 @@ export default function GameScreen() {
             tricks: 0,
           }));
           
-          // Rotate starter clockwise from previous round's starter
           const prevStarter = prev.roundStarterIndex ?? 0;
           const nextStarter = (prevStarter + 1) % 4;
           const nextDealer = (nextStarter + 3) % 4;
@@ -488,28 +605,21 @@ export default function GameScreen() {
       gameCompletedRef.current = true;
       recordGameCompleted();
       
-      // Show interstitial ad after game completion, then show game over modal
       const handleGameOver = async () => {
-        // Check if still mounted before proceeding
         if (!isMountedRef.current) return;
         
-        // Always try to show interstitial after game completion
-        // The hook handles hasRemoveAds check internally
         if (!hasRemoveAds) {
           try {
             await showInterstitialAd();
           } catch (err) {
-            console.log('Interstitial ad failed, continuing to game over modal');
+            if (__DEV__) console.log('Interstitial ad failed, continuing to game over modal');
           }
         }
-        // Only set state if still mounted
         if (isMountedRef.current) {
           setShowGameOverModal(true);
         }
       };
       
-      // Small delay to let the final trick display, then show ad/modal
-      // Store timeout ref for cleanup
       gameOverTimeoutRef.current = setTimeout(handleGameOver, 1500);
     }
     
@@ -521,24 +631,20 @@ export default function GameScreen() {
     previousPhaseRef.current = currentPhase || null;
   }, [gameState?.phase, hasRemoveAds, showInterstitialAd, recordGameCompleted]);
 
-  // Bot AI for solo mode
   useEffect(() => {
     if (isMultiplayer) return;
     if (!gameState) return;
     if (gameState.phase !== 'bidding' && gameState.phase !== 'playing') return;
     
-    // Don't act if trick is complete (waiting for animation/clear)
     if (gameState.phase === 'playing' && gameState.currentTrick.cards.length === 4) return;
     
     const currentPlayer = gameState.players[gameState.currentPlayerIndex];
     if (!currentPlayer || !currentPlayer.isBot) return;
     
-    // Schedule bot action with a delay
     const timer = setTimeout(() => {
       const state = gameStateRef.current;
       if (!state) return;
       
-      // Re-check conditions with fresh state
       if (state.phase === 'playing' && state.currentTrick.cards.length === 4) return;
       
       const botPlayer = state.players[state.currentPlayerIndex];
@@ -558,8 +664,9 @@ export default function GameScreen() {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.loadingContainer}>
-          <Text style={{ color: colors.text, fontSize: 18 }}>
-            {isMultiplayer ? 'Connecting to game...' : 'Loading...'}
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={{ color: colors.text, fontSize: 18, marginTop: 16 }}>
+            {isMultiplayer ? 'Connecting to game...' : 'Setting up game...'}
           </Text>
           {isMultiplayer && !isConnected && (
             <Text style={{ color: colors.textSecondary, fontSize: 14, marginTop: 8 }}>
@@ -587,13 +694,7 @@ export default function GameScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
         <TouchableOpacity 
-          onPress={async () => {
-            if (gameState.phase !== 'game_over' && gameState.phase !== 'waiting') {
-              await recordGameAbandoned();
-            }
-            await SecureStore.deleteItemAsync(GAME_STATE_KEY);
-            router.back();
-          }} 
+          onPress={handleExitGame} 
           style={styles.backButton}
         >
           <Ionicons name="arrow-back" size={24} color={colors.text} />
@@ -667,7 +768,18 @@ export default function GameScreen() {
         </View>
       )}
 
-      {/* Game Over Modal */}
+      {showDisconnectOverlay && (
+        <View style={styles.disconnectOverlay}>
+          <View style={[styles.disconnectContent, { backgroundColor: colors.card }]}>
+            <ActivityIndicator size="large" color={colors.primary} />
+            <Text style={[styles.disconnectTitle, { color: colors.text }]}>Connection Lost</Text>
+            <Text style={[styles.disconnectText, { color: colors.textSecondary }]}>
+              Reconnecting to the game...
+            </Text>
+          </View>
+        </View>
+      )}
+
       <Modal
         visible={showGameOverModal}
         transparent
@@ -785,6 +897,30 @@ const styles = StyleSheet.create({
   bannerContainer: {
     alignItems: 'center',
     paddingBottom: 8,
+  },
+  disconnectOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 100,
+  },
+  disconnectContent: {
+    borderRadius: 16,
+    padding: 32,
+    alignItems: 'center',
+    gap: 12,
+    width: '80%',
+    maxWidth: 300,
+  },
+  disconnectTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginTop: 8,
+  },
+  disconnectText: {
+    fontSize: 15,
+    textAlign: 'center',
   },
   modalOverlay: {
     flex: 1,
