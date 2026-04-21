@@ -9,8 +9,8 @@ import { storeSessionCookie, storeUser, extractSessionCookie } from '@/lib/auth'
 
 const logoImage = require('@/assets/house-card-logo.png');
 
-const PRIVACY_POLICY_URL = 'https://housespades.com/privacy';
-const TERMS_OF_SERVICE_URL = 'https://housespades.com/terms';
+const PRIVACY_POLICY_URL = 'https://house-spades.com/privacy';
+const TERMS_OF_SERVICE_URL = 'https://house-spades.com/terms';
 
 export default function LoginScreen() {
   const router = useRouter();

@@ -7,8 +7,8 @@ import { useColors } from '@/hooks/useColorScheme';
 import { authenticatedFetch, clearAuth, getStoredUser } from '@/lib/auth';
 import Constants from 'expo-constants';
 
-const PRIVACY_POLICY_URL = 'https://housespades.com/privacy';
-const TERMS_OF_SERVICE_URL = 'https://housespades.com/terms';
+const PRIVACY_POLICY_URL = 'https://house-spades.com/privacy';
+const TERMS_OF_SERVICE_URL = 'https://house-spades.com/terms';
 
 export default function SettingsScreen() {
   const router = useRouter();
