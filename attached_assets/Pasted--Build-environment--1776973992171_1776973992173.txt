@@ -1,0 +1,36 @@
++---------------------------------------+
+|           Build environment           |
++-------------+-------------------------+
+| xcode_path  | /Applications/Xcode.app |
+| gym_version | 2.227.2                 |
+| sdk         | iPhoneOS18.5.sdk        |
++-------------+-------------------------+
+Looks like fastlane ran into a build/archive error with your project
+It's hard to tell what's causing the error, so we wrote some guides on how
+to troubleshoot build and signing issues: https://docs.fastlane.tools/codesigning/getting-started/
+Before submitting an issue on GitHub, please follow the guide above and make
+sure your project is set up correctly.
+fastlane uses `xcodebuild` commands to generate your binary, you can see the
+the full commands printed out in yellow in the above log.
+Make sure to inspect the output above, as usually you'll find more error information there
+[!] Error building the application - see the log above
+Error: The "Run fastlane" step failed because of an error in the Xcode build process. We automatically detected following errors in your Xcode build logs:
+- Provisioning profile "*[expo] com.housespades.app AppStore 2026-01-12T01:03:29.249Z" doesn't support the Push Notifications capability.  (in target 'HouseSpades' from project 'HouseSpades')
+- Provisioning profile "*[expo] com.housespades.app AppStore 2026-01-12T01:03:29.249Z" doesn't include the aps-environment entitlement. Profile qualification is using entitlement definitions that may be out of date. Connect to network to update. (in target 'HouseSpades' from project 'HouseSpades')
+Refer to "Xcode Logs" below for additional, more detailed logs.
+Clean up credentials
+
+697ms
+
+
+Destroying keychain - /var/folders/yb/vydyb5n15dlcqb9qhv247rxm0000gn/T/eas-build-273ca851-dde9-46b7-8352-8e8cb32243d8.keychain
+Removing provisioning profile
+Fail job
+
+0ms
+
+
+Build failed: The "Run fastlane" step failed because of an error in the Xcode build process. We automatically detected following errors in your Xcode build logs:
+- Provisioning profile "*[expo] com.housespades.app AppStore 2026-01-12T01:03:29.249Z" doesn't support the Push Notifications capability.  (in target 'HouseSpades' from project 'HouseSpades')
+- Provisioning profile "*[expo] com.housespades.app AppStore 2026-01-12T01:03:29.249Z" doesn't include the aps-environment entitlement. Profile qualification is using entitlement definitions that may be out of date. Connect to network to update. (in target 'HouseSpades' from project 'HouseSpades')
+Refer to "Xcode Logs" below for additional, more detailed logs.
