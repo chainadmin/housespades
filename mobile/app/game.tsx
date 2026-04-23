@@ -6,7 +6,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity, Text } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import * as Haptics from 'expo-haptics';
-import * as Notifications from 'expo-notifications';
 import { useColors } from '@/hooks/useColorScheme';
 import { getStoredUser } from '@/lib/auth';
 import { useWebSocket } from '@/hooks/useWebSocket';
@@ -32,33 +31,6 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const feltBackground = require('@/assets/table-felt.png');
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-    shouldShowAlert: true,
-  }),
-});
-
-let notificationPermissionRequested = false;
-async function ensureNotificationPermission(): Promise<boolean> {
-  try {
-    const { status } = await Notifications.getPermissionsAsync();
-    if (status === 'granted') return true;
-    if (notificationPermissionRequested) return false;
-    notificationPermissionRequested = true;
-    const req = await Notifications.requestPermissionsAsync({
-      ios: { allowAlert: true, allowBadge: false, allowSound: true },
-    });
-    return req.status === 'granted';
-  } catch (err) {
-    if (__DEV__) console.log('Notification permission error', err);
-    return false;
-  }
-}
-
 export default function GameScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ mode: GameMode; points: PointGoal; type: string; gameId?: string }>();
@@ -76,9 +48,6 @@ export default function GameScreen() {
   const [userId, setUserId] = useState<number | null>(null);
   const [showDisconnectOverlay, setShowDisconnectOverlay] = useState(false);
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
-  const turnNotificationIdRef = useRef<string | null>(null);
-  const isMultiplayerRef = useRef(false);
-  const playerIdRef = useRef<string | null>(null);
   
   const localPlayerId = 'player-1';
   const gameStateRef = useRef<GameState | null>(null);
@@ -151,51 +120,6 @@ export default function GameScreen() {
     }
   }, [gameState?.currentTrick?.winnerId]);
 
-  const notifPermissionRequestedRef = useRef(false);
-  useEffect(() => {
-    if (!isMultiplayer) return;
-    if (notifPermissionRequestedRef.current) return;
-    if (!gameState) return;
-    if (gameState.phase !== 'bidding' && gameState.phase !== 'playing') return;
-    notifPermissionRequestedRef.current = true;
-    ensureNotificationPermission().catch(() => {});
-  }, [isMultiplayer, gameState?.phase]);
-
-  const scheduleTurnNotification = useCallback(async (phase: 'bidding' | 'playing') => {
-    const granted = await ensureNotificationPermission();
-    if (!granted) return;
-    if (turnNotificationIdRef.current) return;
-    try {
-      const id = await Notifications.scheduleNotificationAsync({
-        content: {
-          title: 'Your turn in House Spades',
-          body: phase === 'bidding' ? 'Time to place your bid.' : 'Time to play your card.',
-          sound: 'default',
-        },
-        trigger: null,
-      });
-      turnNotificationIdRef.current = id;
-    } catch (err) {
-      if (__DEV__) console.log('Schedule notification failed', err);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!isMultiplayer || !gameState) return;
-    if (gameState.phase !== 'bidding' && gameState.phase !== 'playing') return;
-    const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-    const isMyTurnNow = currentPlayer?.id === playerId;
-    if (!isMyTurnNow) {
-      if (turnNotificationIdRef.current) {
-        Notifications.cancelScheduledNotificationAsync(turnNotificationIdRef.current).catch(() => {});
-        turnNotificationIdRef.current = null;
-      }
-      return;
-    }
-    if (appStateRef.current === 'active') return;
-    scheduleTurnNotification(gameState.phase as 'bidding' | 'playing');
-  }, [isMultiplayer, gameState?.currentPlayerIndex, gameState?.phase, playerId, scheduleTurnNotification]);
-
   const GAME_STATE_KEY = 'house_spades_game_state';
 
   const saveGameState = useCallback(async (state: GameState | null) => {
@@ -246,44 +170,20 @@ export default function GameScreen() {
   }, [isMultiplayer, mode, pointGoal]);
 
   useEffect(() => {
-    isMultiplayerRef.current = isMultiplayer;
-    playerIdRef.current = playerId;
-  }, [isMultiplayer, playerId]);
-
-  useEffect(() => {
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
       appStateRef.current = nextAppState;
       if (nextAppState === 'background' || nextAppState === 'inactive') {
         if (gameStateRef.current && !isMultiplayer) {
           saveGameState(gameStateRef.current);
         }
-        if (isMultiplayerRef.current && gameStateRef.current && playerIdRef.current) {
-          const gs = gameStateRef.current;
-          if (gs.phase === 'bidding' || gs.phase === 'playing') {
-            const cur = gs.players[gs.currentPlayerIndex];
-            if (cur?.id === playerIdRef.current) {
-              scheduleTurnNotification(gs.phase as 'bidding' | 'playing');
-            }
-          }
-        }
-      } else if (nextAppState === 'active') {
-        if (turnNotificationIdRef.current) {
-          Notifications.cancelScheduledNotificationAsync(turnNotificationIdRef.current).catch(() => {});
-          turnNotificationIdRef.current = null;
-        }
-        Notifications.dismissAllNotificationsAsync().catch(() => {});
       }
     };
 
     const subscription = AppState.addEventListener('change', handleAppStateChange);
     return () => {
       subscription.remove();
-      if (turnNotificationIdRef.current) {
-        Notifications.cancelScheduledNotificationAsync(turnNotificationIdRef.current).catch(() => {});
-        turnNotificationIdRef.current = null;
-      }
     };
-  }, [saveGameState, isMultiplayer, scheduleTurnNotification]);
+  }, [saveGameState, isMultiplayer]);
 
   useEffect(() => {
     if (isMultiplayer) {

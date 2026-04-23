@@ -1,4 +1,4 @@
-# House Spades — App Review Notes (v2.1.0 / iOS build 35)
+# House Spades — App Review Notes (v2.1.0 / iOS build 37)
 
 Thank you for reviewing House Spades. This update directly addresses the prior 4.2 (Minimum Functionality) feedback by clearly differentiating the app from a web browser experience.
 
@@ -7,7 +7,6 @@ Thank you for reviewing House Spades. This update directly addresses the prior 4
 It uses the following native iOS APIs and SDKs that are not available in a standard web browser:
 
 - **Haptic feedback** (Core Haptics via `expo-haptics`) — fires on bid placement, card play, trick win, share action, and game-over moments.
-- **Local notifications** (`UNUserNotificationCenter` via `expo-notifications`) — when a multiplayer game is backgrounded and it becomes the user's turn, a local "Your turn in House Spades" notification fires. Permission is requested in-context, not at launch.
 - **Native share sheet** (`UIActivityViewController` via React Native's `Share` API) — players can share match results from the game-over screen.
 - **Secure Keychain storage** (`expo-secure-store`) — session credentials stored in iOS Keychain, not cookies.
 - **AdMob SDK** (`react-native-google-mobile-ads`) — native banner and interstitial ads with App Tracking Transparency (`NSUserTrackingUsageDescription` shown in-context). Family-friendly settings: `maxAdContentRating: G`, `tagForChildDirectedTreatment: true`.

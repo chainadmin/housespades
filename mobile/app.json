@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.housespades.app",
-      "buildNumber": "36",
+      "buildNumber": "37",
       "icon": "./assets/icon.png",
       "infoPlist": {
         "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you. You can still use the app with non-personalized ads if you decline.",
@@ -68,13 +68,10 @@
           { "SKAdNetworkIdentifier": "3qcr597p9d.skadnetwork" }
         ],
         "ITSAppUsesNonExemptEncryption": false
-      },
-      "entitlements": {
-        "aps-environment": null
       }
     },
     "android": {
-      "versionCode": 35,
+      "versionCode": 37,
       "adaptiveIcon": {
         "foregroundImage": "./assets/house-card-logo.png",
         "backgroundColor": "#121212"
