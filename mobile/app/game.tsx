@@ -140,6 +140,27 @@ export default function GameScreen() {
     }
   }, [isConnected, isMultiplayer, gameState?.phase]);
 
+  const lastTrickWinnerRef = useRef<string | null>(null);
+  useEffect(() => {
+    const winnerId = gameState?.currentTrick?.winnerId ?? null;
+    if (winnerId && winnerId !== lastTrickWinnerRef.current) {
+      lastTrickWinnerRef.current = winnerId;
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    } else if (!winnerId) {
+      lastTrickWinnerRef.current = null;
+    }
+  }, [gameState?.currentTrick?.winnerId]);
+
+  const notifPermissionRequestedRef = useRef(false);
+  useEffect(() => {
+    if (!isMultiplayer) return;
+    if (notifPermissionRequestedRef.current) return;
+    if (!gameState) return;
+    if (gameState.phase !== 'bidding' && gameState.phase !== 'playing') return;
+    notifPermissionRequestedRef.current = true;
+    ensureNotificationPermission().catch(() => {});
+  }, [isMultiplayer, gameState?.phase]);
+
   const scheduleTurnNotification = useCallback(async (phase: 'bidding' | 'playing') => {
     const granted = await ensureNotificationPermission();
     if (!granted) return;
