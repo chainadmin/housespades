@@ -40,6 +40,8 @@ House Spades is an online multiplayer Spades card game with both web and mobile 
 - **Ad Integration:** Google Mobile Ads (AdMob) for banner and interstitial ads on the mobile app, with specific placements (game screen banners, interstitials after games or on matchmaking cancel). Includes App Tracking Transparency (ATT) for iOS.
   - **Family-friendly ads configured:** `maxAdContentRating: G`, `tagForChildDirectedTreatment: true`, `tagForUnderAgeOfConsent: true` set globally before AdMob initialization.
 - **Game Statistics:** Match history is recorded for multiplayer games, including scores, game mode, and ELO changes. Solo games do not affect rankings.
+- **Native iOS APIs (App Store 4.2 compliance):** App uses Core Haptics (`expo-haptics`) on bid/play/game-over, local notifications (`expo-notifications`) for "your turn" alerts when multiplayer game is backgrounded, native share sheet (`Share` API) on multiplayer game-over, and a felt-textured `ImageBackground` on the game table. Reviewer notes live in `mobile/APP_REVIEW_NOTES.md`. Notification permission is requested in-context only when needed.
+- **Mobile home screen layout:** Single bottom-anchored options card with mode segmented control (Ace High / JJDD), point goal segmented control (100/300/500), and a primary Play button (solo) plus secondary Online/Sign In button. Hero greeting + collapsible "How to Play" sit above. No more stacked play cards.
 
 **System Design Choices:**
 - **Monorepo Structure:** Divided into `client/` (web), `mobile/` (Expo), `server/`, and `shared/` directories.

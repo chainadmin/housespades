@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "qeXtwVZXuiP0AojTPHc40"
+uri = "file://mobile/assets/table-felt.png"
+type = "image"
+title = "table felt background"

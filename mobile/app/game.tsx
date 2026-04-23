@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { View, StyleSheet, Dimensions, Modal, AppState, AppStateStatus, Alert, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Dimensions, Modal, AppState, AppStateStatus, Alert, ActivityIndicator, ImageBackground, Share, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity, Text } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
+import * as Haptics from 'expo-haptics';
+import * as Notifications from 'expo-notifications';
 import { useColors } from '@/hooks/useColorScheme';
 import { getStoredUser } from '@/lib/auth';
 import { useWebSocket } from '@/hooks/useWebSocket';
@@ -28,6 +30,35 @@ import { useAds } from '@/hooks/useAds';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
+const feltBackground = require('@/assets/table-felt.png');
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowBanner: true,
+    shouldShowList: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+    shouldShowAlert: true,
+  }),
+});
+
+let notificationPermissionRequested = false;
+async function ensureNotificationPermission(): Promise<boolean> {
+  try {
+    const { status } = await Notifications.getPermissionsAsync();
+    if (status === 'granted') return true;
+    if (notificationPermissionRequested) return false;
+    notificationPermissionRequested = true;
+    const req = await Notifications.requestPermissionsAsync({
+      ios: { allowAlert: true, allowBadge: false, allowSound: true },
+    });
+    return req.status === 'granted';
+  } catch (err) {
+    if (__DEV__) console.log('Notification permission error', err);
+    return false;
+  }
+}
+
 export default function GameScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ mode: GameMode; points: PointGoal; type: string; gameId?: string }>();
@@ -44,6 +75,10 @@ export default function GameScreen() {
   const [playedCardIds, setPlayedCardIds] = useState<Set<string>>(new Set());
   const [userId, setUserId] = useState<number | null>(null);
   const [showDisconnectOverlay, setShowDisconnectOverlay] = useState(false);
+  const appStateRef = useRef<AppStateStatus>(AppState.currentState);
+  const turnNotificationIdRef = useRef<string | null>(null);
+  const isMultiplayerRef = useRef(false);
+  const playerIdRef = useRef<string | null>(null);
   
   const localPlayerId = 'player-1';
   const gameStateRef = useRef<GameState | null>(null);
@@ -105,6 +140,41 @@ export default function GameScreen() {
     }
   }, [isConnected, isMultiplayer, gameState?.phase]);
 
+  const scheduleTurnNotification = useCallback(async (phase: 'bidding' | 'playing') => {
+    const granted = await ensureNotificationPermission();
+    if (!granted) return;
+    if (turnNotificationIdRef.current) return;
+    try {
+      const id = await Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Your turn in House Spades',
+          body: phase === 'bidding' ? 'Time to place your bid.' : 'Time to play your card.',
+          sound: 'default',
+        },
+        trigger: null,
+      });
+      turnNotificationIdRef.current = id;
+    } catch (err) {
+      if (__DEV__) console.log('Schedule notification failed', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isMultiplayer || !gameState) return;
+    if (gameState.phase !== 'bidding' && gameState.phase !== 'playing') return;
+    const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+    const isMyTurnNow = currentPlayer?.id === playerId;
+    if (!isMyTurnNow) {
+      if (turnNotificationIdRef.current) {
+        Notifications.cancelScheduledNotificationAsync(turnNotificationIdRef.current).catch(() => {});
+        turnNotificationIdRef.current = null;
+      }
+      return;
+    }
+    if (appStateRef.current === 'active') return;
+    scheduleTurnNotification(gameState.phase as 'bidding' | 'playing');
+  }, [isMultiplayer, gameState?.currentPlayerIndex, gameState?.phase, playerId, scheduleTurnNotification]);
+
   const GAME_STATE_KEY = 'house_spades_game_state';
 
   const saveGameState = useCallback(async (state: GameState | null) => {
@@ -155,19 +225,44 @@ export default function GameScreen() {
   }, [isMultiplayer, mode, pointGoal]);
 
   useEffect(() => {
+    isMultiplayerRef.current = isMultiplayer;
+    playerIdRef.current = playerId;
+  }, [isMultiplayer, playerId]);
+
+  useEffect(() => {
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      appStateRef.current = nextAppState;
       if (nextAppState === 'background' || nextAppState === 'inactive') {
         if (gameStateRef.current && !isMultiplayer) {
           saveGameState(gameStateRef.current);
         }
+        if (isMultiplayerRef.current && gameStateRef.current && playerIdRef.current) {
+          const gs = gameStateRef.current;
+          if (gs.phase === 'bidding' || gs.phase === 'playing') {
+            const cur = gs.players[gs.currentPlayerIndex];
+            if (cur?.id === playerIdRef.current) {
+              scheduleTurnNotification(gs.phase as 'bidding' | 'playing');
+            }
+          }
+        }
+      } else if (nextAppState === 'active') {
+        if (turnNotificationIdRef.current) {
+          Notifications.cancelScheduledNotificationAsync(turnNotificationIdRef.current).catch(() => {});
+          turnNotificationIdRef.current = null;
+        }
+        Notifications.dismissAllNotificationsAsync().catch(() => {});
       }
     };
 
     const subscription = AppState.addEventListener('change', handleAppStateChange);
     return () => {
       subscription.remove();
+      if (turnNotificationIdRef.current) {
+        Notifications.cancelScheduledNotificationAsync(turnNotificationIdRef.current).catch(() => {});
+        turnNotificationIdRef.current = null;
+      }
     };
-  }, [saveGameState, isMultiplayer]);
+  }, [saveGameState, isMultiplayer, scheduleTurnNotification]);
 
   useEffect(() => {
     if (isMultiplayer) {
@@ -397,6 +492,7 @@ export default function GameScreen() {
   }, []);
 
   const handleBid = useCallback((bid: number) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
     if (isMultiplayer) {
       if (!isConnected) {
         return;
@@ -447,6 +543,7 @@ export default function GameScreen() {
       return;
     }
     
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
     setPlayedCardIds(prev => new Set(prev).add(card.id));
     setSelectedCard(null);
     
@@ -603,6 +700,7 @@ export default function GameScreen() {
     
     if (isGameOver && !wasGameOver && !gameCompletedRef.current) {
       gameCompletedRef.current = true;
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       recordGameCompleted();
       
       const handleGameOver = async () => {
@@ -690,8 +788,27 @@ export default function GameScreen() {
     return teamIndex === 0 ? colors.primary : colors.accent;
   };
 
+  const handleShareResult = async () => {
+    if (!gameState) return;
+    const winningTeamIndex = gameState.teams.findIndex(t => t.score >= gameState.winningScore);
+    const winningTeam = winningTeamIndex !== -1 ? gameState.teams[winningTeamIndex] : null;
+    const won = winningTeam?.players.includes(playerId);
+    const modeName = gameState.mode === 'ace_high' ? 'Ace High' : 'Joker Joker Deuce Deuce';
+    const scores = gameState.teams.map(t => `${t.name}: ${t.score}`).join(' • ');
+    try {
+      Haptics.selectionAsync().catch(() => {});
+      await Share.share({
+        message: `${won ? 'Just won' : 'Just played'} a game of House Spades (${modeName})! ${scores}`,
+        title: 'House Spades Result',
+      });
+    } catch (err) {
+      if (__DEV__) console.log('Share failed', err);
+    }
+  };
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
+      <ImageBackground source={feltBackground} style={styles.feltBackground} resizeMode="cover" imageStyle={styles.feltImage}>
       <View style={styles.header}>
         <TouchableOpacity 
           onPress={handleExitGame} 
@@ -780,6 +897,8 @@ export default function GameScreen() {
         </View>
       )}
 
+      </ImageBackground>
+
       <Modal
         visible={showGameOverModal}
         transparent
@@ -819,6 +938,19 @@ export default function GameScreen() {
                 </>
               );
             })()}
+            {isMultiplayer && (
+              <TouchableOpacity
+                style={[styles.modalButton, { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: colors.primary, marginBottom: 10 }]}
+                onPress={handleShareResult}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <Ionicons name="share-outline" size={18} color={colors.primary} />
+                  <Text style={[styles.modalButtonText, { color: colors.primary }]}>
+                    Share Result
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
               style={[styles.modalButton, { backgroundColor: colors.primary }]}
               onPress={async () => {
@@ -841,6 +973,12 @@ export default function GameScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  feltBackground: {
+    flex: 1,
+  },
+  feltImage: {
+    opacity: 0.85,
   },
   loadingContainer: {
     flex: 1,
