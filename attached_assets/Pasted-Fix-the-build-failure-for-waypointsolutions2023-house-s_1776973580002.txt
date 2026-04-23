@@ -1,0 +1,38 @@
+Fix the build failure for @waypointsolutions2023/house-spades:
+
+<build id="889c9a2a-6864-40d4-94b9-22a9c2d433ae" platform="IOS">
+<project fullName="@waypointsolutions2023/house-spades"/>
+<profile>production</profile>
+<buildMode>BUILD</buildMode>
+<distribution>STORE</distribution>
+<environment>production</environment>
+<appVersion>2.1.0</appVersion>
+<appBuildVersion>35</appBuildVersion>
+<sdkVersion>53.0.0</sdkVersion>
+<fingerprint>b12430a3fd19313728b2b5aaf13ca96ccf017903</fingerprint>
+<git commit="db139fb14e2b612142c32e164fb00da955f689c2" message="Update Android version code to match iOS for unified releases
+
+Bump Android versionCode in mobile/app.json from 32 to 35 to align with the iOS build, enabling unified releases of the application.
+
+Replit-Commit-Author: Agent
+Replit-Commit-Session-Id: 20d005b4-397b-46dc-bbd7-06fb3b0a1cae
+Replit-Commit-Checkpoint-Type: full_checkpoint
+Replit-Commit-Event-Id: 3f921e20-fcc6-47fe-b0a7-7dfa408ff65e
+Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/bb402b8b-6042-46eb-bd5a-b7da9959af8a/20d005b4-397b-46dc-bbd7-06fb3b0a1cae/LCN3aV9
+Replit-Helium-Checkpoint-Created: true"/>
+<cliVersion>18.8.1</cliVersion>
+<logFiles>
+<logFile>https://job-logs.eascdn.net/production/889c9a2a-6864-40d4-94b9-22a9c2d433ae/1776971851359-1506d04f-0912-4bc0-9e67-5932838af6d7.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260423%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260423T194606Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=92a0ab927ecc7f3c6d1fa1595daf30a03d9f35323f06ce56fa8e6376c89c023027aa836fc0eeb9caeb9ce33b951470004ead63db74528e1aec8bbb75bbff6f949d78b4073a97e2a143d6ba6be74355ce10aeb4ee1d68da7d5e1de5942fe1a6f3ccecd7f1a76616ea109d5936599ea24e4a8ff05356a94f1da8087b9ac99bef8c21d666f318f03bb6068ebfceb89aa731f0fab4a939498116dd00019cd33449e381b3d67a036294f57f6a2f4230bee62dbc23596d60c59e0fdfcd48a724751d64f7932a7b5c67e7684ad1d1491843d08e0e6b5ea6e02c367108e312acc356268b560df426b14d6c50840749659831098eba60b5aeaba10ca6893a5ea8942b5282</logFile>
+<logFile>https://job-logs.eascdn.net/production/889c9a2a-6864-40d4-94b9-22a9c2d433ae/1776972499983-dfac168e-a063-45eb-b0d8-291c5b5372ff.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260423%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260423T194606Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=32a68537103c5422537da2c045662d74e227c6c8b182a6ac428e00969d3f3dd1d0b785a6520b85dff6643b2d51ddef8210167e8f7e47abdff0db7a25ae00608dcba3a78d027e6706bbc7ee78bb1ddf5a70552cfa5b446c78fa3dab7f7badf79078294434bee41aa913a5ba9eacc029d09480daa1dbcb9e1e11d65b29dcbecbb1a73047a0754f962c9133a6b253540a0268b35d9a3052c9de6817096659955199c97ec71abb0f111da3e67a830192f06731918b1650ee48689667d4f9cfd31cdad781aecfdc6c9f04e83154b1952b9b4fa6ed655e43308c049bff9bb98ad113db835d89e9b2932244b6ed92fa2babddef843736c35a99cd97c6c8d8de320f1e61</logFile>
+<logFile>https://job-logs.eascdn.net/production/889c9a2a-6864-40d4-94b9-22a9c2d433ae/1776972512146-7867456d-a903-4a61-b420-1c563df212fc.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260423%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260423T194606Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=a39fd32234432670d0dee9b2e916c1c73d04567ea0c163930fabc9070ec7579d6bc48988bba2b1d8702ced949fed07686e5698b92c8d152795a92796df9b186e43016f8d2152cb3102b15f08917d8f494a691fc1d012835c4d2ffd62f9c63323a73256cd0f6c12221e66c611a52267c6e7ef6422f7530d34443a364b3d6f7bb48a44b2cfeb4b0bd10e44531dfcb0524cc0b5b0b126532054d9990e11b9fbce3e7b43e2e2e50ff6c3b5917ea6fa6ae25854513b9238ae9f0f2d95d85881f9ff5e4209680a8341fe95f778efaf7129b72dad00879d6eb9c642bbe9d79b7b74822d0bc2219a25465b2eae3ea5e37f4e83a55b3ee65a5680300a2dc9c035c01d33da</logFile>
+<logFile>https://job-logs.eascdn.net/production/889c9a2a-6864-40d4-94b9-22a9c2d433ae/1776972512347-42027b43-640c-463b-8250-1851007ff047.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260423%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260423T194606Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=b2c2268800893cbe58040b0f7f0f79f1851fc4b37c70513c04b6237536b307fb5f9b22f44cf7fc2a5b6bc83183870da2a84bb4dc24fb0a739dc740c429a538855275e41660ecf1570e32548829886a1e1f55e6dbe6580a35ae8b3ac601f05d60f8d94b4dbbc1700eb89bf269f4ddf6594905f56c4c10fe562e29886f04f610564dd264399bdbeb9d5f9180f803bbfe3ec4cecea5c96d044411e73e180a7761d4e844ba803dd9cbaf9dd0b8bc1f87bcc1d6fc26cd34424382066c8dc7872f43225c1fc697bfa799bc47b9390418b606a4c3c651302fe469da4d444d903e99dc755618e05d936b71e46995144eb3590807ba2bb2df878ae5d3d84ae133bf1a6cff</logFile>
+<logFile>https://job-logs.eascdn.net/production/889c9a2a-6864-40d4-94b9-22a9c2d433ae/1776972513043-16a96780-d5eb-4727-b4f1-ba51ff8e569f.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260423%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260423T194606Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=29fc2706587ad5c8cb54d946c0fd2820b8aabe8a6bb1c28f1631dd4a4e51974816345fb9a81b745c3efc18de413659108d5f2a2c6b19e464e727a2064887255a064b0d86f1f0047f830fc72c32f5ecfb36193c3562aca8726e68feaedf1892b1c87afcd40e3db589e020b0d706a589008e452d89edaa2c37b0e5d1c316038af9a098dbac31d25bad89aa3b188dd4237734c6d2cc4138a52578d25fbc4f6448be25f0556ef2e9f2d73c5f4ed84e28d440164e223587259db8ad0fe278f7ffb52f1542619a216b003d9065d47baa50fe46d00015847cc823b0edc85f1679ebfb8b5f72e766896e318e8f6a5e904cfe23716dcdb8f682ac1166845aab0924e3fb36</logFile>
+</logFiles>
+</build>
+
+<instructions>
+Investigate the build failure and propose a fix.
+You can use `eas build:view 889c9a2a-6864-40d4-94b9-22a9c2d433ae --json` for build metadata.
+
+If you have the Expo MCP server connected, you can also use the `build_info` and `build_logs` tools: https://docs.expo.dev/eas/ai/mcp/
+</instructions>
