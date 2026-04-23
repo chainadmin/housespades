@@ -264,6 +264,19 @@ export async function registerRoutes(
   app.get("/api/auth/me", getCurrentUser);
   app.get("/api/user/profile", getCurrentUser);
 
+  // Leaderboard endpoint (public — no auth required)
+  app.get("/api/leaderboard", async (req, res) => {
+    try {
+      const limitParam = parseInt(String(req.query.limit ?? "50"), 10);
+      const limit = Number.isFinite(limitParam) ? Math.min(Math.max(limitParam, 1), 100) : 50;
+      const players = await storage.getTopPlayers(limit);
+      res.json({ players });
+    } catch (error) {
+      console.error("Get leaderboard error:", error);
+      res.status(500).json({ error: "Failed to load leaderboard" });
+    }
+  });
+
   // Match history endpoint
   app.get("/api/user/match-history", async (req, res) => {
     try {

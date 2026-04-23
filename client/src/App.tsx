@@ -14,6 +14,7 @@ import ForgotPassword from "@/pages/ForgotPassword";
 import Splash from "@/pages/Splash";
 import Shop from "@/pages/Shop";
 import Settings from "@/pages/Settings";
+import Leaderboard from "@/pages/Leaderboard";
 import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/Terms";
 import NotFound from "@/pages/not-found";
@@ -26,7 +27,7 @@ function AuthenticatedApp() {
 
   useEffect(() => {
     if (!isLoading && !user) {
-      const publicPaths = ["/splash", "/login", "/signup", "/forgot-password", "/privacy", "/terms"];
+      const publicPaths = ["/splash", "/login", "/signup", "/forgot-password", "/privacy", "/terms", "/leaderboard"];
       if (!publicPaths.includes(location)) {
         setLocation("/splash");
       }
@@ -61,6 +62,7 @@ function AuthenticatedApp() {
       <Route path="/matchmaking" component={Matchmaking} />
       <Route path="/shop" component={Shop} />
       <Route path="/settings" component={Settings} />
+      <Route path="/leaderboard" component={Leaderboard} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
       <Route component={NotFound} />

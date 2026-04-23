@@ -144,6 +144,7 @@ export default function RootLayout() {
           <Stack.Screen name="profile" />
           <Stack.Screen name="settings" />
           <Stack.Screen name="match-history" />
+          <Stack.Screen name="leaderboard" />
         </Stack>
         <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
       </SafeAreaProvider>

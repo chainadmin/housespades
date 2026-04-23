@@ -103,6 +103,13 @@ export default function HomeScreen() {
           <View style={styles.headerButtons}>
             <TouchableOpacity
               style={styles.iconButton}
+              onPress={() => router.push('/leaderboard')}
+              testID="button-leaderboard"
+            >
+              <Ionicons name="trophy-outline" size={26} color={colors.text} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.iconButton}
               onPress={() => router.push('/settings')}
               testID="button-settings"
             >

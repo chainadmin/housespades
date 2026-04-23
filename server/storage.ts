@@ -42,6 +42,13 @@ export interface IStorage {
     losingScore: number,
     players: { userId: number | null; isBot: boolean; teamIndex: number; ratingChange: number }[]
   ): Promise<void>;
+  getTopPlayers(limit: number): Promise<{
+    id: number;
+    username: string;
+    rating: number;
+    gamesPlayed: number;
+    gamesWon: number;
+  }[]>;
   getUserMatchHistory(userId: number): Promise<{
     id: number;
     matchId: number;
@@ -214,6 +221,28 @@ export class DatabaseStorage implements IStorage {
         ratingChange: player.ratingChange,
       });
     }
+  }
+
+  async getTopPlayers(limit: number): Promise<{
+    id: number;
+    username: string;
+    rating: number;
+    gamesPlayed: number;
+    gamesWon: number;
+  }[]> {
+    const rows = await db
+      .select({
+        id: users.id,
+        username: users.username,
+        rating: users.rating,
+        gamesPlayed: users.gamesPlayed,
+        gamesWon: users.gamesWon,
+      })
+      .from(users)
+      .where(sql`${users.gamesPlayed} > 0`)
+      .orderBy(sql`${users.rating} desc, ${users.gamesWon} desc`)
+      .limit(limit);
+    return rows;
   }
 
   async getUserMatchHistory(userId: number): Promise<{
