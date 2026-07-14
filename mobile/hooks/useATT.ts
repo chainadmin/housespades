@@ -40,7 +40,7 @@ export function useATT(): UseATTReturn {
 
   const requestTracking = useCallback(async (): Promise<PermissionStatus> => {
     if (Platform.OS !== 'ios') {
-      return 'granted';
+      return PermissionStatus.GRANTED;
     }
 
     try {
@@ -49,12 +49,12 @@ export function useATT(): UseATTReturn {
       return status;
     } catch (err) {
       if (__DEV__) console.error('Failed to request tracking:', err);
-      return 'denied';
+      return PermissionStatus.DENIED;
     }
   }, []);
 
-  const canRequestTracking = Platform.OS === 'ios' && trackingStatus === 'undetermined';
-  const isTrackingAllowed = Platform.OS !== 'ios' || trackingStatus === 'granted';
+  const canRequestTracking = Platform.OS === 'ios' && trackingStatus === PermissionStatus.UNDETERMINED;
+  const isTrackingAllowed = Platform.OS !== 'ios' || trackingStatus === PermissionStatus.GRANTED;
 
   return {
     trackingStatus,

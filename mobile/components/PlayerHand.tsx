@@ -1,4 +1,5 @@
 import { View, StyleSheet, Dimensions } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Card, GameState } from '@/constants/game';
 import { PlayingCard } from './PlayingCard';
 import { getPlayableCards } from '@/lib/gameUtils';
@@ -70,8 +71,9 @@ export function PlayerHand({
     <View style={styles.container}>
       <View style={[styles.handContainer, { paddingHorizontal: padding }]}>
         {hand.map((card, index) => (
-          <View
+          <Animated.View
             key={card.id}
+            entering={FadeInDown.delay(index * 35).duration(280)}
             style={[
               styles.cardWrapper,
               { 
@@ -87,7 +89,7 @@ export function PlayerHand({
               selected={selectedCard?.id === card.id}
               size="small"
             />
-          </View>
+          </Animated.View>
         ))}
       </View>
     </View>

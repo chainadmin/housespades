@@ -4,9 +4,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import * as SecureStore from 'expo-secure-store';
 import { useColors } from '@/hooks/useColorScheme';
 import { GameMode, PointGoal } from '@/constants/game';
 import { authenticatedFetch, getStoredUser, User } from '@/lib/auth';
+import { Tutorial } from '@/components/Tutorial';
+
+const TUTORIAL_SEEN_KEY = 'house_spades_tutorial_seen';
 
 const logoImage = require('@/assets/house-card-logo.png');
 const chainLogo = require('@/assets/chain-logo.jpg');
@@ -19,10 +23,21 @@ export default function HomeScreen() {
   const [user, setUser] = useState<User | null>(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   useEffect(() => {
     fetchUserProfile();
+    SecureStore.getItemAsync(TUTORIAL_SEEN_KEY)
+      .then((seen) => {
+        if (!seen) setShowTutorial(true);
+      })
+      .catch(() => {});
   }, []);
+
+  const handleTutorialClose = () => {
+    setShowTutorial(false);
+    SecureStore.setItemAsync(TUTORIAL_SEEN_KEY, 'true').catch(() => {});
+  };
 
   const fetchUserProfile = async () => {
     try {
@@ -264,6 +279,8 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
       </View>
+
+      <Tutorial visible={showTutorial} onClose={handleTutorialClose} />
     </SafeAreaView>
   );
 }

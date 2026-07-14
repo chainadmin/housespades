@@ -1,0 +1,2 @@
+- [Mobile toolchain quirks](mobile-toolchain.md) — bash blocks npm/npx in this workspace; run mobile installs/tsc via code_execution with full nix node path.
+- [Sound playback readiness](sound-init-races.md) — async audio init must queue early play calls or first-round cues get dropped; effect deps must include every value the effect reads.

@@ -13,7 +13,7 @@
       "backgroundColor": "#121212"
     },
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.housespades.app",
       "buildNumber": "38",
       "icon": "./assets/icon.png",

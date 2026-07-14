@@ -1,5 +1,12 @@
 import { View, StyleSheet } from 'react-native';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import Animated, {
+  FadeOut,
+  SlideInUp,
+  SlideInDown,
+  SlideInLeft,
+  SlideInRight,
+  ZoomIn,
+} from 'react-native-reanimated';
 import { Trick, Position, Player } from '@/constants/game';
 import { PlayingCard } from './PlayingCard';
 
@@ -15,6 +22,13 @@ const POSITION_STYLES: Record<Position, object> = {
   west: { left: 0, top: '50%', transform: [{ translateY: -42 }] },
 };
 
+const ENTER_ANIMATIONS: Record<Position, typeof SlideInUp> = {
+  north: SlideInUp,
+  south: SlideInDown,
+  east: SlideInRight,
+  west: SlideInLeft,
+};
+
 export function TrickArea({ currentTrick, players }: TrickAreaProps) {
   const getPlayerPosition = (playerId: string): Position => {
     const player = players.find((p) => p.id === playerId);
@@ -26,19 +40,26 @@ export function TrickArea({ currentTrick, players }: TrickAreaProps) {
       {currentTrick.cards.map(({ playerId, card }) => {
         const position = getPlayerPosition(playerId);
         const isWinner = currentTrick.winnerId === playerId;
+        const Entering = ENTER_ANIMATIONS[position];
 
         return (
           <Animated.View
             key={card.id}
-            entering={FadeIn.duration(300)}
-            exiting={FadeOut.duration(300)}
+            entering={Entering.springify().damping(18).stiffness(180)}
+            exiting={FadeOut.duration(250)}
             style={[
               styles.cardPosition,
               POSITION_STYLES[position],
               isWinner && styles.winnerCard,
             ]}
           >
-            <PlayingCard card={card} size="medium" />
+            {isWinner ? (
+              <Animated.View entering={ZoomIn.duration(200)}>
+                <PlayingCard card={card} size="medium" />
+              </Animated.View>
+            ) : (
+              <PlayingCard card={card} size="medium" />
+            )}
           </Animated.View>
         );
       })}
@@ -58,8 +79,9 @@ const styles = StyleSheet.create({
   winnerCard: {
     shadowColor: '#22c55e',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
+    shadowOpacity: 0.6,
+    shadowRadius: 12,
     elevation: 10,
+    zIndex: 10,
   },
 });

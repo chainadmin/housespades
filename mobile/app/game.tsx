@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity, Text } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import * as Haptics from 'expo-haptics';
+import Animated, { ZoomIn } from 'react-native-reanimated';
 import { useColors } from '@/hooks/useColorScheme';
 import { getStoredUser } from '@/lib/auth';
 import { useWebSocket } from '@/hooks/useWebSocket';
@@ -26,6 +27,7 @@ import { BiddingPanel } from '@/components/BiddingPanel';
 import { Scoreboard } from '@/components/Scoreboard';
 import { AdBanner } from '@/components/AdBanner';
 import { useAds } from '@/hooks/useAds';
+import { initSounds, playSound } from '@/lib/sound';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -88,6 +90,10 @@ export default function GameScreen() {
   }, [gameState?.currentPlayerIndex, gameState?.roundNumber, gameState?.phase]);
 
   useEffect(() => {
+    initSounds();
+  }, []);
+
+  useEffect(() => {
     isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
@@ -115,10 +121,34 @@ export default function GameScreen() {
     if (winnerId && winnerId !== lastTrickWinnerRef.current) {
       lastTrickWinnerRef.current = winnerId;
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+      playSound('trick-win');
     } else if (!winnerId) {
       lastTrickWinnerRef.current = null;
     }
   }, [gameState?.currentTrick?.winnerId]);
+
+  const prevTrickCountRef = useRef(0);
+  useEffect(() => {
+    const count = gameState?.currentTrick?.cards.length ?? 0;
+    if (count > prevTrickCountRef.current) {
+      playSound('card-play');
+    }
+    prevTrickCountRef.current = count;
+  }, [gameState?.currentTrick?.cards.length]);
+
+  const prevIsMyTurnRef = useRef(false);
+  useEffect(() => {
+    if (!gameState) return;
+    const current = gameState.players[gameState.currentPlayerIndex];
+    const myTurnNow =
+      current?.id === playerId &&
+      (gameState.phase === 'playing' || gameState.phase === 'bidding') &&
+      gameState.currentTrick.cards.length < 4;
+    if (myTurnNow && !prevIsMyTurnRef.current) {
+      playSound('your-turn');
+    }
+    prevIsMyTurnRef.current = myTurnNow;
+  }, [gameState?.currentPlayerIndex, gameState?.phase, gameState?.currentTrick?.cards.length, playerId]);
 
   const GAME_STATE_KEY = 'house_spades_game_state';
 
@@ -414,6 +444,7 @@ export default function GameScreen() {
 
   const handleBid = useCallback((bid: number) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    playSound('bid');
     if (isMultiplayer) {
       if (!isConnected) {
         return;
@@ -622,6 +653,11 @@ export default function GameScreen() {
     if (isGameOver && !wasGameOver && !gameCompletedRef.current) {
       gameCompletedRef.current = true;
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      const state = gameStateRef.current;
+      if (state) {
+        const winningTeam = state.teams.find(t => t.score >= state.winningScore);
+        playSound(winningTeam?.players.includes(playerId) ? 'win' : 'lose');
+      }
       recordGameCompleted();
       
       const handleGameOver = async () => {
@@ -645,6 +681,7 @@ export default function GameScreen() {
     if (currentPhase === 'bidding' && previousPhaseRef.current !== 'bidding') {
       gameCompletedRef.current = false;
       setShowGameOverModal(false);
+      playSound('card-deal');
     }
     
     previousPhaseRef.current = currentPhase || null;
@@ -827,7 +864,7 @@ export default function GameScreen() {
         onRequestClose={() => {}}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <Animated.View entering={ZoomIn.springify().damping(16)} style={[styles.modalContent, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <Ionicons 
               name="trophy" 
               size={64} 
@@ -884,7 +921,7 @@ export default function GameScreen() {
                 Return Home
               </Text>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
         </View>
       </Modal>
     </SafeAreaView>

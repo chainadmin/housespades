@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Alert, Linking, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Alert, Linking, ActivityIndicator, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
 import { authenticatedFetch, clearAuth, getStoredUser } from '@/lib/auth';
 import Constants from 'expo-constants';
+import { getSoundMuted, setSoundMuted } from '@/lib/sound';
+import { Tutorial } from '@/components/Tutorial';
 
 const PRIVACY_POLICY_URL = 'https://house-spades.com/privacy';
 const TERMS_OF_SERVICE_URL = 'https://house-spades.com/terms';
@@ -17,10 +19,18 @@ export default function SettingsScreen() {
   const [deleteText, setDeleteText] = useState('');
   const [deleting, setDeleting] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   useEffect(() => {
     getStoredUser().then(user => setIsLoggedIn(!!user));
+    getSoundMuted().then(muted => setSoundEnabled(!muted));
   }, []);
+
+  const handleToggleSound = (value: boolean) => {
+    setSoundEnabled(value);
+    setSoundMuted(!value);
+  };
 
   const openURL = async (url: string) => {
     try {
@@ -77,6 +87,34 @@ export default function SettingsScreen() {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Preferences</Text>
+          <View style={[styles.menuItem, { backgroundColor: colors.card }]}>
+            <View style={styles.menuItemLeft}>
+              <Ionicons name="volume-high-outline" size={22} color={colors.text} />
+              <Text style={styles.menuItemText}>Sound Effects</Text>
+            </View>
+            <Switch
+              value={soundEnabled}
+              onValueChange={handleToggleSound}
+              trackColor={{ false: colors.muted, true: colors.primary }}
+              thumbColor="#ffffff"
+              testID="switch-sound"
+            />
+          </View>
+          <TouchableOpacity
+            style={[styles.menuItem, { backgroundColor: colors.card }]}
+            onPress={() => setShowTutorial(true)}
+            testID="button-how-to-play"
+          >
+            <View style={styles.menuItemLeft}>
+              <Ionicons name="school-outline" size={22} color={colors.text} />
+              <Text style={styles.menuItemText}>How to Play Tutorial</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+        </View>
+
         {!isLoggedIn && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Account</Text>
@@ -200,6 +238,8 @@ export default function SettingsScreen() {
           </View>
         </View>
       </ScrollView>
+
+      <Tutorial visible={showTutorial} onClose={() => setShowTutorial(false)} />
     </SafeAreaView>
   );
 }
