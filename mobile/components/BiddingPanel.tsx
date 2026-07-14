@@ -26,13 +26,14 @@ export function BiddingPanel({ onBid, isMyTurn, partnerBid, teamCurrentBid }: Bi
 
   return (
     <View style={[styles.container, { backgroundColor: colors.card }]}>
-      <Text style={[styles.title, { color: colors.text }]}>Your Bid</Text>
-      
-      {partnerBid !== null && (
-        <Text style={[styles.partnerBid, { color: colors.textSecondary }]}>
-          Partner bid: {partnerBid} | Team total: {teamCurrentBid + (selectedBid || 0)}
-        </Text>
-      )}
+      <View style={styles.headerRow}>
+        <Text style={[styles.title, { color: colors.text }]}>Your Bid</Text>
+        {partnerBid !== null && (
+          <Text style={[styles.partnerBid, { color: colors.textSecondary }]}>
+            Partner: {partnerBid} | Team: {teamCurrentBid + (selectedBid || 0)}
+          </Text>
+        )}
+      </View>
 
       <ScrollView 
         horizontal 
@@ -80,31 +81,37 @@ export function BiddingPanel({ onBid, isMyTurn, partnerBid, teamCurrentBid }: Bi
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
     borderRadius: 16,
     alignItems: 'center',
-    gap: 12,
+    gap: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 5,
   },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 10,
+  },
   title: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   partnerBid: {
-    fontSize: 14,
+    fontSize: 13,
   },
   bidsContainer: {
     gap: 8,
     paddingHorizontal: 4,
   },
   bidButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
@@ -116,9 +123,8 @@ const styles = StyleSheet.create({
   },
   confirmButton: {
     paddingHorizontal: 32,
-    paddingVertical: 12,
+    paddingVertical: 10,
     borderRadius: 24,
-    marginTop: 8,
   },
   confirmText: {
     fontSize: 16,

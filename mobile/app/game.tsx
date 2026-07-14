@@ -804,16 +804,7 @@ export default function GameScreen() {
           )}
 
           <View style={styles.centerArea}>
-            {gameState.phase === 'bidding' && isMyTurn ? (
-              <BiddingPanel
-                onBid={handleBid}
-                isMyTurn={isMyTurn}
-                partnerBid={partner?.bid || null}
-                teamCurrentBid={partner?.bid || 0}
-              />
-            ) : (
-              <TrickArea currentTrick={gameState.currentTrick} players={gameState.players} />
-            )}
+            <TrickArea currentTrick={gameState.currentTrick} players={gameState.players} />
           </View>
 
           {eastPlayer && (
@@ -823,6 +814,17 @@ export default function GameScreen() {
           )}
         </View>
       </View>
+
+      {gameState.phase === 'bidding' && isMyTurn && (
+        <View style={styles.biddingContainer}>
+          <BiddingPanel
+            onBid={handleBid}
+            isMyTurn={isMyTurn}
+            partnerBid={partner?.bid || null}
+            teamCurrentBid={partner?.bid || 0}
+          />
+        </View>
+      )}
 
       {myPlayer && (
         <View style={styles.handContainer}>
@@ -986,6 +988,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  biddingContainer: {
+    paddingHorizontal: 8,
+    paddingBottom: 8,
   },
   handContainer: {
     paddingBottom: 8,
