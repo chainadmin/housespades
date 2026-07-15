@@ -765,7 +765,7 @@ export default function GameScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'left', 'right', 'bottom']}>
       <ImageBackground source={feltBackground} style={styles.feltBackground} resizeMode="cover" imageStyle={styles.feltImage}>
       <View style={styles.header}>
         <TouchableOpacity 
