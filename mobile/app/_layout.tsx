@@ -130,21 +130,25 @@ export default function RootLayout() {
         <Stack
           screenOptions={{
             headerShown: false,
+            animation: 'fade_from_bottom',
+            animationDuration: 220,
+            gestureEnabled: true,
+            fullScreenGestureEnabled: true,
             contentStyle: {
               backgroundColor: colorScheme === 'dark' ? '#121212' : '#ffffff',
             },
           }}
         >
-          <Stack.Screen name="index" />
-          <Stack.Screen name="auth/login" />
-          <Stack.Screen name="auth/signup" />
-          <Stack.Screen name="auth/forgot-password" />
-          <Stack.Screen name="game" />
-          <Stack.Screen name="matchmaking" />
-          <Stack.Screen name="profile" />
-          <Stack.Screen name="settings" />
-          <Stack.Screen name="match-history" />
-          <Stack.Screen name="leaderboard" />
+          <Stack.Screen name="index" options={{ animation: 'fade' }} />
+          <Stack.Screen name="auth/login" options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="auth/signup" options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="auth/forgot-password" options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="game" options={{ animation: 'fade', gestureEnabled: false }} />
+          <Stack.Screen name="matchmaking" options={{ animation: 'fade_from_bottom' }} />
+          <Stack.Screen name="profile" options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="settings" options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="match-history" options={{ animation: 'slide_from_right' }} />
+          <Stack.Screen name="leaderboard" options={{ animation: 'slide_from_right' }} />
         </Stack>
         <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
       </SafeAreaProvider>

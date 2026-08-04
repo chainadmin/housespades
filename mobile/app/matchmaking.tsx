@@ -7,7 +7,8 @@ import Animated, {
   withRepeat, 
   withTiming,
   useSharedValue,
-  Easing 
+  Easing,
+  FadeIn,
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
@@ -44,7 +45,7 @@ export default function MatchmakingScreen() {
       
       setTimeout(() => {
         router.replace(`/game?mode=${params.mode}&points=${params.points}&type=multiplayer&gameId=${gameId}`);
-      }, 1000);
+      }, 450);
     },
     onAuthenticated: () => {
       setIsAuthenticated(true);
@@ -177,7 +178,8 @@ export default function MatchmakingScreen() {
   const styles = createStyles(colors);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <Animated.View entering={FadeIn.duration(220)} style={styles.container}>
+      <SafeAreaView style={styles.container}>
       <TouchableOpacity style={styles.closeButton} onPress={handleCancel}>
         <Ionicons name="close" size={28} color={colors.text} />
       </TouchableOpacity>
@@ -271,7 +273,8 @@ export default function MatchmakingScreen() {
       <View style={styles.adContainer}>
         <AdBanner />
       </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </Animated.View>
   );
 }
 
