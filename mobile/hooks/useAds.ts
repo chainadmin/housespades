@@ -5,7 +5,6 @@ import {
   AdEventType,
   TestIds
 } from 'react-native-google-mobile-ads';
-import { useATT } from './useATT';
 
 const INTERSTITIAL_AD_UNIT_ID = __DEV__ 
   ? TestIds.INTERSTITIAL 
@@ -38,7 +37,10 @@ interface UseAdsReturn {
 
 export function useAds(): UseAdsReturn {
   const hasRemoveAds = false;
-  const { isTrackingAllowed, requestTracking, canRequestTracking } = useATT();
+  // House Spades configures AdMob as child-directed/under-age-of-consent in
+  // _layout.tsx. Keep every request non-personalized rather than requesting
+  // App Tracking Transparency permission for an identifier we do not need.
+  const isTrackingAllowed = false;
   const [isAdLoaded, setIsAdLoaded] = useState(false);
   const [isAdLoading, setIsAdLoading] = useState(false);
   const [gamesPlayed, setGamesPlayed] = useState(0);
@@ -62,11 +64,6 @@ export function useAds(): UseAdsReturn {
     if (hasRemoveAds || isAdLoading || isAdLoaded) {
       if (__DEV__) console.log('[Ads] Skip load - hasRemoveAds:', hasRemoveAds, 'isAdLoading:', isAdLoading, 'isAdLoaded:', isAdLoaded);
       return;
-    }
-
-    if (canRequestTracking) {
-      if (__DEV__) console.log('[Ads] Requesting tracking permission...');
-      await requestTracking();
     }
 
     setIsAdLoading(true);
@@ -129,7 +126,7 @@ export function useAds(): UseAdsReturn {
       if (__DEV__) console.error('[Ads] Failed to create interstitial ad:', err);
       setIsAdLoading(false);
     }
-  }, [hasRemoveAds, isAdLoading, isAdLoaded, isTrackingAllowed, canRequestTracking, requestTracking]);
+  }, [hasRemoveAds, isAdLoading, isAdLoaded, isTrackingAllowed]);
 
   const showInterstitialAd = useCallback(async (): Promise<boolean> => {
     if (hasRemoveAds) return false;
