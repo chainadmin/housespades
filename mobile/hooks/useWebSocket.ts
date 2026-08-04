@@ -82,6 +82,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [gameState, setGameState] = useState<GameState | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const reconnectAttemptRef = useRef(0);
+  const pendingMessagesRef = useRef<Map<string, WSMessage>>(new Map());
   const intentionalDisconnectRef = useRef(false);
   const optionsRef = useRef(options);
   
@@ -108,6 +110,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         return;
       }
       setIsConnected(true);
+      reconnectAttemptRef.current = 0;
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
         reconnectTimeoutRef.current = null;
@@ -120,6 +123,13 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         }));
         if (__DEV__) console.log('[WebSocket] Sent authenticate message for user', optionsRef.current.userId);
       }
+
+      // Gameplay actions made during a brief network interruption are retained
+      // and sent in order as soon as the socket is healthy again.
+      pendingMessagesRef.current.forEach((message) => {
+        ws.send(JSON.stringify(message));
+      });
+      pendingMessagesRef.current.clear();
     };
 
     ws.onmessage = (event) => {
@@ -162,10 +172,12 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       if (intentionalDisconnectRef.current) return;
       
       if (!reconnectTimeoutRef.current) {
+        const attempt = reconnectAttemptRef.current++;
+        const delay = Math.min(8000, 750 * 2 ** attempt) + Math.random() * 250;
         reconnectTimeoutRef.current = setTimeout(() => {
           reconnectTimeoutRef.current = null;
           connect();
-        }, 2000);
+        }, delay);
       }
     };
 
@@ -184,12 +196,17 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       wsRef.current.close();
       wsRef.current = null;
     }
+    pendingMessagesRef.current.clear();
+    reconnectAttemptRef.current = 0;
   }, []);
 
   const sendMessage = useCallback((message: WSMessage) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify(message));
       return true;
+    }
+    if (message.type === 'place_bid' || message.type === 'play_card') {
+      pendingMessagesRef.current.set(message.type, message);
     }
     return false;
   }, []);
@@ -211,19 +228,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       type: 'place_bid',
       payload: { bid },
     });
-    if (!sent) {
-      if (__DEV__) console.error('[WebSocket] Failed to send bid - WebSocket not open, retrying...');
-      setTimeout(() => {
-        const retrySent = sendMessage({
-          type: 'place_bid',
-          payload: { bid },
-        });
-        if (!retrySent) {
-          if (__DEV__) console.error('[WebSocket] Retry failed - WebSocket still not open');
-          optionsRef.current.onError?.('Connection lost. Please wait for reconnection.');
-        }
-      }, 1000);
-    }
+    if (!sent && __DEV__) console.log('[WebSocket] Bid queued until reconnection');
   }, [sendMessage]);
 
   const playCard = useCallback((cardId: string) => {
@@ -232,19 +237,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       type: 'play_card',
       payload: { cardId },
     });
-    if (!sent) {
-      if (__DEV__) console.error('[WebSocket] Failed to send play_card - WebSocket not open, retrying...');
-      setTimeout(() => {
-        const retrySent = sendMessage({
-          type: 'play_card',
-          payload: { cardId },
-        });
-        if (!retrySent) {
-          if (__DEV__) console.error('[WebSocket] Retry failed - WebSocket still not open');
-          optionsRef.current.onError?.('Connection lost. Please wait for reconnection.');
-        }
-      }, 1000);
-    }
+    if (!sent && __DEV__) console.log('[WebSocket] Card play queued until reconnection');
   }, [sendMessage]);
 
   const leaveLobby = useCallback(() => {

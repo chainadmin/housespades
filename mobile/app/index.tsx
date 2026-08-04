@@ -9,6 +9,7 @@ import { useColors } from '@/hooks/useColorScheme';
 import { GameMode, PointGoal } from '@/constants/game';
 import { authenticatedFetch, getStoredUser, User } from '@/lib/auth';
 import { Tutorial } from '@/components/Tutorial';
+import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
 
 const TUTORIAL_SEEN_KEY = 'house_spades_tutorial_seen';
 
@@ -109,7 +110,7 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
+        <Animated.View entering={FadeIn.duration(250)} style={styles.header}>
           <View style={styles.logoRow}>
             <Image source={logoImage} style={styles.logoImage} resizeMode="contain" />
             <Text style={styles.title}>House Spades</Text>
@@ -138,7 +139,7 @@ export default function HomeScreen() {
               <Ionicons name="person-circle-outline" size={28} color={colors.text} />
             </TouchableOpacity>
           </View>
-        </View>
+        </Animated.View>
 
         {user && (
           <View style={styles.statsBar}>
@@ -174,17 +175,22 @@ export default function HomeScreen() {
           </TouchableOpacity>
         )}
 
-        <View style={styles.heroSection}>
+        <Animated.View entering={FadeInDown.delay(60).duration(320)} style={styles.heroSection}>
+          <View style={styles.eyebrowRow}>
+            <View style={styles.liveDot} />
+            <Text style={styles.eyebrow}>READY TO DEAL</Text>
+          </View>
           <Text style={styles.heroTitle}>Welcome{user ? `, ${user.username}` : ''}</Text>
           <Text style={styles.heroSubtitle}>
             {user 
               ? 'Pick your settings below and tap Play.' 
               : 'Play solo against bots or sign in to compete online.'}
           </Text>
-        </View>
+        </Animated.View>
 
+        <Animated.View entering={FadeInDown.delay(120).duration(320)}>
         <TouchableOpacity
-          style={[styles.howToPlayHeader, { backgroundColor: colors.card }]}
+          style={styles.howToPlayHeader}
           onPress={() => setShowHowToPlay(v => !v)}
           activeOpacity={0.7}
           testID="button-toggle-howtoplay"
@@ -214,10 +220,11 @@ export default function HomeScreen() {
             </View>
           </View>
         )}
+        </Animated.View>
       </ScrollView>
 
       {/* Bottom-anchored options + play */}
-      <View style={[styles.bottomBar, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      <Animated.View entering={FadeInDown.delay(160).duration(360)} style={[styles.bottomBar, { backgroundColor: colors.card, borderColor: colors.border }]}>
         <View style={styles.optionsRow}>
           <View style={styles.optionGroup}>
             <Text style={styles.optionLabel}>Mode</Text>
@@ -278,7 +285,7 @@ export default function HomeScreen() {
             </Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </Animated.View>
 
       <Tutorial visible={showTutorial} onClose={handleTutorialClose} />
     </SafeAreaView>
@@ -321,7 +328,14 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       gap: 4,
     },
     iconButton: {
-      padding: 8,
+      width: 40,
+      height: 40,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: 12,
+      backgroundColor: colors.card,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
     },
     statsBar: {
       flexDirection: 'row',
@@ -385,7 +399,27 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       marginTop: 2,
     },
     heroSection: {
-      marginBottom: 16,
+      marginTop: 12,
+      marginBottom: 20,
+      paddingVertical: 8,
+    },
+    eyebrowRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 7,
+      marginBottom: 8,
+    },
+    liveDot: {
+      width: 7,
+      height: 7,
+      borderRadius: 4,
+      backgroundColor: colors.success,
+    },
+    eyebrow: {
+      color: colors.textTertiary,
+      fontSize: 11,
+      fontWeight: '700',
+      letterSpacing: 1.2,
     },
     heroTitle: {
       fontSize: 28,
@@ -405,6 +439,9 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       padding: 14,
       borderRadius: 12,
       marginBottom: 8,
+      backgroundColor: 'transparent',
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
     },
     howToPlayHeaderText: {
       fontSize: 15,
@@ -429,7 +466,10 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       color: colors.text,
     },
     bottomBar: {
-      borderTopWidth: 1,
+      borderWidth: 1,
+      borderRadius: 20,
+      marginHorizontal: 12,
+      marginBottom: 10,
       paddingHorizontal: 16,
       paddingTop: 12,
       paddingBottom: 16,
