@@ -1,4 +1,4 @@
-# House Spades — App Review Notes (v2.1.0 / iOS build 37)
+# House Spades — App Review Notes (v2.1.0 / iOS build 39)
 
 Thank you for reviewing House Spades. This update directly addresses the prior 4.2 (Minimum Functionality) feedback by clearly differentiating the app from a web browser experience.
 
@@ -9,9 +9,8 @@ It uses the following native iOS APIs and SDKs that are not available in a stand
 - **Haptic feedback** (Core Haptics via `expo-haptics`) — fires on bid placement, card play, trick win, share action, and game-over moments.
 - **Native share sheet** (`UIActivityViewController` via React Native's `Share` API) — players can share match results from the game-over screen.
 - **Secure Keychain storage** (`expo-secure-store`) — session credentials stored in iOS Keychain, not cookies.
-- **AdMob SDK** (`react-native-google-mobile-ads`) — native banner and interstitial ads with App Tracking Transparency (`NSUserTrackingUsageDescription` shown in-context). Family-friendly settings: `maxAdContentRating: G`, `tagForChildDirectedTreatment: true`.
+- **AdMob SDK** (`react-native-google-mobile-ads`) — native banner and interstitial ads. All requests are non-personalized and the SDK is configured with `maxAdContentRating: G`, `tagForChildDirectedTreatment: true`, and `tagForUnderAgeOfConsent: true`. The app does not request App Tracking Transparency permission or use IDFA.
 - **Native WebSocket** for real-time multiplayer (game state, matchmaking, live opponent moves) — not HTTP polling.
-- **App Tracking Transparency** prompt with proper usage description.
 - **Native gestures** via `react-native-gesture-handler` and reanimated card animations.
 - **Offline solo play** — full Spades logic runs entirely on-device with no network required (try airplane mode + tap Play).
 
@@ -35,8 +34,8 @@ It uses the following native iOS APIs and SDKs that are not available in a stand
 ## Demo account
 
 Username: `appreviewer`
-Password: (provided in App Store Connect "App Review Information" notes)
+Password: (enter the working password in App Store Connect "App Review Information")
 
-If a demo account is not provisioned, please create one — the registration flow is one screen and email verification is not required.
+The reviewer account must be provisioned and tested against the production server before submission. It provides access to profile, matchmaking, leaderboard, and match-history features. Solo play remains available without signing in.
 
 Thanks again for your time.

@@ -18,7 +18,6 @@
       "buildNumber": "40",
       "icon": "./assets/icon.png",
       "infoPlist": {
-        "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you. You can still use the app with non-personalized ads if you decline.",
         "SKAdNetworkItems": [
           { "SKAdNetworkIdentifier": "cstr6suwn9.skadnetwork" },
           { "SKAdNetworkIdentifier": "4fzdc2evr5.skadnetwork" },
@@ -90,12 +89,6 @@
       "expo-router",
       "expo-secure-store",
       "./plugins/withGooglePlayBilling",
-      [
-        "expo-tracking-transparency",
-        {
-          "userTrackingPermission": "This identifier will be used to deliver personalized ads to you."
-        }
-      ],
       [
         "expo-build-properties",
         {
