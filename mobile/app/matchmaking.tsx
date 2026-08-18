@@ -165,7 +165,7 @@ export default function MatchmakingScreen() {
       case 'connecting': return 'Connecting to server...';
       case 'authenticating': return 'Authenticating...';
       case 'joining': return 'Joining matchmaking queue...';
-      case 'searching': return 'Searching for opponents...';
+      case 'searching': return 'Searching for opponents... Computer players (marked "BOT") fill any empty seats after about 10 seconds.';
       case 'found': return 'Match found! Starting game...';
       case 'error': return errorMessage || 'Something went wrong';
     }
@@ -238,6 +238,9 @@ export default function MatchmakingScreen() {
           </Text>
           <Text style={styles.modeLabel}>Goal</Text>
           <Text style={styles.modeValue}>{params.points} Points</Text>
+          <Text style={styles.modeLabel}>
+            If no human opponents are available, seats are filled by computer players clearly labeled "BOT" in-game.
+          </Text>
         </View>
       </View>
 

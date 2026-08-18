@@ -32,6 +32,11 @@ export function PlayerZone({ player, position, isCurrentTurn, teamColor }: Playe
             <Text style={[styles.nameSmall, { color: colors.text }]} numberOfLines={2}>
               {player.name}
             </Text>
+            {player.isBot && (
+              <View style={[styles.botBadgeSmall, { backgroundColor: colors.muted }]}>
+                <Text style={[styles.botBadgeTextSmall, { color: colors.textSecondary }]}>BOT</Text>
+              </View>
+            )}
             {player.bid !== null && (
               <Text style={[styles.bidSmall, { color: colors.textSecondary }]}>
                 {player.bid}/{player.tricks}
@@ -69,9 +74,16 @@ export function PlayerZone({ player, position, isCurrentTurn, teamColor }: Playe
           <Text style={styles.avatarText}>{player.name.charAt(0)}</Text>
         </View>
         <View style={styles.nameContainer}>
-          <Text style={[styles.name, { color: colors.text }]}>
-            {player.name}
-          </Text>
+          <View style={styles.nameRow}>
+            <Text style={[styles.name, { color: colors.text }]}>
+              {player.name}
+            </Text>
+            {player.isBot && (
+              <View style={[styles.botBadge, { backgroundColor: colors.muted }]}>
+                <Text style={[styles.botBadgeText, { color: colors.textSecondary }]}>BOT</Text>
+              </View>
+            )}
+          </View>
           {player.bid !== null && (
             <Text style={[styles.bid, { color: colors.textSecondary }]}>
               Bid: {player.bid} | Books: {player.tricks}
@@ -210,6 +222,32 @@ const styles = StyleSheet.create({
   },
   nameContainer: {
     alignItems: 'flex-start',
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  botBadge: {
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderRadius: 4,
+  },
+  botBadgeText: {
+    fontSize: 8,
+    fontWeight: 'bold',
+    letterSpacing: 0.5,
+  },
+  botBadgeSmall: {
+    paddingHorizontal: 3,
+    paddingVertical: 1,
+    borderRadius: 3,
+    marginTop: 2,
+  },
+  botBadgeTextSmall: {
+    fontSize: 7,
+    fontWeight: 'bold',
+    letterSpacing: 0.5,
   },
   name: {
     fontWeight: '600',

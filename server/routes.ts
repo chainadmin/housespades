@@ -341,26 +341,13 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Missing purchase data" });
       }
 
-      // TODO: Verify receipt with Google Play or Apple App Store
-      // For now, we'll trust the mobile app's verification
-      // In production, implement server-side receipt validation:
+      // Purchases are disabled until server-side receipt validation is implemented.
+      // Never grant entitlements from an unverified client-supplied receipt:
       // - iOS: https://developer.apple.com/documentation/appstorereceipts
       // - Android: https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.products
-      
-      if (productId === "remove_ads") {
-        const updated = await storage.setRemoveAds(userId, true);
-        if (!updated) {
-          return res.status(400).json({ error: "Failed to update purchase" });
-        }
-        
-        return res.json({ 
-          success: true, 
-          message: "Ads removed successfully",
-          removeAds: true 
-        });
-      }
-
-      res.status(400).json({ error: "Unknown product" });
+      return res.status(501).json({
+        error: "Purchases are not available yet",
+      });
     } catch (error) {
       console.error("Purchase verification error:", error);
       res.status(500).json({ error: "Failed to verify purchase" });

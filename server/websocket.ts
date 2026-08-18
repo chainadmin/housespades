@@ -22,6 +22,7 @@ interface GameRoom {
   statsSaved: boolean;
   isRanked: boolean;
   botDifficulty: BotDifficulty;
+  idleCounts: Map<string, number>;
 }
 
 const IDLE_TIMEOUT_MS = 60000; // 60 seconds idle timeout for human players
@@ -89,6 +90,7 @@ export class GameWebSocketServer {
         clients: new Map(),
         botTimer: null,
         idleTimer: null,
+        idleCounts: new Map(),
         statsSaved: false,
         isRanked,
         botDifficulty,
@@ -290,6 +292,7 @@ export class GameWebSocketServer {
         clients: new Map(),
         botTimer: null,
         idleTimer: null,
+        idleCounts: new Map(),
         statsSaved: false,
         isRanked,
         botDifficulty,
@@ -329,6 +332,7 @@ export class GameWebSocketServer {
 
     try {
       room.gameState = GameEngine.placeBid(room.gameState, client.playerId, payload.bid);
+      room.idleCounts.delete(client.playerId);
       this.broadcastGameState(client.gameId);
       this.scheduleBotMove(client.gameId);
       this.scheduleIdleTimeout(client.gameId);
@@ -348,6 +352,7 @@ export class GameWebSocketServer {
     try {
       const playedCard = room.gameState.players.find(p => p.id === client.playerId)?.hand.find(c => c.id === payload.cardId);
       room.gameState = GameEngine.playCard(room.gameState, client.playerId, payload.cardId);
+      room.idleCounts.delete(client.playerId);
       if (playedCard) BotAI.trackCard(client.gameId, playedCard);
       this.broadcastGameState(client.gameId);
 
@@ -454,14 +459,11 @@ export class GameWebSocketServer {
 
     const quitterUserId = (player as any).userId as number | undefined;
 
-    const botNames = ["SpadeMaster", "TrickTaker", "CardShark", "AceHunter", "BotPlayer"];
-    const usedNames = new Set(room.gameState.players.map(p => p.name));
-    let botName = botNames.find(name => !usedNames.has(name)) || `Bot${Date.now()}`;
+    console.log(`[Game ${gameId}] Player ${player.name} disconnected, bot taking over their seat`);
 
-    console.log(`[Game ${gameId}] Player ${player.name} disconnected, replacing with bot ${botName}`);
-
+    // Keep the original name visible so other players can see a bot took over
+    // for this person; the isBot flag drives a visible "BOT" badge in the UI.
     player.isBot = true;
-    player.name = botName;
     (player as any).userId = undefined;
 
     // Apply quit penalty for ranked games (-30 rating)
@@ -576,7 +578,18 @@ export class GameWebSocketServer {
       const player = state.players[state.currentPlayerIndex];
       if (!player || player.isBot) return;
 
-      console.log(`[Idle Timeout] Player ${player.name} timed out, auto-playing`);
+      const missedTurns = (currentRoom.idleCounts.get(player.id) || 0) + 1;
+      currentRoom.idleCounts.set(player.id, missedTurns);
+
+      // After two consecutive missed turns, hand the seat to a clearly
+      // labeled bot instead of continuing to auto-play for a human.
+      if (missedTurns >= 2) {
+        console.log(`[Idle Timeout] Player ${player.name} missed ${missedTurns} consecutive turns, bot taking over seat`);
+        this.replacePlayerWithBot(gameId, player.id);
+        return;
+      }
+
+      console.log(`[Idle Timeout] Player ${player.name} timed out, auto-playing (missed turn ${missedTurns})`);
 
       try {
         const diff = currentRoom.botDifficulty;

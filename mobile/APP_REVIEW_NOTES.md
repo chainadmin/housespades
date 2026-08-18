@@ -1,42 +1,37 @@
-# House Spades — App Review Notes (v2.1.0 / iOS build 37)
+# House Spades — App Review Notes (v2.1.1 / iOS build 40)
 
-Thank you for reviewing House Spades. This update directly addresses the prior 4.2 (Minimum Functionality) feedback by clearly differentiating the app from a web browser experience.
+Thank you for reviewing House Spades. This update responds directly to the Guideline 5.6 feedback by making every automated behavior in the app fully transparent to users. Nothing in the app is conditional on review status, account, region, date, or any remote flag — the build behaves identically for reviewers and for the public.
 
-## This is a fully native React Native (Expo) app, not a webview wrapper.
+## Transparency changes in this build
 
-It uses the following native iOS APIs and SDKs that are not available in a standard web browser:
+- **Computer opponents are clearly labeled.** Every computer-controlled player shows a visible "BOT" badge next to their name in the game UI, in both offline solo play and online multiplayer.
+- **Matchmaking discloses bot seat-filling up front.** The matchmaking screen tells players that if no human opponents are found, empty seats are filled by computer players (labeled "BOT") after about 10 seconds. This matches the actual server behavior.
+- **Turn timer is escalated transparently.** In online games, if a player doesn't act within 60 seconds their turn is auto-completed once; if they miss two consecutive turns, their seat is handed to a bot — keeping their name and gaining the visible "BOT" badge.
+- **Disconnections are visible.** If a human player disconnects mid-game, their seat is taken over by a bot after a short grace period. The player's original name stays visible and the seat gains the "BOT" badge, so everyone at the table can see exactly what happened.
+- **No purchases.** The in-app purchase endpoint has been disabled server-side; the app currently sells nothing and grants no entitlements. Ads are provided by AdMob with family-safe settings (`maxAdContentRating: G`, child-directed treatment) and an in-context App Tracking Transparency prompt.
 
-- **Haptic feedback** (Core Haptics via `expo-haptics`) — fires on bid placement, card play, trick win, share action, and game-over moments.
-- **Native share sheet** (`UIActivityViewController` via React Native's `Share` API) — players can share match results from the game-over screen.
-- **Secure Keychain storage** (`expo-secure-store`) — session credentials stored in iOS Keychain, not cookies.
-- **AdMob SDK** (`react-native-google-mobile-ads`) — native banner and interstitial ads with App Tracking Transparency (`NSUserTrackingUsageDescription` shown in-context). Family-friendly settings: `maxAdContentRating: G`, `tagForChildDirectedTreatment: true`.
-- **Native WebSocket** for real-time multiplayer (game state, matchmaking, live opponent moves) — not HTTP polling.
-- **App Tracking Transparency** prompt with proper usage description.
-- **Native gestures** via `react-native-gesture-handler` and reanimated card animations.
-- **Offline solo play** — full Spades logic runs entirely on-device with no network required (try airplane mode + tap Play).
+## What the app is
 
-## Distinctive features beyond a generic browser experience
+A fully native React Native (Expo) Spades card game — not a webview wrapper. Native iOS capabilities include haptic feedback (`expo-haptics`), the native share sheet, Keychain storage (`expo-secure-store`), native WebSocket multiplayer, native gestures/animations, and full offline solo play (works in airplane mode).
 
-- Two complete game modes with different rule engines: **Ace High** (classic Spades) and **Joker Joker Deuce Deuce** (custom variant with jokers, 2♠, and 2♦ in a custom trump hierarchy).
-- ELO-based ranking and matchmaking (8-tier bot AI scales with player rating).
-- Persistent local game state — solo games are saved automatically and resume after backgrounding.
-- Disconnection recovery overlay during multiplayer.
+Game features:
+- Two rule engines: **Ace High** (classic Spades) and **Joker Joker Deuce Deuce** (custom variant).
+- ELO-based ranking and matchmaking; bot AI scales with player rating.
+- Persistent local game state with automatic resume.
 - In-app account deletion (Guideline 5.1.1(v)).
 - Privacy Policy: https://house-spades.com/privacy
 - Terms of Service: https://house-spades.com/terms
 
 ## How to test online multiplayer
 
-1. Sign in (or create a free account).
+1. Sign in (or create a free account — one screen, no email verification).
 2. From the home screen, tap **Online**.
 3. Pick a mode and point goal.
-4. Bots fill any empty seats after ~30 seconds so you can experience a full match without needing other reviewers online.
+4. If no other humans are queued, seats are filled with clearly labeled bots after ~10 seconds, so you can experience a full match at any time.
 
 ## Demo account
 
 Username: `appreviewer`
 Password: (provided in App Store Connect "App Review Information" notes)
-
-If a demo account is not provisioned, please create one — the registration flow is one screen and email verification is not required.
 
 Thanks again for your time.
