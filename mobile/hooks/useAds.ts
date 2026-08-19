@@ -6,6 +6,7 @@ import {
   TestIds
 } from 'react-native-google-mobile-ads';
 import { useATT } from './useATT';
+import { getCachedRemoveAds, getStoredUser, refreshUserFromServer, subscribeToRemoveAds } from '@/lib/auth';
 
 const INTERSTITIAL_AD_UNIT_ID = __DEV__ 
   ? TestIds.INTERSTITIAL 
@@ -37,8 +38,24 @@ interface UseAdsReturn {
 }
 
 export function useAds(): UseAdsReturn {
-  const hasRemoveAds = false;
+  const [hasRemoveAds, setHasRemoveAds] = useState(getCachedRemoveAds());
   const { isTrackingAllowed, requestTracking, canRequestTracking } = useATT();
+
+  useEffect(() => {
+    let mounted = true;
+    // Seed from local storage, then confirm with the server
+    getStoredUser().then(user => {
+      if (mounted && user) setHasRemoveAds(!!user.removeAds);
+    });
+    refreshUserFromServer().catch(() => {});
+    const unsubscribe = subscribeToRemoveAds(value => {
+      if (mounted) setHasRemoveAds(value);
+    });
+    return () => {
+      mounted = false;
+      unsubscribe();
+    };
+  }, []);
   const [isAdLoaded, setIsAdLoaded] = useState(false);
   const [isAdLoading, setIsAdLoading] = useState(false);
   const [gamesPlayed, setGamesPlayed] = useState(0);

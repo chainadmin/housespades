@@ -7,6 +7,7 @@ import { sendPasswordResetEmail } from "./email";
 import bcrypt from "bcrypt";
 import { z } from "zod";
 import { sign as signCookie } from "cookie-signature";
+import { verifyRemoveAdsWithRevenueCat } from "./purchases";
 
 // Helper to generate signed session cookie for mobile apps
 // Must match express-session's cookie format exactly
@@ -33,6 +34,11 @@ const registerSchema = z.object({
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string(),
+});
+
+const purchaseVerifySchema = z.object({
+  platform: z.enum(["ios", "android"]),
+  productId: z.string().min(1),
 });
 
 export async function registerRoutes(
@@ -84,6 +90,7 @@ export async function registerRoutes(
           email: user.email,
           rating: user.rating,
           gamesPlayed: user.gamesPlayed,
+          removeAds: user.removeAds,
           gamesWon: user.gamesWon,
           sessionCookie, // Full signed cookie for mobile apps
         });
@@ -132,6 +139,7 @@ export async function registerRoutes(
           email: user.email,
           rating: user.rating,
           gamesPlayed: user.gamesPlayed,
+          removeAds: user.removeAds,
           gamesWon: user.gamesWon,
           sessionCookie, // Full signed cookie for mobile apps
         });
@@ -335,19 +343,31 @@ export async function registerRoutes(
         return res.status(401).json({ error: "Not authenticated" });
       }
 
-      const { platform, receipt, productId } = req.body;
-      
-      if (!platform || !receipt || !productId) {
+      const parsed = purchaseVerifySchema.safeParse(req.body);
+      if (!parsed.success) {
         return res.status(400).json({ error: "Missing purchase data" });
       }
+      const { platform } = parsed.data;
 
-      // Purchases are disabled until server-side receipt validation is implemented.
-      // Never grant entitlements from an unverified client-supplied receipt:
-      // - iOS: https://developer.apple.com/documentation/appstorereceipts
-      // - Android: https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.products
-      return res.status(501).json({
-        error: "Purchases are not available yet",
-      });
+      // Never grant entitlements from a client-supplied receipt. The mobile
+      // app purchases through RevenueCat (app user ID = our user id), and we
+      // verify server-to-server with RevenueCat, which validates receipts
+      // with Apple / Google.
+      const result = await verifyRemoveAdsWithRevenueCat(String(userId), platform);
+      if (!result.ok) {
+        return res.status(result.status ?? 502).json({ error: result.error ?? "Receipt validation failed" });
+      }
+
+      if (!result.entitled) {
+        return res.status(402).json({ error: "No valid remove-ads purchase found for this account" });
+      }
+
+      const updated = await storage.setRemoveAds(userId, true);
+      if (!updated) {
+        return res.status(500).json({ error: "Failed to update account" });
+      }
+
+      res.json({ success: true, removeAds: true });
     } catch (error) {
       console.error("Purchase verification error:", error);
       res.status(500).json({ error: "Failed to verify purchase" });

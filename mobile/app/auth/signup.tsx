@@ -69,6 +69,7 @@ export default function SignupScreen() {
         rating: data.rating,
         gamesPlayed: data.gamesPlayed,
         gamesWon: data.gamesWon,
+        removeAds: data.removeAds,
       });
 
       router.replace('/');

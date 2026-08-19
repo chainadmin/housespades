@@ -60,6 +60,7 @@ export default function LoginScreen() {
         rating: data.rating,
         gamesPlayed: data.gamesPlayed,
         gamesWon: data.gamesWon,
+        removeAds: data.removeAds,
       });
 
       router.replace('/');

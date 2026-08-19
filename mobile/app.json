@@ -126,7 +126,9 @@
     "extra": {
       "eas": {
         "projectId": "28f71604-478a-448b-ae73-00579715d806"
-      }
+      },
+      "revenueCatAppleApiKey": "",
+      "revenueCatGoogleApiKey": ""
     }
   }
 }

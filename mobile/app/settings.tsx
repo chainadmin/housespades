@@ -4,7 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
-import { authenticatedFetch, clearAuth, getStoredUser } from '@/lib/auth';
+import { authenticatedFetch, clearAuth, getStoredUser, subscribeToRemoveAds, refreshUserFromServer } from '@/lib/auth';
+import { usePurchases } from '@/hooks/usePurchases';
 import Constants from 'expo-constants';
 import { getSoundMuted, setSoundMuted } from '@/lib/sound';
 import { Tutorial } from '@/components/Tutorial';
@@ -21,11 +22,29 @@ export default function SettingsScreen() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [hasRemoveAds, setHasRemoveAds] = useState(false);
+  const { purchaseRemoveAds, restorePurchases, isPurchasing, isRestoring } = usePurchases();
 
   useEffect(() => {
-    getStoredUser().then(user => setIsLoggedIn(!!user));
+    getStoredUser().then(user => {
+      setIsLoggedIn(!!user);
+      setHasRemoveAds(!!user?.removeAds);
+    });
     getSoundMuted().then(muted => setSoundEnabled(!muted));
+    refreshUserFromServer().catch(() => {});
+    return subscribeToRemoveAds(setHasRemoveAds);
   }, []);
+
+  const handlePurchaseRemoveAds = async () => {
+    const result = await purchaseRemoveAds();
+    if (result.cancelled) return;
+    Alert.alert(result.success ? 'Success' : 'Purchase', result.message);
+  };
+
+  const handleRestorePurchases = async () => {
+    const result = await restorePurchases();
+    Alert.alert(result.success ? 'Success' : 'Restore', result.message);
+  };
 
   const handleToggleSound = (value: boolean) => {
     setSoundEnabled(value);
@@ -114,6 +133,60 @@ export default function SettingsScreen() {
             <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
+
+        {isLoggedIn && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Remove Ads</Text>
+            {hasRemoveAds ? (
+              <View style={[styles.menuItem, { backgroundColor: colors.card }]}>
+                <View style={styles.menuItemLeft}>
+                  <Ionicons name="checkmark-circle" size={22} color={colors.primary} />
+                  <Text style={styles.menuItemText}>Ads are removed on your account</Text>
+                </View>
+              </View>
+            ) : (
+              <>
+                <TouchableOpacity
+                  style={[styles.menuItem, { backgroundColor: colors.card }]}
+                  onPress={handlePurchaseRemoveAds}
+                  disabled={isPurchasing}
+                  testID="button-remove-ads"
+                >
+                  <View style={styles.menuItemLeft}>
+                    <Ionicons name="sparkles-outline" size={22} color={colors.primary} />
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.menuItemText, { color: colors.primary }]}>Remove Ads</Text>
+                      <Text style={[styles.menuItemSubtext, { color: colors.textSecondary }]}>
+                        One-time purchase, removes all ads forever
+                      </Text>
+                    </View>
+                  </View>
+                  {isPurchasing ? (
+                    <ActivityIndicator size="small" color={colors.primary} />
+                  ) : (
+                    <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+                  )}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.menuItem, { backgroundColor: colors.card }]}
+                  onPress={handleRestorePurchases}
+                  disabled={isRestoring}
+                  testID="button-restore-purchases"
+                >
+                  <View style={styles.menuItemLeft}>
+                    <Ionicons name="refresh-outline" size={22} color={colors.text} />
+                    <Text style={styles.menuItemText}>Restore Purchases</Text>
+                  </View>
+                  {isRestoring ? (
+                    <ActivityIndicator size="small" color={colors.primary} />
+                  ) : (
+                    <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+                  )}
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        )}
 
         {!isLoggedIn && (
           <View style={styles.section}>

@@ -26,6 +26,51 @@ export interface User {
   rating: number;
   gamesPlayed: number;
   gamesWon: number;
+  removeAds?: boolean;
+}
+
+// Global remove-ads entitlement state, kept in sync with the stored user
+type RemoveAdsListener = (hasRemoveAds: boolean) => void;
+let removeAdsListeners: RemoveAdsListener[] = [];
+let cachedRemoveAds = false;
+
+export function getCachedRemoveAds(): boolean {
+  return cachedRemoveAds;
+}
+
+export function subscribeToRemoveAds(listener: RemoveAdsListener): () => void {
+  removeAdsListeners.push(listener);
+  return () => {
+    removeAdsListeners = removeAdsListeners.filter(l => l !== listener);
+  };
+}
+
+function setCachedRemoveAds(value: boolean) {
+  if (cachedRemoveAds !== value) {
+    cachedRemoveAds = value;
+    removeAdsListeners.forEach(listener => listener(value));
+  }
+}
+
+/**
+ * Re-fetch the current user from the server (includes removeAds) and
+ * persist it locally. Silently no-ops when not authenticated.
+ */
+export async function refreshUserFromServer(): Promise<User | null> {
+  try {
+    const sessionCookie = await getStoredSessionCookie();
+    if (!sessionCookie) return null;
+    const response = await fetch(apiUrl('/api/auth/me'), {
+      headers: { Cookie: sessionCookie },
+      credentials: 'include',
+    });
+    if (!response.ok) return null;
+    const user: User = await response.json();
+    await storeUser(user);
+    return user;
+  } catch {
+    return null;
+  }
 }
 
 export async function getStoredSessionCookie(): Promise<string | null> {
@@ -51,12 +96,14 @@ export async function getStoredUser(): Promise<User | null> {
 
 export async function storeUser(user: User): Promise<void> {
   await SecureStore.setItemAsync(USER_DATA_KEY, JSON.stringify(user));
+  setCachedRemoveAds(!!user.removeAds);
   notifyAuthStateChange(true);
 }
 
 export async function clearAuth(): Promise<void> {
   await SecureStore.deleteItemAsync(SESSION_COOKIE_KEY);
   await SecureStore.deleteItemAsync(USER_DATA_KEY);
+  setCachedRemoveAds(false);
   notifyAuthStateChange(false);
 }
 
