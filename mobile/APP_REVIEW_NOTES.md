@@ -1,4 +1,4 @@
-# House Spades — App Review Notes (v2.1.1 / iOS build 41)
+# House Spades — App Review Notes (v2.1.1 / iOS build 42)
 
 Thank you for reviewing House Spades. This update responds directly to the Guideline 5.6 feedback by making every automated behavior in the app fully transparent to users. Nothing in the app is conditional on review status, account, region, date, or any remote flag — the build behaves identically for reviewers and for the public.
 
