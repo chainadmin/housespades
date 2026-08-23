@@ -8,7 +8,7 @@ Hello App Review team,
 
 Thank you for the feedback. We want to be clear that House Spades contains no features that are hidden, gated, or conditional on the review process — the binary behaves identically for reviewers and for all users. There is no review detection, remote configuration, dynamic code loading, or hidden functionality of any kind.
 
-After investigating what could have appeared misleading, we identified that our computer opponents ("bots") were shown with human-like names and no visible indication that they were computer-controlled. We agree this could look like undisclosed behavior, and we have fixed it in this build (v2.1.1, build 42):
+After investigating what could have appeared misleading, we identified that our computer opponents ("bots") were shown with human-like names and no visible indication that they were computer-controlled. We agree this could look like undisclosed behavior, and we have fixed it in this build (v2.1.2, build 43):
 
 1. Every computer-controlled player now displays a visible "BOT" badge next to their name, in both offline solo play and online multiplayer.
 2. The matchmaking screen now discloses up front that empty seats are filled with computer players (labeled "BOT") after about 10 seconds if no human opponents are available.
@@ -26,4 +26,4 @@ Thank you for your time and consideration.
 
 Notes for you (not part of the reply):
 - If this app/account was previously locked under 5.6 and this is a resubmission under a new app record, Apple may be flagging the account/app history itself. If the rejection persists after these changes, address that history head-on in a follow-up reply or via an appeal to the App Review Board, explaining why the new submission exists and what changed.
-- Bump handled: this build is v2.1.1 / iOS build 42 / Android versionCode 39.
+- Bump handled: this build is v2.1.2 / iOS build 43 / Android versionCode 39.
