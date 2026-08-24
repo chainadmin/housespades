@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { WS_BASE_URL } from '@/config/api';
+import { getStoredSessionCookie } from '@/lib/auth';
 
 // Define types locally since we can't import from shared in mobile
 export interface Card {
@@ -104,7 +105,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
 
-    ws.onopen = () => {
+    ws.onopen = async () => {
       if (intentionalDisconnectRef.current) {
         ws.close();
         return;
@@ -117,9 +118,10 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       }
       
       if (optionsRef.current.userId) {
+        const sessionCookie = await getStoredSessionCookie();
         ws.send(JSON.stringify({
           type: 'authenticate',
-          payload: { userId: optionsRef.current.userId },
+          payload: { sessionCookie },
         }));
         if (__DEV__) console.log('[WebSocket] Sent authenticate message for user', optionsRef.current.userId);
       }

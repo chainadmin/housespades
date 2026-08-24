@@ -6,6 +6,9 @@ import { BotAI, getDifficultyFromRating, type BotDifficulty } from "./botAI";
 import { storage } from "./storage";
 import { matchmaking, calculateRatingChange } from "./matchmaking";
 import { presence } from "./presence";
+import { unsign } from "cookie-signature";
+import { db } from "./db";
+import { sql } from "drizzle-orm";
 
 interface Client {
   ws: WebSocket;
@@ -33,6 +36,38 @@ export class GameWebSocketServer {
   private clients: Map<WebSocket, Client> = new Map();
   private gameRooms: Map<string, GameRoom> = new Map();
   private userIdToClient: Map<number, Client> = new Map();
+
+  /** Creates a normal GameEngine session from a private lobby entry path. */
+  createGameFromPrivateRoom(roomId: string, players: { userId?: number; name: string; isBot: boolean; team: number }[], mode: GameMode, pointGoal: PointGoal) {
+    const ordered = [
+      ...players.filter(p => p.team === 1),
+      ...players.filter(p => p.team === 2),
+    ];
+    // Partners must occupy opposite seats (indices 0/2 and 1/3).
+    const team1 = ordered.filter(p => p.team === 1);
+    const team2 = ordered.filter(p => p.team === 2);
+    const seated = [team1[0], team2[0], team1[1], team2[1]];
+    if (seated.some(p => !p)) throw new Error("Each team must have two players.");
+    const gamePlayers = seated.map((p, index) => {
+      const client = p.userId ? this.userIdToClient.get(p.userId) : undefined;
+      return { id: p.isBot ? `private-bot-${roomId}-${index}` : client?.playerId ?? `player-${p.userId}`, name: p.name, isBot: p.isBot, userId: p.userId };
+    });
+    const gameState = GameEngine.createGame(gamePlayers, mode, pointGoal);
+    BotAI.resetTracking(gameState.id);
+    const humans = players.filter(p => !p.isBot && p.userId);
+    const gameRoom: GameRoom = { gameState, clients: new Map(), botTimer: null, idleTimer: null, idleCounts: new Map(), statsSaved: false, isRanked: humans.length >= 2, botDifficulty: "medium" };
+    for (const player of gameState.players) {
+      if (!player.userId) continue;
+      const client = this.userIdToClient.get(player.userId);
+      if (client) { client.gameId = gameState.id; client.playerId = player.id; gameRoom.clients.set(player.id, client); }
+    }
+    this.gameRooms.set(gameState.id, gameRoom);
+    for (const client of Array.from(gameRoom.clients.values())) this.sendMessage(client.ws, { type: "match_found", payload: { gameId: gameState.id, privateRoomId: roomId } });
+    this.broadcastGameState(gameState.id);
+    this.scheduleBotMove(gameState.id);
+    this.scheduleIdleTimeout(gameState.id);
+    return gameState.id;
+  }
 
   constructor(server: Server) {
     this.wss = new WebSocketServer({ server, path: "/ws" });
@@ -198,31 +233,38 @@ export class GameWebSocketServer {
     }
   }
 
-  private handleAuthenticate(ws: WebSocket, payload: { userId: number }) {
+  private async handleAuthenticate(ws: WebSocket, payload: { sessionCookie?: string }) {
     const client = this.clients.get(ws);
-    if (!client || !payload.userId) return;
+    if (!client || !payload.sessionCookie) return this.sendError(ws, "Authentication required");
+    const match = payload.sessionCookie.match(/connect\.sid=s%3A([^;]+)|connect\.sid=s:([^;]+)/);
+    const signed = match?.[1] ? decodeURIComponent(match[1]) : match?.[2];
+    const sessionId = signed && unsign(signed, process.env.SESSION_SECRET || "house-spades-dev-secret");
+    if (!sessionId) return this.sendError(ws, "Authentication required");
+    const result = await db.execute(sql`SELECT sess FROM session WHERE sid = ${sessionId} AND expire > NOW()`);
+    const userId = Number((result.rows[0] as any)?.sess?.userId);
+    if (!userId) return this.sendError(ws, "Authentication required");
     
-    client.userId = payload.userId;
-    presence.set(payload.userId, "Online");
-    this.userIdToClient.set(payload.userId, client);
-    console.log(`[WebSocket] Client ${client.playerId} authenticated as user ${payload.userId}`);
+    client.userId = userId;
+    presence.set(userId, "Online");
+    this.userIdToClient.set(userId, client);
+    console.log(`[WebSocket] Client ${client.playerId} authenticated as user ${userId}`);
     
     // Check if user has an active game and reconnect them
     let reconnectedToGame = false;
     const gameEntries = Array.from(this.gameRooms.entries());
     for (const [gameId, room] of gameEntries) {
-      const player = room.gameState.players.find((p: any) => p.userId === payload.userId);
+      const player = room.gameState.players.find((p: any) => p.userId === userId);
       if (player) {
         // User has an active game - reconnect them
-        console.log(`[WebSocket] Reconnecting user ${payload.userId} to game ${gameId} as player ${player.id}`);
+        console.log(`[WebSocket] Reconnecting user ${userId} to game ${gameId} as player ${player.id}`);
         
         // Cancel any pending bot replacement for this user
-        const pendingKey = `${gameId}-${payload.userId}`;
+        const pendingKey = `${gameId}-${userId}`;
         const pendingTimeout = this.pendingReconnects.get(pendingKey);
         if (pendingTimeout) {
           clearTimeout(pendingTimeout);
           this.pendingReconnects.delete(pendingKey);
-          console.log(`[WebSocket] Cancelled pending bot replacement for user ${payload.userId}`);
+          console.log(`[WebSocket] Cancelled pending bot replacement for user ${userId}`);
         }
         
         // Update client's gameId and playerId to match the game
