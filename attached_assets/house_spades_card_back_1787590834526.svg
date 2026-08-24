@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f58f8a"/>
+      <stop offset="24%" stop-color="#f7c57a"/>
+      <stop offset="52%" stop-color="#f7edd8"/>
+      <stop offset="76%" stop-color="#82cfe0"/>
+      <stop offset="100%" stop-color="#5576bf"/>
+    </linearGradient>
+
+    <radialGradient id="washA" cx="0.18" cy="0.22" r="0.55">
+      <stop offset="0%" stop-color="#ff7f8d" stop-opacity="0.58"/>
+      <stop offset="100%" stop-color="#ff7f8d" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="washB" cx="0.82" cy="0.18" r="0.55">
+      <stop offset="0%" stop-color="#4bbfd1" stop-opacity="0.58"/>
+      <stop offset="100%" stop-color="#4bbfd1" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="washC" cx="0.2" cy="0.8" r="0.48">
+      <stop offset="0%" stop-color="#f05c72" stop-opacity="0.42"/>
+      <stop offset="100%" stop-color="#f05c72" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="washD" cx="0.78" cy="0.78" r="0.48">
+      <stop offset="0%" stop-color="#4d87c9" stop-opacity="0.42"/>
+      <stop offset="100%" stop-color="#4d87c9" stop-opacity="0"/>
+    </radialGradient>
+
+    <linearGradient id="spadeFill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#172336"/>
+      <stop offset="48%" stop-color="#0b1a30"/>
+      <stop offset="100%" stop-color="#243d66"/>
+    </linearGradient>
+    <linearGradient id="leaf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#5ad0e8"/>
+      <stop offset="100%" stop-color="#1b5c9f"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f2d494"/>
+      <stop offset="55%" stop-color="#c99f57"/>
+      <stop offset="100%" stop-color="#8c6c35"/>
+    </linearGradient>
+
+    
+      
+      
+      
+        
+      
+      
+    
+
+    <clipPath id="cardClip">
+      <rect x="18" y="18" width="564" height="864" rx="34" ry="34"/>
+    </clipPath>
+  </defs>
+
+  
+  <g clip-path="url(#cardClip)">
+    <rect x="18" y="18" width="564" height="864" fill="url(#bg)"/>
+    <rect x="18" y="18" width="564" height="864" fill="url(#washA)"/>
+    <rect x="18" y="18" width="564" height="864" fill="url(#washB)"/>
+    <rect x="18" y="18" width="564" height="864" fill="url(#washC)"/>
+    <rect x="18" y="18" width="564" height="864" fill="url(#washD)"/>
+
+    
+    <ellipse cx="300" cy="450" rx="210" ry="330" fill="#fff9ea" opacity="0.42"/>
+
+    
+    <rect x="28" y="28" width="544" height="844" rx="28" ry="28" fill="none" stroke="#334d7d" stroke-opacity="0.65" stroke-width="4"/>
+    <rect x="40" y="40" width="520" height="820" rx="24" ry="24" fill="none" stroke="url(#gold)" stroke-opacity="0.75" stroke-width="2.5"/>
+
+    
+    <g fill="none" stroke="url(#gold)" stroke-width="3" stroke-linecap="round" opacity="0.75">
+      <path d="M58 162 C86 116, 132 88, 184 74 C136 80, 96 66, 72 48"/>
+      <path d="M58 214 C84 176, 116 154, 150 146 C118 150, 88 136, 64 112"/>
+      <path d="M542 162 C514 116, 468 88, 416 74 C464 80, 504 66, 528 48"/>
+      <path d="M542 214 C516 176, 484 154, 450 146 C482 150, 512 136, 536 112"/>
+      <path d="M58 738 C86 784, 132 812, 184 826 C136 820, 96 834, 72 852"/>
+      <path d="M58 686 C84 724, 116 746, 150 754 C118 750, 88 764, 64 788"/>
+      <path d="M542 738 C514 784, 468 812, 416 826 C464 820, 504 834, 528 852"/>
+      <path d="M542 686 C516 724, 484 746, 450 754 C482 750, 512 764, 536 788"/>
+    </g>
+
+    
+    <g fill="none" stroke="#9d4f68" stroke-width="2.6" opacity="0.48">
+      <path d="M82 120 q22 -28 48 0 q-16 18 -48 0z"/>
+      <path d="M120 84 q28 -22 48 6 q-18 14 -48 -6z"/>
+      <path d="M518 120 q-22 -28 -48 0 q16 18 48 0z"/>
+      <path d="M480 84 q-28 -22 -48 6 q18 14 48 -6z"/>
+      <path d="M82 780 q22 28 48 0 q-16 -18 -48 0z"/>
+      <path d="M120 816 q28 22 48 -6 q-18 -14 -48 6z"/>
+      <path d="M518 780 q-22 28 -48 0 q16 -18 48 0z"/>
+      <path d="M480 816 q-28 22 -48 -6 q18 -14 48 6z"/>
+    </g>
+
+    
+    <g transform="translate(0,6)">
+      <path d="M300 240                C270 292 194 336 194 410                C194 471 242 505 294 472                C289 528 268 573 236 606                L364 606                C332 573 311 528 306 472                C358 505 406 471 406 410                C406 336 330 292 300 240 Z" fill="url(#spadeFill)" stroke="#1b1b26" stroke-width="9"/>
+      <path d="M300 257                C274 300 209 339 209 409                C209 456 246 481 292 448                L300 442                L308 448                C354 481 391 456 391 409                C391 339 326 300 300 257 Z" fill="none" stroke="url(#gold)" stroke-width="3.2" opacity="0.92"/>
+
+      
+      <g fill="none" stroke="url(#leaf)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M300 308 C300 352 300 395 300 447"/>
+        <path d="M300 350 C272 342 250 326 236 304"/>
+        <path d="M300 370 C267 375 242 392 226 415"/>
+        <path d="M300 393 C268 399 247 420 238 447"/>
+        <path d="M300 350 C328 342 350 326 364 304"/>
+        <path d="M300 370 C333 375 358 392 374 415"/>
+        <path d="M300 393 C332 399 353 420 362 447"/>
+      </g>
+      <g fill="url(#leaf)" opacity="0.96">
+        <path d="M296 330 C275 323 261 305 259 286 C279 294 292 308 296 330 Z"/>
+        <path d="M304 330 C325 323 339 305 341 286 C321 294 308 308 304 330 Z"/>
+        <path d="M290 360 C266 359 248 345 240 326 C261 329 279 340 290 360 Z"/>
+        <path d="M310 360 C334 359 352 345 360 326 C339 329 321 340 310 360 Z"/>
+        <path d="M286 392 C260 398 241 415 234 437 C257 430 276 415 286 392 Z"/>
+        <path d="M314 392 C340 398 359 415 366 437 C343 430 324 415 314 392 Z"/>
+      </g>
+
+      
+      <g fill="none" stroke="#2f6fa8" stroke-width="4" opacity="0.9">
+        <path d="M286 438 C250 456 246 493 272 500 C292 505 299 486 287 478 C276 470 264 478 266 489"/>
+        <path d="M314 438 C350 456 354 493 328 500 C308 505 301 486 313 478 C324 470 336 478 334 489"/>
+      </g>
+    </g>
+
+    
+    <g fill="none" stroke="url(#gold)" stroke-width="3" opacity="0.58">
+      <path d="M245 86 C270 108 330 108 355 86"/>
+      <path d="M262 86 C273 66 291 60 300 78 C309 60 327 66 338 86"/>
+      <path d="M245 814 C270 792 330 792 355 814"/>
+      <path d="M262 814 C273 834 291 840 300 822 C309 840 327 834 338 814"/>
+    </g>
+
+    <rect x="18" y="18" width="564" height="864" fill="transparent"/>
+  </g>
+
+  
+  <rect x="18" y="18" width="564" height="864" rx="34" ry="34" fill="none" stroke="#202b48" stroke-width="5"/>
+</svg>
