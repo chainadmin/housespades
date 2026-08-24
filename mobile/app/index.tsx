@@ -101,6 +101,12 @@ export default function HomeScreen() {
     router.push(`/matchmaking?mode=${selectedMode}&points=${selectedPoints}`);
   };
 
+  const handlePrivateRoom = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+    if (!user) return router.push('/auth/login');
+    router.push(`/private-room?mode=${selectedMode}&points=${selectedPoints}`);
+  };
+
   const winRate = user && user.gamesPlayed > 0 
     ? Math.round((user.gamesWon / user.gamesPlayed) * 100) 
     : 0;
@@ -285,6 +291,12 @@ export default function HomeScreen() {
             </Text>
           </TouchableOpacity>
         </View>
+        {user && (
+          <TouchableOpacity style={[styles.privateRoomButton, { borderColor: colors.primary }]} onPress={handlePrivateRoom} testID="button-private-room">
+            <Ionicons name="key-outline" size={20} color={colors.primary} />
+            <Text style={[styles.onlineButtonText, { color: colors.primary }]}>Private Room</Text>
+          </TouchableOpacity>
+        )}
       </Animated.View>
 
       <Tutorial visible={showTutorial} onClose={handleTutorialClose} />
@@ -546,5 +558,9 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
     onlineButtonText: {
       fontSize: 14,
       fontWeight: '700',
+    },
+    privateRoomButton: {
+      marginTop: 12, minHeight: 52, borderWidth: 2, borderRadius: 14,
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9,
     },
   });

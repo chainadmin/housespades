@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { pgTable, text, integer, timestamp, boolean, serial } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, timestamp, boolean, serial, uniqueIndex } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
 
@@ -39,6 +39,36 @@ export const gameInvites = pgTable("game_invites", {
   status: text("status").notNull().default("pending"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   expiresAt: timestamp("expires_at").notNull(),
+});
+
+// Both public matchmaking and code-based entry ultimately create the same
+// websocket game session. These tables only persist the pre-game room/lobby.
+export const multiplayerRooms = pgTable("multiplayer_rooms", {
+  id: text("id").primaryKey(),
+  roomCode: text("room_code").notNull(),
+  roomType: text("room_type").notNull().default("private"),
+  hostUserId: integer("host_user_id").notNull().references(() => users.id),
+  status: text("status").notNull().default("waiting"),
+  maxPlayers: integer("max_players").notNull().default(4),
+  botFillEnabled: boolean("bot_fill_enabled").notNull().default(true),
+  gameMode: text("game_mode").notNull().default("ace_high"),
+  pointGoal: text("point_goal").notNull().default("300"),
+  gameSessionId: text("game_session_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+}, (table) => ({ roomCodeUnique: uniqueIndex("multiplayer_rooms_room_code_unique").on(table.roomCode) }));
+
+export const multiplayerRoomPlayers = pgTable("multiplayer_room_players", {
+  id: serial("id").primaryKey(),
+  roomId: text("room_id").notNull().references(() => multiplayerRooms.id, { onDelete: "cascade" }),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
+  seatNumber: integer("seat_number").notNull(),
+  team: integer("team").notNull().default(1),
+  ready: boolean("ready").notNull().default(false),
+  isHost: boolean("is_host").notNull().default(false),
+  isBot: boolean("is_bot").notNull().default(false),
+  joinedAt: timestamp("joined_at").defaultNow().notNull(),
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({

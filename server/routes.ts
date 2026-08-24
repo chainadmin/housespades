@@ -9,9 +9,10 @@ import { z } from "zod";
 import { sign as signCookie } from "cookie-signature";
 import { verifyRemoveAdsWithRevenueCat } from "./purchases";
 import { db } from "./db";
-import { friendships, gameInvites, users, GAME_MODES, POINT_GOALS } from "@shared/schema";
+import { friendships, gameInvites, multiplayerRoomPlayers, multiplayerRooms, users, GAME_MODES, POINT_GOALS } from "@shared/schema";
 import { and, eq, ilike, or, sql } from "drizzle-orm";
 import { presence } from "./presence";
+import { PrivateRoomError, assertHost, assertMember, createPrivateRoom, joinPrivateRoom, leavePrivateRoom, roomView } from "./privateRooms";
 
 // Helper to generate signed session cookie for mobile apps
 // Must match express-session's cookie format exactly
@@ -55,7 +56,83 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  new GameWebSocketServer(httpServer);
+  const gameServer = new GameWebSocketServer(httpServer);
+
+  const requirePrivateUser = (req: any, res: any): number | null => {
+    if (!req.session.userId) { res.status(401).json({ error: "Please sign in to use private rooms." }); return null; }
+    return req.session.userId;
+  };
+  const privateRoomHandler = (handler: any) => async (req: any, res: any) => {
+    try { await handler(req, res); }
+    catch (error) {
+      const known = error instanceof PrivateRoomError;
+      console.error("Private room error:", error);
+      res.status(known ? error.status : 500).json({ error: known ? error.message : "Unable to update the room." });
+    }
+  };
+
+  app.post("/api/private-rooms", privateRoomHandler(async (req: any, res: any) => {
+    const userId = requirePrivateUser(req, res); if (!userId) return;
+    const mode = GAME_MODES.includes(req.body?.gameMode) ? req.body.gameMode : "ace_high";
+    const points = POINT_GOALS.includes(req.body?.pointGoal) ? req.body.pointGoal : "300";
+    res.status(201).json(await createPrivateRoom(userId, { gameMode: mode, pointGoal: points }));
+  }));
+  app.post("/api/private-rooms/join", privateRoomHandler(async (req: any, res: any) => {
+    const userId = requirePrivateUser(req, res); if (!userId) return;
+    res.json(await joinPrivateRoom(userId, req.body?.code));
+  }));
+  app.get("/api/private-rooms/:roomId", privateRoomHandler(async (req: any, res: any) => {
+    const userId = requirePrivateUser(req, res); if (!userId) return;
+    await assertMember(req.params.roomId, userId); res.json(await roomView(req.params.roomId));
+  }));
+  app.post("/api/private-rooms/:roomId/ready", privateRoomHandler(async (req: any, res: any) => {
+    const userId = requirePrivateUser(req, res); if (!userId) return;
+    const member = await assertMember(req.params.roomId, userId);
+    if (member.isHost) throw new PrivateRoomError("The host is always ready.");
+    await db.update(multiplayerRoomPlayers).set({ ready: Boolean(req.body?.ready) }).where(eq(multiplayerRoomPlayers.id, member.id));
+    res.json(await roomView(req.params.roomId));
+  }));
+  app.post("/api/private-rooms/:roomId/settings", privateRoomHandler(async (req: any, res: any) => {
+    const userId = requirePrivateUser(req, res); if (!userId) return;
+    await assertHost(req.params.roomId, userId);
+    if (typeof req.body?.botFillEnabled === "boolean") await db.update(multiplayerRooms).set({ botFillEnabled: req.body.botFillEnabled, updatedAt: new Date() }).where(eq(multiplayerRooms.id, req.params.roomId));
+    if (Array.isArray(req.body?.teams)) {
+      for (const assignment of req.body.teams) if ([1, 2].includes(assignment.team)) await db.update(multiplayerRoomPlayers).set({ team: assignment.team }).where(and(eq(multiplayerRoomPlayers.roomId, req.params.roomId), eq(multiplayerRoomPlayers.id, assignment.playerId)));
+    }
+    res.json(await roomView(req.params.roomId));
+  }));
+  app.post("/api/private-rooms/:roomId/kick", privateRoomHandler(async (req: any, res: any) => {
+    const userId = requirePrivateUser(req, res); if (!userId) return;
+    await assertHost(req.params.roomId, userId);
+    await db.delete(multiplayerRoomPlayers).where(and(eq(multiplayerRoomPlayers.roomId, req.params.roomId), eq(multiplayerRoomPlayers.id, Number(req.body?.playerId)), eq(multiplayerRoomPlayers.isHost, false)));
+    res.json(await roomView(req.params.roomId));
+  }));
+  app.post("/api/private-rooms/:roomId/leave", privateRoomHandler(async (req: any, res: any) => {
+    const userId = requirePrivateUser(req, res); if (!userId) return;
+    await leavePrivateRoom(req.params.roomId, userId); res.status(204).end();
+  }));
+  app.post("/api/private-rooms/:roomId/close", privateRoomHandler(async (req: any, res: any) => {
+    const userId = requirePrivateUser(req, res); if (!userId) return;
+    await assertHost(req.params.roomId, userId);
+    await db.update(multiplayerRooms).set({ status: "closed", updatedAt: new Date() }).where(eq(multiplayerRooms.id, req.params.roomId)); res.status(204).end();
+  }));
+  app.post("/api/private-rooms/:roomId/start", privateRoomHandler(async (req: any, res: any) => {
+    const userId = requirePrivateUser(req, res); if (!userId) return;
+    await assertHost(req.params.roomId, userId);
+    const room = await roomView(req.params.roomId);
+    if (room.status !== "waiting") throw new PrivateRoomError("This game has already started.", 409);
+    const humans = room.players.filter(p => !p.isBot);
+    if (humans.length < 2) throw new PrivateRoomError("At least two human players are required.");
+    if (humans.some(p => !p.isHost && !p.ready)) throw new PrivateRoomError("All players must be ready before starting.");
+    if (humans.length < 4 && !room.botFillEnabled) throw new PrivateRoomError("Four players are required when bot fill is off.");
+    const players: { userId?: number; name: string; isBot: boolean; team: number }[] = humans.map(p => ({ userId: p.userId!, name: p.displayName || p.username || "Player", isBot: false, team: p.team }));
+    let bot = 1; while (players.length < 4) { const team = players.filter(p => p.team === 1).length < 2 ? 1 : 2; players.push({ name: `Bot ${bot++}`, isBot: true, team }); }
+    if (players.filter(p => p.team === 1).length !== 2 || players.filter(p => p.team === 2).length !== 2) throw new PrivateRoomError("Each team must have two seats. Use Auto Assign Teams.");
+    await db.update(multiplayerRooms).set({ status: "starting", updatedAt: new Date() }).where(and(eq(multiplayerRooms.id, room.id), eq(multiplayerRooms.status, "waiting")));
+    const gameSessionId = gameServer.createGameFromPrivateRoom(room.id, players, room.gameMode as any, room.pointGoal as any);
+    await db.update(multiplayerRooms).set({ status: "in_game", gameSessionId, updatedAt: new Date() }).where(eq(multiplayerRooms.id, room.id));
+    res.json({ gameSessionId });
+  }));
 
   // Auth Routes
   app.post("/api/auth/register", async (req, res) => {
