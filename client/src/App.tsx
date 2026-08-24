@@ -17,6 +17,8 @@ import Settings from "@/pages/Settings";
 import Leaderboard from "@/pages/Leaderboard";
 import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/Terms";
+import OnlinePlay from "@/pages/OnlinePlay";
+import PlayWithFriends from "@/pages/PlayWithFriends";
 import NotFound from "@/pages/not-found";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
@@ -60,6 +62,8 @@ function AuthenticatedApp() {
       <Route path="/" component={Home} />
       <Route path="/game" component={Game} />
       <Route path="/matchmaking" component={Matchmaking} />
+      <Route path="/online" component={OnlinePlay} />
+      <Route path="/play-with-friends" component={PlayWithFriends} />
       <Route path="/shop" component={Shop} />
       <Route path="/settings" component={Settings} />
       <Route path="/leaderboard" component={Leaderboard} />

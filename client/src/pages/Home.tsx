@@ -25,7 +25,7 @@ export default function Home() {
   };
 
   const handleFindMatch = () => {
-    navigate(`/matchmaking?mode=${selectedMode}&points=${selectedPointGoal}`);
+    navigate(`/online?mode=${selectedMode}&points=${selectedPointGoal}`);
   };
 
   const winRate = user && user.gamesPlayed > 0 
@@ -151,7 +151,7 @@ export default function Home() {
                       <Users className="h-6 w-6 text-chart-2" />
                     </div>
                     <div>
-                      <CardTitle>Find Match</CardTitle>
+                      <CardTitle>Online Play</CardTitle>
                       <CardDescription>
                         Play with others online
                       </CardDescription>
@@ -160,7 +160,7 @@ export default function Home() {
                 </CardHeader>
                 <CardContent>
                   <Button variant="outline" className="w-full" data-testid="button-find-match">
-                    Find Opponents
+                    Play Online
                   </Button>
                 </CardContent>
               </Card>

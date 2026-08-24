@@ -5,6 +5,7 @@ import { GameEngine } from "./gameEngine";
 import { BotAI, getDifficultyFromRating, type BotDifficulty } from "./botAI";
 import { storage } from "./storage";
 import { matchmaking, calculateRatingChange } from "./matchmaking";
+import { presence } from "./presence";
 
 interface Client {
   ws: WebSocket;
@@ -202,6 +203,7 @@ export class GameWebSocketServer {
     if (!client || !payload.userId) return;
     
     client.userId = payload.userId;
+    presence.set(payload.userId, "Online");
     this.userIdToClient.set(payload.userId, client);
     console.log(`[WebSocket] Client ${client.playerId} authenticated as user ${payload.userId}`);
     
@@ -264,6 +266,7 @@ export class GameWebSocketServer {
   private handleStartGame(ws: WebSocket, payload: { mode: GameMode; pointGoal: PointGoal; players: { id: string; name: string; isBot: boolean; userId?: number }[] }) {
     const client = this.clients.get(ws);
     if (!client) return;
+    if (client.userId) presence.set(client.userId, "In Game");
 
     const { mode, pointGoal, players } = payload;
 
@@ -486,6 +489,7 @@ export class GameWebSocketServer {
     if (client) {
       this.handleLeaveLobby(ws);
       if (client.userId) {
+        presence.offline(client.userId);
         this.userIdToClient.delete(client.userId);
         matchmaking.removeFromQueue(client.userId);
         console.log(`[WebSocket] User ${client.userId} disconnected and removed from matchmaking queue`);
