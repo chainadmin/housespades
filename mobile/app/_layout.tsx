@@ -7,6 +7,7 @@ import { View, ActivityIndicator, Image, Text } from 'react-native';
 import { useColorScheme, useColors } from '@/hooks/useColorScheme';
 import { checkAuthStatus, subscribeToAuthState } from '@/lib/auth';
 import mobileAds, { MaxAdContentRating } from 'react-native-google-mobile-ads';
+import '@/constants/cardBacks';
 
 SplashScreen.preventAutoHideAsync();
 
