@@ -9,6 +9,8 @@ import { relations } from "drizzle-orm";
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
+  displayName: text("display_name"),
+  avatar: text("avatar"),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   rating: integer("rating").notNull().default(1000),
@@ -16,6 +18,27 @@ export const users = pgTable("users", {
   gamesWon: integer("games_won").notNull().default(0),
   removeAds: boolean("remove_ads").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const friendships = pgTable("friendships", {
+  id: serial("id").primaryKey(),
+  requesterId: integer("requester_id").notNull().references(() => users.id),
+  recipientId: integer("recipient_id").notNull().references(() => users.id),
+  status: text("status").notNull().default("pending"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const gameInvites = pgTable("game_invites", {
+  id: serial("id").primaryKey(),
+  senderId: integer("sender_id").notNull().references(() => users.id),
+  recipientId: integer("recipient_id").notNull().references(() => users.id),
+  roomId: text("room_id").notNull(),
+  gameMode: text("game_mode").notNull(),
+  pointGoal: text("point_goal").notNull().default("300"),
+  status: text("status").notNull().default("pending"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({

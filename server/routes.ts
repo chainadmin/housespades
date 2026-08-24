@@ -8,6 +8,10 @@ import bcrypt from "bcrypt";
 import { z } from "zod";
 import { sign as signCookie } from "cookie-signature";
 import { verifyRemoveAdsWithRevenueCat } from "./purchases";
+import { db } from "./db";
+import { friendships, gameInvites, users, GAME_MODES, POINT_GOALS } from "@shared/schema";
+import { and, eq, ilike, or, sql } from "drizzle-orm";
+import { presence } from "./presence";
 
 // Helper to generate signed session cookie for mobile apps
 // Must match express-session's cookie format exactly
@@ -39,6 +43,12 @@ const loginSchema = z.object({
 const purchaseVerifySchema = z.object({
   platform: z.enum(["ios", "android"]),
   productId: z.string().min(1),
+});
+
+const friendRequestSchema = z.object({ recipientId: z.number().int().positive() });
+const inviteSchema = z.object({
+  recipientIds: z.array(z.number().int().positive()).min(1).max(3),
+  gameMode: z.enum(GAME_MODES), pointGoal: z.enum(POINT_GOALS), roomId: z.string().optional(),
 });
 
 export async function registerRoutes(
@@ -375,6 +385,66 @@ export async function registerRoutes(
   });
 
   // User Routes
+  const publicProfile = (user: typeof users.$inferSelect) => ({
+    id: user.id, username: user.username, displayName: user.displayName || user.username,
+    avatar: user.avatar, rating: user.rating, gamesPlayed: user.gamesPlayed, gamesWon: user.gamesWon,
+  });
+  const requireUser = (req: any, res: any): number | undefined => {
+    if (!req.session.userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+    presence.touch(req.session.userId);
+    return req.session.userId;
+  };
+
+  app.get("/api/players/search", async (req, res) => {
+    const userId = requireUser(req, res); if (!userId) return;
+    const q = String(req.query.q || "").trim();
+    const page = Math.max(1, Number(req.query.page) || 1); const limit = 20;
+    if (q.length < 2) return res.json({ players: [], page, hasMore: false });
+    const rows = await db.select().from(users).where(and(sql`${users.id} <> ${userId}`,
+      or(ilike(users.username, `%${q}%`), ilike(users.displayName, `%${q}%`))))
+      .orderBy(users.username).limit(limit + 1).offset((page - 1) * limit);
+    const ids = rows.slice(0, limit).map(x => x.id);
+    const links = ids.length ? await db.select().from(friendships).where(and(
+      or(eq(friendships.requesterId, userId), eq(friendships.recipientId, userId)),
+      or(...ids.map(id => or(eq(friendships.requesterId, id), eq(friendships.recipientId, id)))))) : [];
+    res.json({ players: rows.slice(0, limit).map(u => ({ ...publicProfile(u), friendship: links.find(f => f.requesterId === u.id || f.recipientId === u.id) || null })), page, hasMore: rows.length > limit });
+  });
+
+  app.get("/api/friends", async (req, res) => {
+    const userId = requireUser(req, res); if (!userId) return;
+    const rows = await db.select().from(friendships).where(and(eq(friendships.status, "accepted"), or(eq(friendships.requesterId, userId), eq(friendships.recipientId, userId))));
+    const result = await Promise.all(rows.map(async f => { const otherId = f.requesterId === userId ? f.recipientId : f.requesterId; const [u] = await db.select().from(users).where(eq(users.id, otherId)); return { friendshipId: f.id, ...publicProfile(u), status: presence.get(otherId) }; }));
+    res.json({ friends: result });
+  });
+  app.get("/api/friends/online", async (req, res) => {
+    const userId = requireUser(req, res); if (!userId) return;
+    const rows = await db.select().from(friendships).where(and(eq(friendships.status, "accepted"), or(eq(friendships.requesterId, userId), eq(friendships.recipientId, userId))));
+    const result = (await Promise.all(rows.map(async f => { const id = f.requesterId === userId ? f.recipientId : f.requesterId; const [u] = await db.select().from(users).where(eq(users.id, id)); return { friendshipId: f.id, ...publicProfile(u), status: presence.get(id) }; }))).filter(x => x.status !== "Offline");
+    res.json({ friends: result });
+  });
+  app.get("/api/friends/requests", async (req, res) => {
+    const userId = requireUser(req, res); if (!userId) return;
+    const rows = await db.select().from(friendships).where(and(eq(friendships.status, "pending"), or(eq(friendships.requesterId, userId), eq(friendships.recipientId, userId))));
+    const decorated = await Promise.all(rows.map(async f => { const other = f.requesterId === userId ? f.recipientId : f.requesterId; const [u] = await db.select().from(users).where(eq(users.id, other)); return { id: f.id, direction: f.requesterId === userId ? "outgoing" : "incoming", player: publicProfile(u) }; }));
+    const invites = await db.select({ invite: gameInvites, sender: users }).from(gameInvites).innerJoin(users, eq(gameInvites.senderId, users.id)).where(and(eq(gameInvites.recipientId, userId), eq(gameInvites.status, "pending"), sql`${gameInvites.expiresAt} > NOW()`));
+    res.json({ requests: decorated, gameInvites: invites.map(x => ({ ...x.invite, sender: publicProfile(x.sender) })) });
+  });
+  app.post("/api/friends/request", async (req, res) => {
+    const userId = requireUser(req, res); if (!userId) return; const parsed = friendRequestSchema.safeParse(req.body);
+    if (!parsed.success || parsed.data.recipientId === userId) return res.status(400).json({ error: "Invalid recipient" });
+    const [recipient] = await db.select().from(users).where(eq(users.id, parsed.data.recipientId)); if (!recipient) return res.status(404).json({ error: "Player not found" });
+    const [existing] = await db.select().from(friendships).where(or(and(eq(friendships.requesterId, userId), eq(friendships.recipientId, recipient.id)), and(eq(friendships.requesterId, recipient.id), eq(friendships.recipientId, userId))));
+    if (existing) return res.status(409).json({ error: "A friendship or request already exists" });
+    const [request] = await db.insert(friendships).values({ requesterId: userId, recipientId: recipient.id }).returning(); res.status(201).json(request);
+  });
+  app.post("/api/friends/:id/accept", async (req, res) => { const uid=requireUser(req,res); if(!uid)return; const [f]=await db.update(friendships).set({status:"accepted",updatedAt:new Date()}).where(and(eq(friendships.id,+req.params.id),eq(friendships.recipientId,uid),eq(friendships.status,"pending"))).returning(); if(!f)return res.status(404).json({error:"Request not found"}); res.json(f); });
+  app.post("/api/friends/:id/decline", async (req, res) => { const uid=requireUser(req,res); if(!uid)return; const [f]=await db.update(friendships).set({status:"declined",updatedAt:new Date()}).where(and(eq(friendships.id,+req.params.id),eq(friendships.recipientId,uid),eq(friendships.status,"pending"))).returning(); if(!f)return res.status(404).json({error:"Request not found"}); res.json(f); });
+  app.delete("/api/friends/:id", async (req, res) => { const uid=requireUser(req,res); if(!uid)return; const rows=await db.delete(friendships).where(and(eq(friendships.id,+req.params.id),or(eq(friendships.requesterId,uid),eq(friendships.recipientId,uid)))).returning(); if(!rows.length)return res.status(404).json({error:"Friendship not found"}); res.status(204).end(); });
+
+  app.post("/api/game-invites", async (req, res) => { const uid=requireUser(req,res); if(!uid)return; const parsed=inviteSchema.safeParse(req.body); if(!parsed.success)return res.status(400).json({error:"Invalid game invite"}); const host=await storage.getUser(uid); const room=parsed.data.roomId ? await storage.getLobby(parsed.data.roomId) : await storage.createLobby({mode:parsed.data.gameMode,pointGoal:parsed.data.pointGoal,hostId:String(uid),players:[{id:String(uid),name:host?.displayName||host?.username||"Player",isBot:false,isReady:true}],status:"waiting"}); if(!room)return res.status(404).json({error:"Room not found"}); const values=parsed.data.recipientIds.map(recipientId=>({senderId:uid,recipientId,roomId:room.id,gameMode:parsed.data.gameMode,pointGoal:parsed.data.pointGoal,expiresAt:new Date(Date.now()+15*60*1000)})); const created=await db.insert(gameInvites).values(values).returning(); res.status(201).json({room,invites:created}); });
+  app.post("/api/game-invites/:id/accept", async (req,res)=>{ const uid=requireUser(req,res);if(!uid)return;const [invite]=await db.update(gameInvites).set({status:"accepted"}).where(and(eq(gameInvites.id,+req.params.id),eq(gameInvites.recipientId,uid),eq(gameInvites.status,"pending"),sql`${gameInvites.expiresAt} > NOW()`)).returning();if(!invite)return res.status(404).json({error:"Invite not found or expired"});const lobby=await storage.getLobby(invite.roomId);const user=await storage.getUser(uid);if(!lobby)return res.status(410).json({error:"Room is no longer available"});if(lobby.players.length>=4)return res.status(409).json({error:"Room is full"});const updated=await storage.updateLobby(lobby.id,{players:[...lobby.players,{id:String(uid),name:user?.displayName||user?.username||"Player",isBot:false,isReady:true}]});res.json({invite,lobby:updated});});
+  app.post("/api/game-invites/:id/decline", async(req,res)=>{const uid=requireUser(req,res);if(!uid)return;const [i]=await db.update(gameInvites).set({status:"declined"}).where(and(eq(gameInvites.id,+req.params.id),eq(gameInvites.recipientId,uid),eq(gameInvites.status,"pending"))).returning();if(!i)return res.status(404).json({error:"Invite not found"});res.json(i);});
+
   app.get("/api/users/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id, 10);
@@ -387,14 +457,7 @@ export async function registerRoutes(
         return res.status(404).json({ error: "User not found" });
       }
       
-      res.json({
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        rating: user.rating,
-        gamesPlayed: user.gamesPlayed,
-        gamesWon: user.gamesWon,
-      });
+      res.json(publicProfile(user));
     } catch (error) {
       res.status(500).json({ error: "Failed to get user" });
     }

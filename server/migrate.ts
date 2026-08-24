@@ -22,6 +22,26 @@ export async function migrate() {
     await db.execute(sql`
       ALTER TABLE users ADD COLUMN IF NOT EXISTS remove_ads BOOLEAN NOT NULL DEFAULT false
     `);
+    await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name VARCHAR(80)`);
+    await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar TEXT`);
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS friendships (
+        id SERIAL PRIMARY KEY, requester_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        recipient_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        status VARCHAR(20) NOT NULL DEFAULT 'pending', created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW(), CHECK (requester_id <> recipient_id),
+        UNIQUE (requester_id, recipient_id)
+      )
+    `);
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS game_invites (
+        id SERIAL PRIMARY KEY, sender_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        recipient_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, room_id VARCHAR(255) NOT NULL,
+        game_mode VARCHAR(50) NOT NULL, point_goal VARCHAR(10) NOT NULL DEFAULT '300',
+        status VARCHAR(20) NOT NULL DEFAULT 'pending', created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        expires_at TIMESTAMP NOT NULL
+      )
+    `);
 
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS password_resets (
