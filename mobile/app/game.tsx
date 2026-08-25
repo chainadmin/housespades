@@ -248,6 +248,19 @@ export default function GameScreen() {
     }
   }, [isMultiplayer, mode, pointGoal]);
 
+  const returnHome = useCallback(async () => {
+    setShowGameOverModal(false);
+    try {
+      await SecureStore.deleteItemAsync(GAME_STATE_KEY);
+    } catch (err) {
+      if (__DEV__) console.error('[Game] Failed to clear saved game while returning home:', err);
+    } finally {
+      // A game can be opened from several screens, so going back is not guaranteed
+      // to lead home (and can be a no-op if this is the first route in the stack).
+      router.replace('/');
+    }
+  }, [router]);
+
   const handleExitGame = useCallback(() => {
     const state = gameStateRef.current;
     const isActiveGame = state && state.phase !== 'game_over' && state.phase !== 'waiting';
@@ -263,16 +276,15 @@ export default function GameScreen() {
             style: 'destructive',
             onPress: async () => {
               await recordGameAbandoned();
-              await SecureStore.deleteItemAsync(GAME_STATE_KEY);
-              router.back();
+              await returnHome();
             },
           },
         ]
       );
     } else {
-      SecureStore.deleteItemAsync(GAME_STATE_KEY).then(() => router.back());
+      void returnHome();
     }
-  }, [recordGameAbandoned, router]);
+  }, [recordGameAbandoned, returnHome]);
 
   const initializeLocalGame = () => {
     const deck = mode === 'ace_high' ? generateStandardDeck() : generateJJDDDeck();
@@ -660,18 +672,18 @@ export default function GameScreen() {
       }
       recordGameCompleted();
       
-      const handleGameOver = async () => {
+      const handleGameOver = () => {
         if (!isMountedRef.current) return;
-        
+
+        // Render the result controls before presenting the native ad. Some ad SDK
+        // implementations do not settle show() until well after dismissal; waiting
+        // for it here used to leave the game-over screen with no usable navigation.
+        setShowGameOverModal(true);
+
         if (!hasRemoveAds) {
-          try {
-            await showInterstitialAd();
-          } catch (err) {
+          showInterstitialAd().catch((err) => {
             if (__DEV__) console.log('Interstitial ad failed, continuing to game over modal');
-          }
-        }
-        if (isMountedRef.current) {
-          setShowGameOverModal(true);
+          });
         }
       };
       
@@ -863,7 +875,9 @@ export default function GameScreen() {
         visible={showGameOverModal}
         transparent
         animationType="fade"
-        onRequestClose={() => {}}
+        onRequestClose={() => {
+          void returnHome();
+        }}
       >
         <View style={styles.modalOverlay}>
           <Animated.View entering={ZoomIn.springify().damping(16)} style={[styles.modalContent, { backgroundColor: colors.card, borderColor: colors.border }]}>
@@ -913,10 +927,8 @@ export default function GameScreen() {
             )}
             <TouchableOpacity
               style={[styles.modalButton, { backgroundColor: colors.primary }]}
-              onPress={async () => {
-                setShowGameOverModal(false);
-                await SecureStore.deleteItemAsync(GAME_STATE_KEY);
-                router.back();
+              onPress={() => {
+                void returnHome();
               }}
             >
               <Text style={[styles.modalButtonText, { color: colors.primaryForeground }]}>
