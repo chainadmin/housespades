@@ -531,10 +531,15 @@ export class GameWebSocketServer {
     if (client) {
       this.handleLeaveLobby(ws);
       if (client.userId) {
-        presence.offline(client.userId);
-        this.userIdToClient.delete(client.userId);
-        matchmaking.removeFromQueue(client.userId);
-        console.log(`[WebSocket] User ${client.userId} disconnected and removed from matchmaking queue`);
+        const activeClient = this.userIdToClient.get(client.userId);
+        if (activeClient === client) {
+          presence.offline(client.userId);
+          this.userIdToClient.delete(client.userId);
+          matchmaking.removeFromQueue(client.userId);
+          console.log(`[WebSocket] User ${client.userId} disconnected and removed from matchmaking queue`);
+        } else {
+          console.log(`[WebSocket] Stale socket for user ${client.userId} disconnected; active connection remains queued`);
+        }
       }
       this.clients.delete(ws);
     }

@@ -1,3 +1,4 @@
 - [Mobile toolchain quirks](mobile-toolchain.md) — bash blocks npm/npx in this workspace; run mobile installs/tsc via code_execution with full nix node path.
 - [RevenueCat server verification](revenuecat-server-verification.md) — verify entitlements server-to-server; secret keys 403 if X-Platform header sent; public SDK keys must be embedded in the app build.
 - [Sound playback readiness](sound-init-races.md) — async audio init must queue early play calls or first-round cues get dropped; effect deps must include every value the effect reads.
+- [Online reconnect ownership](online-reconnect-ownership.md) — reconnect cleanup must be active-socket-aware; serialize queue leave/rejoin and replay actions only after authentication.

@@ -145,6 +145,7 @@ export default function RootLayout() {
           <Stack.Screen name="auth/signup" options={{ animation: 'slide_from_right' }} />
           <Stack.Screen name="auth/forgot-password" options={{ animation: 'slide_from_right' }} />
           <Stack.Screen name="game" options={{ animation: 'fade', gestureEnabled: false }} />
+          <Stack.Screen name="online" options={{ animation: 'slide_from_right' }} />
           <Stack.Screen name="matchmaking" options={{ animation: 'fade_from_bottom' }} />
           <Stack.Screen name="private-room" options={{ animation: 'slide_from_right' }} />
           <Stack.Screen name="private-room-lobby" options={{ animation: 'fade_from_bottom', gestureEnabled: false }} />

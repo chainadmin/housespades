@@ -458,9 +458,6 @@ export default function GameScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
     playSound('bid');
     if (isMultiplayer) {
-      if (!isConnected) {
-        return;
-      }
       wsPlaceBid(bid);
       return;
     }
@@ -498,7 +495,7 @@ export default function GameScreen() {
         currentPlayerIndex: allBid ? (prev.roundStarterIndex ?? 0) : (prev.currentPlayerIndex + 1) % 4,
       };
     });
-  }, [localGameState, isMultiplayer, wsPlaceBid, isConnected, playerId]);
+  }, [localGameState, isMultiplayer, wsPlaceBid, playerId]);
 
   const handlePlayCard = useCallback((card: Card) => {
     if (playedCardIds.has(card.id)) return;

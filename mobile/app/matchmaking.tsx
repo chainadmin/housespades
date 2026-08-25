@@ -13,12 +13,19 @@ import Animated, {
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
 import { GameMode, PointGoal } from '@/constants/game';
-import { authenticatedFetch, getStoredUser } from '@/lib/auth';
+import {
+  AuthError,
+  authenticatedFetch,
+  clearAuth,
+  getStoredSessionCookie,
+  getStoredUser,
+} from '@/lib/auth';
 import { AdBanner } from '@/components/AdBanner';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { useAds } from '@/hooks/useAds';
 
-type MatchmakingPhase = 'connecting' | 'authenticating' | 'joining' | 'searching' | 'found' | 'error';
+type MatchmakingPhase = 'checking' | 'connecting' | 'authenticating' | 'joining' | 'searching' | 'found' | 'error';
+type MatchmakingErrorKind = 'session' | 'server' | 'socket' | 'authentication' | 'matchmaking';
 
 export default function MatchmakingScreen() {
   const router = useRouter();
@@ -26,16 +33,27 @@ export default function MatchmakingScreen() {
   const colors = useColors();
   const { showInterstitialAd, hasRemoveAds } = useAds();
   
-  const [phase, setPhase] = useState<MatchmakingPhase>('connecting');
+  const mode: GameMode = params.mode === 'joker_joker_deuce_deuce' ? params.mode : 'ace_high';
+  const points: PointGoal = params.points === '100' || params.points === '500' ? params.points : '300';
+  const [phase, setPhase] = useState<MatchmakingPhase>('checking');
   const [errorMessage, setErrorMessage] = useState('');
+  const [errorKind, setErrorKind] = useState<MatchmakingErrorKind | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
+  const [validationAttempt, setValidationAttempt] = useState(0);
   const rotation = useSharedValue(0);
   
   const inQueueRef = useRef(false);
   const matchFoundRef = useRef(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const mountedRef = useRef(true);
+  const joinAttemptRef = useRef(0);
+  const joinAbortRef = useRef<AbortController | null>(null);
+  const navigationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const socketGenerationRef = useRef(0);
+  const resettingAttemptRef = useRef(false);
+  const hadAuthenticatedSocketRef = useRef(false);
 
-  const { connect, disconnect, isConnected } = useWebSocket({
+  const { connect, disconnect, isConnected, isAuthenticated } = useWebSocket({
     userId,
     onMatchFound: (gameId) => {
       if (matchFoundRef.current) return;
@@ -43,17 +61,38 @@ export default function MatchmakingScreen() {
       inQueueRef.current = false;
       setPhase('found');
       
-      setTimeout(() => {
-        router.replace(`/game?mode=${params.mode}&points=${params.points}&type=multiplayer&gameId=${gameId}`);
+      navigationTimerRef.current = setTimeout(() => {
+        router.replace(`/game?mode=${mode}&points=${points}&type=multiplayer&gameId=${gameId}`);
       }, 450);
     },
     onAuthenticated: () => {
-      setIsAuthenticated(true);
+      hadAuthenticatedSocketRef.current = true;
+    },
+    onDisconnected: () => {
+      socketGenerationRef.current += 1;
+      inQueueRef.current = false;
+      if (
+        mountedRef.current &&
+        hadAuthenticatedSocketRef.current &&
+        !matchFoundRef.current &&
+        !resettingAttemptRef.current
+      ) {
+        setPhase('connecting');
+        setErrorKind(null);
+        setErrorMessage('');
+      }
     },
     onError: (message) => {
       if (__DEV__) console.error('[Matchmaking] WebSocket error:', message);
+      const isAuthFailure = /auth|session|sign.?in|unauthor/i.test(message);
       setPhase('error');
-      setErrorMessage(message || 'Connection error');
+      setErrorKind(isAuthFailure ? 'authentication' : 'socket');
+      setErrorMessage(
+        message ||
+        (isAuthFailure
+          ? 'Your session could not be verified. Please sign in again.'
+          : 'Unable to connect to the online server. Check your connection and try again.')
+      );
     },
   });
 
@@ -66,35 +105,86 @@ export default function MatchmakingScreen() {
   }, []);
 
   useEffect(() => {
-    const initMatchmaking = async () => {
-      const user = await getStoredUser();
-      if (user) {
-        setUserId(user.id);
-      } else {
+    mountedRef.current = true;
+    const validateOnlineSession = async () => {
+      setPhase('checking');
+      setErrorKind(null);
+      setErrorMessage('');
+
+      const [user, sessionCookie] = await Promise.all([
+        getStoredUser(),
+        getStoredSessionCookie(),
+      ]);
+
+      if (!mountedRef.current) return;
+      if (!user || !sessionCookie) {
         setPhase('error');
-        setErrorMessage('Sign in required for online play');
-        setTimeout(() => {
-          router.replace('/auth/login');
-        }, 2000);
+        setErrorKind('session');
+        setErrorMessage('Sign in is required for online play.');
+        return;
+      }
+
+      const controller = new AbortController();
+      joinAbortRef.current = controller;
+      const timeout = setTimeout(() => controller.abort(), 8000);
+
+      try {
+        const response = await authenticatedFetch('/api/user/profile', {
+          signal: controller.signal,
+        });
+        if (!response.ok) {
+          throw new Error('The online service could not verify your account.');
+        }
+        const verifiedUser = await response.json();
+        if (mountedRef.current) {
+          setUserId(verifiedUser.id || user.id);
+          setPhase('connecting');
+        }
+      } catch (error) {
+        if (!mountedRef.current) return;
+        if (error instanceof AuthError) {
+          setErrorKind('session');
+          setErrorMessage('Your session has expired. Please sign in again.');
+        } else {
+          setErrorKind('server');
+          setErrorMessage(
+            error instanceof Error && error.name === 'AbortError'
+              ? 'The online server is taking too long to respond. Please try again.'
+              : 'The online server is unavailable right now. Check your connection and try again.'
+          );
+        }
+        setPhase('error');
+      } finally {
+        clearTimeout(timeout);
       }
     };
     
-    initMatchmaking();
+    validateOnlineSession();
 
     return () => {
+      mountedRef.current = false;
+      joinAttemptRef.current += 1;
+      joinAbortRef.current?.abort();
+      if (navigationTimerRef.current) {
+        clearTimeout(navigationTimerRef.current);
+      }
+      if (retryTimerRef.current) {
+        clearTimeout(retryTimerRef.current);
+        retryTimerRef.current = null;
+      }
       if (!matchFoundRef.current) {
-        leaveMatchmaking();
+        void leaveMatchmaking();
       }
       disconnect();
     };
-  }, [params.mode, params.points]);
+  }, [mode, points, validationAttempt]);
 
   useEffect(() => {
-    if (userId && !isConnected) {
+    if (userId && !isConnected && phase !== 'error' && !resettingAttemptRef.current) {
       setPhase('connecting');
       connect(true);
     }
-  }, [userId, isConnected, connect]);
+  }, [userId, isConnected, connect, phase]);
 
   useEffect(() => {
     if (isConnected && !isAuthenticated) {
@@ -103,35 +193,62 @@ export default function MatchmakingScreen() {
   }, [isConnected, isAuthenticated]);
 
   useEffect(() => {
-    if (isAuthenticated && !inQueueRef.current) {
+    if (isAuthenticated && !inQueueRef.current && !resettingAttemptRef.current) {
       setPhase('joining');
-      joinMatchmaking();
+      void joinMatchmaking();
     }
   }, [isAuthenticated]);
 
   const joinMatchmaking = async () => {
+    const attempt = ++joinAttemptRef.current;
+    const socketGeneration = socketGenerationRef.current;
+    joinAbortRef.current?.abort();
+    const controller = new AbortController();
+    joinAbortRef.current = controller;
+    const timeout = setTimeout(() => controller.abort(), 10000);
+
     try {
       const response = await authenticatedFetch('/api/matchmaking/join', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          gameMode: params.mode,
-          pointGoal: params.points,
+          gameMode: mode,
+          pointGoal: points,
         }),
+        signal: controller.signal,
       });
+      if (
+        !mountedRef.current ||
+        attempt !== joinAttemptRef.current ||
+        socketGeneration !== socketGenerationRef.current
+      ) return;
 
       if (response.ok) {
         inQueueRef.current = true;
+        setErrorKind(null);
         setPhase('searching');
       } else {
         const data = await response.json();
         setPhase('error');
-        setErrorMessage(data.message || 'Failed to join queue');
+        setErrorKind('matchmaking');
+        setErrorMessage(data.error || data.message || 'The matchmaking queue could not be joined. Please try again.');
       }
     } catch (err) {
+      if (!mountedRef.current || attempt !== joinAttemptRef.current) return;
       if (__DEV__) console.error('Failed to join matchmaking:', err);
       setPhase('error');
-      setErrorMessage('Connection error. Please try again.');
+      if (err instanceof AuthError) {
+        setErrorKind('session');
+        setErrorMessage('Your session expired before matchmaking started. Please sign in again.');
+      } else if (err instanceof Error && err.name === 'AbortError') {
+        setErrorKind('matchmaking');
+        setErrorMessage('Matchmaking took too long to respond. Please try again.');
+      } else {
+        setErrorKind('server');
+        setErrorMessage('The matchmaking service is unavailable. Check your connection and try again.');
+      }
+    } finally {
+      clearTimeout(timeout);
     }
   };
 
@@ -146,7 +263,18 @@ export default function MatchmakingScreen() {
   };
 
   const handleCancel = async () => {
-    leaveMatchmaking();
+    resettingAttemptRef.current = true;
+    matchFoundRef.current = true;
+    joinAttemptRef.current += 1;
+    if (retryTimerRef.current) {
+      clearTimeout(retryTimerRef.current);
+      retryTimerRef.current = null;
+    }
+    joinAbortRef.current?.abort();
+    if (inQueueRef.current) {
+      await leaveMatchmaking();
+    }
+    socketGenerationRef.current += 1;
     disconnect();
     
     if (!hasRemoveAds) {
@@ -162,6 +290,7 @@ export default function MatchmakingScreen() {
 
   const getStatusText = () => {
     switch (phase) {
+      case 'checking': return 'Checking the online server and your sign-in session...';
       case 'connecting': return 'Connecting to server...';
       case 'authenticating': return 'Authenticating...';
       case 'joining': return 'Joining matchmaking queue...';
@@ -200,7 +329,15 @@ export default function MatchmakingScreen() {
         )}
 
         <Text style={styles.title}>
-          {phase === 'found' ? 'Match Found!' : phase === 'error' ? 'Connection Issue' : 'Finding Match'}
+          {phase === 'found'
+            ? 'Match Found!'
+            : phase === 'error'
+              ? errorKind === 'session' || errorKind === 'authentication'
+                ? 'Sign In Needed'
+                : errorKind === 'matchmaking'
+                  ? 'Matchmaking Issue'
+                  : 'Connection Issue'
+              : 'Finding Match'}
         </Text>
         <Text style={styles.status}>{getStatusText()}</Text>
 
@@ -208,7 +345,7 @@ export default function MatchmakingScreen() {
           <StepIndicator
             label="Connected"
             isComplete={isConnected || phase === 'found'}
-            isActive={phase === 'connecting'}
+            isActive={phase === 'checking' || phase === 'connecting'}
             colors={colors}
           />
           <StepIndicator
@@ -234,10 +371,10 @@ export default function MatchmakingScreen() {
         <View style={styles.modeInfo}>
           <Text style={styles.modeLabel}>Mode</Text>
           <Text style={styles.modeValue}>
-            {params.mode === 'ace_high' ? 'Ace High' : 'Joker Joker Deuce Deuce'}
+            {mode === 'ace_high' ? 'Ace High' : 'Joker Joker Deuce Deuce'}
           </Text>
           <Text style={styles.modeLabel}>Goal</Text>
-          <Text style={styles.modeValue}>{params.points} Points</Text>
+          <Text style={styles.modeValue}>{points} Points</Text>
           <Text style={styles.modeLabel}>
             If no human opponents are available, seats are filled by computer players clearly labeled "BOT" in-game.
           </Text>
@@ -245,27 +382,55 @@ export default function MatchmakingScreen() {
       </View>
 
       {phase === 'error' && (
-        <TouchableOpacity style={[styles.retryButton, { backgroundColor: colors.primary }]} onPress={() => {
-          setErrorMessage('');
-          inQueueRef.current = false;
+        <TouchableOpacity style={[styles.retryButton, { backgroundColor: colors.primary }]} onPress={async () => {
+          if (errorKind === 'session' || errorKind === 'authentication') {
+            resettingAttemptRef.current = true;
+            await clearAuth();
+            router.replace({
+              pathname: '/auth/login',
+              params: { message: 'Please sign in again to continue online.' },
+            });
+            return;
+          }
 
-          if (!isConnected) {
+          resettingAttemptRef.current = true;
+          const retryGeneration = ++joinAttemptRef.current;
+          if (retryTimerRef.current) {
+            clearTimeout(retryTimerRef.current);
+            retryTimerRef.current = null;
+          }
+          joinAbortRef.current?.abort();
+          setErrorMessage('');
+          setErrorKind(null);
+          matchFoundRef.current = false;
+
+          if (inQueueRef.current) {
+            await leaveMatchmaking();
+          }
+          socketGenerationRef.current += 1;
+          disconnect();
+          if (userId) {
             setPhase('connecting');
-            if (userId) {
-              disconnect();
-              setTimeout(() => connect(true), 300);
-            }
-          } else if (!isAuthenticated) {
-            setPhase('authenticating');
-            disconnect();
-            setTimeout(() => connect(true), 300);
+            retryTimerRef.current = setTimeout(() => {
+              retryTimerRef.current = null;
+              if (!mountedRef.current || retryGeneration !== joinAttemptRef.current) return;
+              resettingAttemptRef.current = false;
+              connect(true);
+            }, 250);
           } else {
-            setPhase('joining');
-            joinMatchmaking();
+            resettingAttemptRef.current = false;
+            setPhase('checking');
+            setValidationAttempt((current) => current + 1);
           }
         }}>
-          <Ionicons name="refresh-outline" size={20} color={colors.primaryForeground} />
-          <Text style={[styles.retryText, { color: colors.primaryForeground }]}>Retry</Text>
+          <Ionicons
+            name={errorKind === 'session' || errorKind === 'authentication' ? 'log-in-outline' : 'refresh-outline'}
+            size={20}
+            color={colors.primaryForeground}
+          />
+          <Text style={[styles.retryText, { color: colors.primaryForeground }]}>
+            {errorKind === 'session' || errorKind === 'authentication' ? 'Sign In' : 'Retry'}
+          </Text>
         </TouchableOpacity>
       )}
 

@@ -73,45 +73,90 @@ interface UseWebSocketOptions {
   onPlayerJoined?: (playerId: string) => void;
   onMatchFound?: (gameId: string) => void;
   onAuthenticated?: () => void;
+  onDisconnected?: () => void;
+  onConnectionStateChange?: (state: ConnectionState) => void;
   autoConnect?: boolean;
   userId?: number | null;
 }
 
+export type ConnectionState =
+  | 'idle'
+  | 'connecting'
+  | 'connected'
+  | 'authenticating'
+  | 'authenticated'
+  | 'reconnecting'
+  | 'error';
+
 export function useWebSocket(options: UseWebSocketOptions = {}) {
   const wsRef = useRef<WebSocket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [connectionState, setConnectionState] = useState<ConnectionState>('idle');
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [gameState, setGameState] = useState<GameState | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const authenticationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const reconnectAttemptRef = useRef(0);
   const pendingMessagesRef = useRef<Map<string, WSMessage>>(new Map());
   const intentionalDisconnectRef = useRef(false);
+  const authenticatedRef = useRef(false);
   const optionsRef = useRef(options);
   
   useEffect(() => {
     optionsRef.current = options;
   }, [options]);
 
+  const updateConnectionState = useCallback((state: ConnectionState) => {
+    setConnectionState(state);
+    optionsRef.current.onConnectionStateChange?.(state);
+  }, []);
+
   const connect = useCallback((isExplicit?: boolean) => {
     if (isExplicit) {
       intentionalDisconnectRef.current = false;
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
     }
     if (intentionalDisconnectRef.current) return;
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
     if (wsRef.current?.readyState === WebSocket.CONNECTING) return;
 
     const wsUrl = `${WS_BASE_URL}/ws`;
-    
+    const isReconnect = reconnectAttemptRef.current > 0;
+    updateConnectionState(isReconnect ? 'reconnecting' : 'connecting');
+    setIsAuthenticated(false);
+    authenticatedRef.current = false;
+
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
+    let opened = false;
+    let errorReported = false;
+
+    connectionTimeoutRef.current = setTimeout(() => {
+      if (wsRef.current !== ws || ws.readyState === WebSocket.OPEN) return;
+      errorReported = true;
+      updateConnectionState('error');
+      optionsRef.current.onError?.('The online server did not respond. Check your connection and try again.');
+      ws.close();
+    }, 12000);
 
     ws.onopen = async () => {
-      if (intentionalDisconnectRef.current) {
+      if (intentionalDisconnectRef.current || wsRef.current !== ws) {
         ws.close();
         return;
       }
+      opened = true;
+      if (connectionTimeoutRef.current) {
+        clearTimeout(connectionTimeoutRef.current);
+        connectionTimeoutRef.current = null;
+      }
       setIsConnected(true);
       reconnectAttemptRef.current = 0;
+      updateConnectionState('connected');
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
         reconnectTimeoutRef.current = null;
@@ -119,23 +164,32 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       
       if (optionsRef.current.userId) {
         const sessionCookie = await getStoredSessionCookie();
+        if (intentionalDisconnectRef.current || wsRef.current !== ws) return;
+        if (!sessionCookie) {
+          errorReported = true;
+          updateConnectionState('error');
+          optionsRef.current.onError?.('Your sign-in session is missing. Please sign in again to play online.');
+          ws.close();
+          return;
+        }
+        updateConnectionState('authenticating');
         ws.send(JSON.stringify({
           type: 'authenticate',
           payload: { sessionCookie },
         }));
         if (__DEV__) console.log('[WebSocket] Sent authenticate message for user', optionsRef.current.userId);
+        authenticationTimeoutRef.current = setTimeout(() => {
+          if (wsRef.current !== ws || authenticatedRef.current) return;
+          errorReported = true;
+          updateConnectionState('error');
+          optionsRef.current.onError?.('The server could not verify your session. Please sign in again.');
+          ws.close();
+        }, 8000);
       }
-
-      // Gameplay actions made during a brief network interruption are retained
-      // and sent in order as soon as the socket is healthy again.
-      pendingMessagesRef.current.forEach((message) => {
-        ws.send(JSON.stringify(message));
-      });
-      pendingMessagesRef.current.clear();
     };
 
     ws.onmessage = (event) => {
-      if (intentionalDisconnectRef.current) return;
+      if (intentionalDisconnectRef.current || wsRef.current !== ws) return;
       try {
         const message = JSON.parse(event.data) as WSMessage;
         
@@ -145,7 +199,21 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
             optionsRef.current.onPlayerJoined?.(message.payload.playerId);
             if (message.payload.authenticated) {
               if (__DEV__) console.log('[WebSocket] Authentication confirmed');
+              if (authenticationTimeoutRef.current) {
+                clearTimeout(authenticationTimeoutRef.current);
+                authenticationTimeoutRef.current = null;
+              }
+              authenticatedRef.current = true;
+              setIsAuthenticated(true);
+              updateConnectionState('authenticated');
               optionsRef.current.onAuthenticated?.();
+
+              // Gameplay actions made during a brief network interruption are retained
+              // and sent only after the reconnected socket is authenticated.
+              pendingMessagesRef.current.forEach((pendingMessage) => {
+                ws.send(JSON.stringify(pendingMessage));
+              });
+              pendingMessagesRef.current.clear();
             }
             break;
           case 'game_state_update':
@@ -156,9 +224,20 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
             if (__DEV__) console.log('[WebSocket] Match found:', message.payload.gameId);
             optionsRef.current.onMatchFound?.(message.payload.gameId);
             break;
-          case 'error':
-            optionsRef.current.onError?.(message.payload.message);
+          case 'error': {
+            const serverMessage = message.payload?.message || 'The online server reported an error.';
+            if (/auth|session|sign.?in|unauthor/i.test(serverMessage)) {
+              authenticatedRef.current = false;
+              setIsAuthenticated(false);
+              updateConnectionState('error');
+              if (authenticationTimeoutRef.current) {
+                clearTimeout(authenticationTimeoutRef.current);
+                authenticationTimeoutRef.current = null;
+              }
+            }
+            optionsRef.current.onError?.(serverMessage);
             break;
+          }
         }
       } catch (error) {
         if (__DEV__) console.error('Failed to parse WebSocket message:', error);
@@ -166,16 +245,34 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     };
 
     ws.onclose = () => {
+      if (wsRef.current !== ws) return;
+      if (connectionTimeoutRef.current) {
+        clearTimeout(connectionTimeoutRef.current);
+        connectionTimeoutRef.current = null;
+      }
+      if (authenticationTimeoutRef.current) {
+        clearTimeout(authenticationTimeoutRef.current);
+        authenticationTimeoutRef.current = null;
+      }
       setIsConnected(false);
-      if (wsRef.current === ws) {
-        wsRef.current = null;
+      setIsAuthenticated(false);
+      authenticatedRef.current = false;
+      wsRef.current = null;
+      optionsRef.current.onDisconnected?.();
+
+      if (!opened && !errorReported && !intentionalDisconnectRef.current) {
+        optionsRef.current.onError?.('Unable to open a connection to the online server. Please try again.');
       }
       
-      if (intentionalDisconnectRef.current) return;
+      if (intentionalDisconnectRef.current) {
+        updateConnectionState('idle');
+        return;
+      }
       
       if (!reconnectTimeoutRef.current) {
         const attempt = reconnectAttemptRef.current++;
         const delay = Math.min(8000, 750 * 2 ** attempt) + Math.random() * 250;
+        updateConnectionState('reconnecting');
         reconnectTimeoutRef.current = setTimeout(() => {
           reconnectTimeoutRef.current = null;
           connect();
@@ -185,8 +282,13 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
     ws.onerror = (error) => {
       if (__DEV__) console.error('WebSocket error:', error);
+      if (!opened && !errorReported) {
+        errorReported = true;
+        updateConnectionState('error');
+        optionsRef.current.onError?.('Unable to reach the online server. Check your internet connection and try again.');
+      }
     };
-  }, []);
+  }, [updateConnectionState]);
 
   const disconnect = useCallback(() => {
     intentionalDisconnectRef.current = true;
@@ -194,16 +296,33 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       clearTimeout(reconnectTimeoutRef.current);
       reconnectTimeoutRef.current = null;
     }
+    if (connectionTimeoutRef.current) {
+      clearTimeout(connectionTimeoutRef.current);
+      connectionTimeoutRef.current = null;
+    }
+    if (authenticationTimeoutRef.current) {
+      clearTimeout(authenticationTimeoutRef.current);
+      authenticationTimeoutRef.current = null;
+    }
     if (wsRef.current) {
-      wsRef.current.close();
+      const ws = wsRef.current;
       wsRef.current = null;
+      ws.close();
     }
     pendingMessagesRef.current.clear();
     reconnectAttemptRef.current = 0;
-  }, []);
+    authenticatedRef.current = false;
+    setIsConnected(false);
+    setIsAuthenticated(false);
+    updateConnectionState('idle');
+  }, [updateConnectionState]);
 
   const sendMessage = useCallback((message: WSMessage) => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
+    const requiresAuthentication = Boolean(optionsRef.current.userId);
+    if (
+      wsRef.current?.readyState === WebSocket.OPEN &&
+      (!requiresAuthentication || authenticatedRef.current)
+    ) {
       wsRef.current.send(JSON.stringify(message));
       return true;
     }
@@ -252,7 +371,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
   useEffect(() => {
     if (options.autoConnect) {
-      connect();
+      connect(true);
     }
     return () => {
       disconnect();
@@ -263,6 +382,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     connect,
     disconnect,
     isConnected,
+    isAuthenticated,
+    connectionState,
     playerId,
     gameState,
     startGame,

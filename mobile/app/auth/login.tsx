@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Image, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter, Link } from 'expo-router';
+import { useLocalSearchParams, useRouter, Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
 import { apiUrl } from '@/config/api';
@@ -14,6 +14,7 @@ const TERMS_OF_SERVICE_URL = 'https://house-spades.com/terms';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { message } = useLocalSearchParams<{ message?: string }>();
   const colors = useColors();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -97,6 +98,13 @@ export default function LoginScreen() {
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Welcome back</Text>
             <Text style={styles.cardDescription}>Enter your credentials to continue</Text>
+
+            {message ? (
+              <View style={styles.messageContainer}>
+                <Ionicons name="information-circle-outline" size={18} color={colors.primary} />
+                <Text style={styles.messageText}>{message}</Text>
+              </View>
+            ) : null}
 
             {error ? (
               <View style={styles.errorContainer}>
@@ -235,6 +243,23 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       padding: 12,
       borderRadius: 12,
       marginBottom: 16,
+    },
+    messageContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      backgroundColor: colors.muted,
+      borderColor: colors.border,
+      borderWidth: 1,
+      borderRadius: 10,
+      padding: 12,
+      marginBottom: 16,
+    },
+    messageText: {
+      color: colors.textSecondary,
+      fontSize: 13,
+      lineHeight: 18,
+      flex: 1,
     },
     errorText: {
       color: colors.error,
