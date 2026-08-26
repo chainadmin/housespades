@@ -71,6 +71,7 @@ export function useAds(): UseAdsReturn {
         interstitialRef.current.removeAllListeners();
       }
       pendingShowRef.current = false;
+      pendingResolveRef.current?.(false);
       pendingResolveRef.current = null;
     };
   }, [hasRemoveAds]);
@@ -108,10 +109,6 @@ export function useAds(): UseAdsReturn {
           pendingShowRef.current = false;
           try {
             await interstitialRef.current.show();
-            if (pendingResolveRef.current) {
-              pendingResolveRef.current(true);
-              pendingResolveRef.current = null;
-            }
           } catch (err) {
             if (__DEV__) console.error('[Ads] Failed to show pending ad:', err);
             if (pendingResolveRef.current) {
@@ -125,12 +122,10 @@ export function useAds(): UseAdsReturn {
       interstitial.addAdEventListener(AdEventType.ERROR, (error) => {
         if (__DEV__) console.error('[Ads] Interstitial ad failed to load:', error);
         setIsAdLoading(false);
-        if (pendingShowRef.current) {
-          pendingShowRef.current = false;
-          if (pendingResolveRef.current) {
-            pendingResolveRef.current(false);
-            pendingResolveRef.current = null;
-          }
+        pendingShowRef.current = false;
+        if (pendingResolveRef.current) {
+          pendingResolveRef.current(false);
+          pendingResolveRef.current = null;
         }
         setTimeout(() => loadAd(), 60000);
       });
@@ -138,6 +133,11 @@ export function useAds(): UseAdsReturn {
       interstitial.addAdEventListener(AdEventType.CLOSED, () => {
         if (__DEV__) console.log('[Ads] Interstitial ad closed');
         setIsAdLoaded(false);
+        interstitialRef.current = null;
+        if (pendingResolveRef.current) {
+          pendingResolveRef.current(true);
+          pendingResolveRef.current = null;
+        }
         loadAd();
       });
 
@@ -168,14 +168,20 @@ export function useAds(): UseAdsReturn {
       });
     }
 
-    try {
-      await interstitialRef.current.show();
-      return true;
-    } catch (err) {
-      if (__DEV__) console.error('Failed to show ad:', err);
-      loadAd();
-      return false;
-    }
+    return new Promise((resolve) => {
+      // Google Mobile Ads resolves show() when presentation begins, not when the
+      // user dismisses the ad. Keep this promise open until CLOSED so callers can
+      // safely navigate only after the native ad is no longer covering the app.
+      pendingResolveRef.current = resolve;
+      interstitialRef.current!.show().catch((err) => {
+        if (__DEV__) console.error('Failed to show ad:', err);
+        if (pendingResolveRef.current === resolve) {
+          pendingResolveRef.current = null;
+          resolve(false);
+        }
+        loadAd();
+      });
+    });
   }, [hasRemoveAds, isAdLoaded, loadAd]);
 
   const recordGameCompleted = useCallback(() => {
