@@ -57,6 +57,8 @@ export default function GameScreen() {
   const gameCompletedRef = useRef(false);
   const isMountedRef = useRef(true);
   const gameOverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const postGameNavigationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hasStartedPostGameNavigationRef = useRef(false);
   const wasConnectedRef = useRef(false);
 
   const {
@@ -99,6 +101,9 @@ export default function GameScreen() {
       isMountedRef.current = false;
       if (gameOverTimeoutRef.current) {
         clearTimeout(gameOverTimeoutRef.current);
+      }
+      if (postGameNavigationTimeoutRef.current) {
+        clearTimeout(postGameNavigationTimeoutRef.current);
       }
     };
   }, []);
@@ -672,15 +677,32 @@ export default function GameScreen() {
       const handleGameOver = () => {
         if (!isMountedRef.current) return;
 
-        // Render the result controls before presenting the native ad. Some ad SDK
-        // implementations do not settle show() until well after dismissal; waiting
-        // for it here used to leave the game-over screen with no usable navigation.
+        // Render usable result controls while an ad loads or if it cannot be shown.
         setShowGameOverModal(true);
 
         if (!hasRemoveAds) {
-          showInterstitialAd().catch((err) => {
-            if (__DEV__) console.log('Interstitial ad failed, continuing to game over modal');
-          });
+          const finishPostGame = () => {
+            if (!isMountedRef.current || hasStartedPostGameNavigationRef.current) return;
+            hasStartedPostGameNavigationRef.current = true;
+            if (postGameNavigationTimeoutRef.current) {
+              clearTimeout(postGameNavigationTimeoutRef.current);
+              postGameNavigationTimeoutRef.current = null;
+            }
+            void returnHome();
+          };
+
+          // CLOSED is the normal completion signal, but some native ad versions
+          // have failed to deliver it after dismissal. Navigate underneath the
+          // native overlay as a fail-safe so dismissing the ad can never reveal a
+          // frozen, completed game. This also covers an ad that never loads.
+          postGameNavigationTimeoutRef.current = setTimeout(finishPostGame, 7000);
+
+          void showInterstitialAd()
+            .then(finishPostGame)
+            .catch(() => {
+              if (__DEV__) console.log('Interstitial ad failed, continuing to game over modal');
+              finishPostGame();
+            });
         }
       };
       
@@ -689,12 +711,13 @@ export default function GameScreen() {
     
     if (currentPhase === 'bidding' && previousPhaseRef.current !== 'bidding') {
       gameCompletedRef.current = false;
+      hasStartedPostGameNavigationRef.current = false;
       setShowGameOverModal(false);
       playSound('card-deal');
     }
     
     previousPhaseRef.current = currentPhase || null;
-  }, [gameState?.phase, hasRemoveAds, showInterstitialAd, recordGameCompleted]);
+  }, [gameState?.phase, hasRemoveAds, showInterstitialAd, recordGameCompleted, returnHome]);
 
   useEffect(() => {
     if (isMultiplayer) return;
