@@ -163,6 +163,11 @@ export class GameEngine {
       },
     ];
 
+    // Pick a dealer for the opening round instead of always assigning the
+    // first (usually human) seat. Bidding starts to the dealer's left, just as
+    // it does after every subsequent round.
+    const dealerIndex = Math.floor(Math.random() * gamePlayers.length);
+
     return {
       id: randomUUID(),
       mode,
@@ -175,8 +180,8 @@ export class GameEngine {
         leadSuit: null,
         winnerId: null,
       },
-      currentPlayerIndex: 0,
-      dealerIndex: 0,
+      currentPlayerIndex: (dealerIndex + 1) % gamePlayers.length,
+      dealerIndex,
       roundNumber: 1,
       spadesBroken: false,
       winningScore: POINT_GOAL_VALUES[pointGoal],
@@ -484,14 +489,16 @@ export class GameEngine {
       tricks: 0,
     }));
 
+    const nextDealerIndex = (state.dealerIndex + 1) % players.length;
+
     return {
       ...state,
       players: newDealtPlayers,
       teams: finalTeams,
       currentTrick: { cards: [], leadSuit: null, winnerId: null },
       phase: "bidding",
-      currentPlayerIndex: (state.dealerIndex + 1) % 4,
-      dealerIndex: (state.dealerIndex + 1) % 4,
+      currentPlayerIndex: (nextDealerIndex + 1) % players.length,
+      dealerIndex: nextDealerIndex,
       roundNumber: state.roundNumber + 1,
       spadesBroken: false,
     };

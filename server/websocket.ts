@@ -113,11 +113,10 @@ export class GameWebSocketServer {
       BotAI.resetTracking(gameState.id);
       
       const authenticatedHumans = gamePlayers.filter(p => !p.isBot && p.userId).length;
-      // Public matchmaking is ranked even when the queue has to fill empty
-      // seats with bots. Requiring two humans meant that the most common
-      // online match (one queued player plus three bots) never recorded the
-      // player's result or changed their rating.
-      const isRanked = authenticatedHumans >= 1;
+      // Ratings only change in competitive matches with at least two
+      // authenticated people. Bots can fill the remaining seats, but a solo
+      // human game is practice and does not affect the leaderboard.
+      const isRanked = authenticatedHumans >= 2;
       
       const avgRating = connectedHumanPlayers.length > 0
         ? Math.round(connectedHumanPlayers.reduce((sum, p) => sum + p.rating, 0) / connectedHumanPlayers.length)
