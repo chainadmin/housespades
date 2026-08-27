@@ -113,7 +113,11 @@ export class GameWebSocketServer {
       BotAI.resetTracking(gameState.id);
       
       const authenticatedHumans = gamePlayers.filter(p => !p.isBot && p.userId).length;
-      const isRanked = authenticatedHumans >= 2;
+      // Public matchmaking is ranked even when the queue has to fill empty
+      // seats with bots. Requiring two humans meant that the most common
+      // online match (one queued player plus three bots) never recorded the
+      // player's result or changed their rating.
+      const isRanked = authenticatedHumans >= 1;
       
       const avgRating = connectedHumanPlayers.length > 0
         ? Math.round(connectedHumanPlayers.reduce((sum, p) => sum + p.rating, 0) / connectedHumanPlayers.length)
@@ -566,6 +570,11 @@ export class GameWebSocketServer {
       const currentRoom = this.gameRooms.get(gameId);
       if (!currentRoom) return;
 
+      // This timeout is now running. Clearing the reference makes the next
+      // bot in the turn order responsible for its own timer and prevents a
+      // completed timeout from being mistaken for pending work.
+      currentRoom.botTimer = null;
+
       const { gameState: state } = currentRoom;
       const bot = state.players[state.currentPlayerIndex];
       if (!bot || !bot.isBot) return;
@@ -599,6 +608,9 @@ export class GameWebSocketServer {
         }
       } catch (error) {
         console.error("Bot move error:", error);
+        // A transient AI/game-state error must not permanently strand an
+        // online game on a bot seat. Re-check the current turn and retry.
+        this.scheduleBotMove(gameId);
       }
     }, delay);
   }
