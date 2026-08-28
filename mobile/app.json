@@ -71,7 +71,7 @@
       }
     },
     "android": {
-      "versionCode": 41,
+      "versionCode": 44,
       "adaptiveIcon": {
         "foregroundImage": "./assets/house-card-logo.png",
         "backgroundColor": "#121212"
