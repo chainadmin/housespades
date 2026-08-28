@@ -1,6 +1,6 @@
 const { withGradleProperties } = require("expo/config-plugins");
 
-module.exports = function withAndroidSdk35(config) {
+module.exports = function withAndroidSdk36(config) {
   return withGradleProperties(config, (config) => {
     config.modResults = config.modResults.filter(
       (item) =>
@@ -16,17 +16,17 @@ module.exports = function withAndroidSdk35(config) {
       {
         type: "property",
         key: "android.compileSdkVersion",
-        value: "35",
+        value: "36",
       },
       {
         type: "property",
         key: "android.targetSdkVersion",
-        value: "35",
+        value: "36",
       },
       {
         type: "property",
         key: "android.buildToolsVersion",
-        value: "35.0.0",
+        value: "36.0.0",
       }
     );
 
