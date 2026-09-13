@@ -12,7 +12,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColorScheme';
-import { GameMode, PointGoal } from '@/constants/game';
+import { GameMode, ONLINE_GAME_MODE, ONLINE_POINT_GOAL, PointGoal } from '@/constants/game';
 import {
   AuthError,
   authenticatedFetch,
@@ -29,12 +29,13 @@ type MatchmakingErrorKind = 'session' | 'server' | 'socket' | 'authentication' |
 
 export default function MatchmakingScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ mode: GameMode; points: PointGoal }>();
   const colors = useColors();
   const { showInterstitialAd, hasRemoveAds } = useAds();
-  
-  const mode: GameMode = params.mode === 'joker_joker_deuce_deuce' ? params.mode : 'ace_high';
-  const points: PointGoal = params.points === '100' || params.points === '500' ? params.points : '300';
+
+  // TEMPORARY: quick matchmaking is pinned to a single mode/point-goal combo (see ONLINE_GAME_MODE)
+  // because the online player pool is too small to split across every combination.
+  const mode: GameMode = ONLINE_GAME_MODE;
+  const points: PointGoal = ONLINE_POINT_GOAL;
   const [phase, setPhase] = useState<MatchmakingPhase>('checking');
   const [errorMessage, setErrorMessage] = useState('');
   const [errorKind, setErrorKind] = useState<MatchmakingErrorKind | null>(null);

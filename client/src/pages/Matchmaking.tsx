@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { useLocation, useSearch } from "wouter";
+import { useLocation } from "wouter";
 import { MatchmakingScreen } from "@/components/MatchmakingScreen";
-import type { GameMode, PointGoal } from "@shared/schema";
+import { ONLINE_GAME_MODE, ONLINE_POINT_GOAL } from "@shared/schema";
 
 interface MatchmakingPlayer {
   id: string;
@@ -14,12 +14,12 @@ const BOT_NAMES = ["SpadeMaster", "TrickTaker", "CardShark", "AceHunter", "BidWi
 
 export default function Matchmaking() {
   const [, navigate] = useLocation();
-  const searchString = useSearch();
-  const params = new URLSearchParams(searchString);
-  
-  const mode = (params.get("mode") as GameMode) || "ace_high";
-  const pointGoal = (params.get("points") as PointGoal) || "300";
-  
+
+  // TEMPORARY: online matchmaking is pinned to a single mode/point-goal combo (see ONLINE_GAME_MODE)
+  // because the online player pool is too small to split across every combination.
+  const mode = ONLINE_GAME_MODE;
+  const pointGoal = ONLINE_POINT_GOAL;
+
   const [players, setPlayers] = useState<MatchmakingPlayer[]>([
     { id: "player-1", name: "You", isBot: false, isReady: true }
   ]);
