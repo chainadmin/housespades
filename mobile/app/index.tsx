@@ -101,7 +101,9 @@ export default function HomeScreen() {
       });
       return;
     }
-    router.push(`/online?mode=${selectedMode}&points=${selectedPoints}`);
+    // Online play has its own fixed mode/point goal for now (see /online) — the
+    // Mode/Point Goal selectors below only apply to solo play against bots.
+    router.push('/online');
   };
 
   const winRate = user && user.gamesPlayed > 0 
@@ -228,6 +230,8 @@ export default function HomeScreen() {
 
       {/* Bottom-anchored options + play */}
       <Animated.View entering={FadeInDown.delay(160).duration(360)} style={[styles.bottomBar, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <Text style={styles.optionsHint}>Mode &amp; Point Goal below apply to solo play. Online is fixed to JJDD · 100 pts for now.</Text>
+
         <View style={styles.optionsRow}>
           <View style={styles.optionGroup}>
             <Text style={styles.optionLabel}>Mode</Text>
@@ -477,6 +481,11 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       paddingTop: 12,
       paddingBottom: 16,
       gap: 10,
+    },
+    optionsHint: {
+      fontSize: 11,
+      color: colors.textTertiary,
+      marginBottom: 2,
     },
     optionsRow: {
       flexDirection: 'row',

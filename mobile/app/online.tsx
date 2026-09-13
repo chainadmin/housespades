@@ -1,43 +1,18 @@
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { useColors } from '@/hooks/useColorScheme';
-import { GameMode, PointGoal } from '@/constants/game';
 
 type OnlineChoice = 'quick' | 'create' | 'join';
-
-const modes: { value: GameMode; title: string; description: string; icon: 'star-outline' | 'diamond-outline' }[] = [
-  {
-    value: 'ace_high',
-    title: 'Ace High',
-    description: 'Classic Spades rules. Aces lead the table.',
-    icon: 'star-outline',
-  },
-  {
-    value: 'joker_joker_deuce_deuce',
-    title: 'Joker Joker Deuce Deuce',
-    description: 'A bigger deck with four high cards in play.',
-    icon: 'diamond-outline',
-  },
-];
-
-const goals: PointGoal[] = ['100', '300', '500'];
 
 export default function OnlineScreen() {
   const colors = useColors();
   const router = useRouter();
-  const params = useLocalSearchParams<{ mode?: GameMode; points?: PointGoal }>();
   const [choice, setChoice] = useState<OnlineChoice>('quick');
-  const [mode, setMode] = useState<GameMode>(
-    params.mode === 'joker_joker_deuce_deuce' ? params.mode : 'ace_high'
-  );
-  const [points, setPoints] = useState<PointGoal>(
-    params.points === '100' || params.points === '500' ? params.points : '300'
-  );
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   const selectChoice = (next: OnlineChoice) => {
@@ -45,30 +20,18 @@ export default function OnlineScreen() {
     setChoice(next);
   };
 
-  const selectMode = (next: GameMode) => {
-    Haptics.selectionAsync().catch(() => {});
-    setMode(next);
-  };
-
-  const selectPoints = (next: PointGoal) => {
-    Haptics.selectionAsync().catch(() => {});
-    setPoints(next);
-  };
-
   const continueToGame = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
     if (choice === 'quick') {
-      router.push(`/matchmaking?mode=${mode}&points=${points}`);
+      router.push('/matchmaking');
       return;
     }
     if (choice === 'create') {
-      router.push(`/private-room?mode=${mode}&points=${points}&intent=create`);
+      router.push('/private-room?intent=create');
       return;
     }
     router.push('/private-room?intent=join');
   };
-
-  const isRuleSelectionVisible = choice !== 'join';
 
   return (
     <SafeAreaView style={styles.page} edges={['top', 'left', 'right']}>
@@ -102,6 +65,18 @@ export default function OnlineScreen() {
           <View style={styles.secureLine}>
             <Ionicons name="shield-checkmark-outline" size={15} color={colors.success} />
             <Text style={styles.secureText}>Matched with players ready to deal</Text>
+          </View>
+        </Animated.View>
+
+        <Animated.View entering={FadeInDown.delay(90).duration(320)} style={styles.hostNote} testID="text-online-restricted-notice">
+          <View style={styles.hostIcon}>
+            <Ionicons name="information-circle-outline" size={20} color={colors.accent} />
+          </View>
+          <View style={styles.hostCopy}>
+            <Text style={styles.hostTitle}>Online is Joker Joker Deuce Deuce · 100 pts for now</Text>
+            <Text style={styles.hostDescription}>
+              We&apos;re temporarily limiting online tables to one mode and point goal so matches fill faster while our player base grows.
+            </Text>
           </View>
         </Animated.View>
 
@@ -155,52 +130,35 @@ export default function OnlineScreen() {
           </Animated.View>
         )}
 
-        {isRuleSelectionVisible && (
+        {choice !== 'join' && (
           <Animated.View entering={FadeInDown.delay(80).duration(320)} style={styles.rulesPanel}>
             <View style={styles.rulesHeading}>
               <View>
                 <Text style={styles.sectionLabel}>TABLE RULES</Text>
-                <Text style={styles.rulesTitle}>Make it your game.</Text>
+                <Text style={styles.rulesTitle}>Fixed while we grow.</Text>
               </View>
-              <Ionicons name="options-outline" size={21} color={colors.textTertiary} />
+              <Ionicons name="lock-closed-outline" size={21} color={colors.textTertiary} />
             </View>
 
             <Text style={styles.fieldLabel}>GAME MODE</Text>
             <View style={styles.modeList}>
-              {modes.map((item) => (
-                <RuleOption
-                  key={item.value}
-                  selected={mode === item.value}
-                  icon={item.icon}
-                  title={item.title}
-                  description={item.description}
-                  colors={colors}
-                  styles={styles}
-                  onPress={() => selectMode(item.value)}
-                  testID={`button-online-mode-${item.value}`}
-                />
-              ))}
+              <RuleOption
+                selected
+                icon="diamond-outline"
+                title="Joker Joker Deuce Deuce"
+                description="A bigger deck with four high cards in play."
+                colors={colors}
+                styles={styles}
+                testID="text-online-mode-jjdd"
+              />
             </View>
 
             <Text style={[styles.fieldLabel, styles.goalLabel]}>POINT GOAL</Text>
             <View style={styles.goalRow}>
-              {goals.map((goal) => (
-                <Pressable
-                  key={goal}
-                  onPress={() => selectPoints(goal)}
-                  style={({ pressed }) => [
-                    styles.goal,
-                    points === goal && styles.goalSelected,
-                    pressed && styles.pressed,
-                  ]}
-                  testID={`button-online-points-${goal}`}
-                  accessibilityRole="radio"
-                  accessibilityState={{ selected: points === goal }}
-                >
-                  <Text style={[styles.goalNumber, points === goal && styles.goalSelectedText]}>{goal}</Text>
-                  <Text style={[styles.goalCaption, points === goal && styles.selectedSubtext]}>points</Text>
-                </Pressable>
-              ))}
+              <View style={[styles.goal, styles.goalSelected]} testID="text-online-points-100">
+                <Text style={[styles.goalNumber, styles.goalSelectedText]}>100</Text>
+                <Text style={[styles.goalCaption, styles.selectedSubtext]}>points</Text>
+              </View>
             </View>
           </Animated.View>
         )}

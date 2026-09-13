@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useLocation, useSearch } from "wouter";
+import { useLocation } from "wouter";
 import { ArrowLeft, Check, Search, UserPlus, Users, X } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ONLINE_GAME_MODE, ONLINE_POINT_GOAL } from "@shared/schema";
 
 type Player={id:number;username:string;displayName:string;avatar:string|null;status?:"Online"|"In Game"|"Offline";friendshipId?:number;friendship?:{id:number;status:string;requesterId:number}|null};
 type Request={id:number;direction:"incoming"|"outgoing";player:Player};
@@ -20,8 +20,11 @@ const initials=(p:Player)=>p.displayName.slice(0,2).toUpperCase();
 function PlayerRow({player,action,onProfile}:{player:Player;action?:React.ReactNode;onProfile:()=>void}) { return <div className="flex items-center gap-3 py-3"><button onClick={onProfile} className="flex items-center gap-3 min-w-0 flex-1 text-left"><Avatar><AvatarImage src={player.avatar||undefined}/><AvatarFallback>{initials(player)}</AvatarFallback></Avatar><span className="min-w-0"><span className="block font-medium truncate">{player.displayName}</span><span className="block text-sm text-muted-foreground truncate">@{player.username}</span></span></button>{player.status&&<Badge variant={player.status==="Online"?"default":"secondary"}>{player.status}</Badge>}{action}</div> }
 
 export default function PlayWithFriends(){
- const [,navigate]=useLocation();const searchString=useSearch();const defaults=new URLSearchParams(searchString);const {toast}=useToast();
- const [searchOpen,setSearchOpen]=useState(false),[q,setQ]=useState(""),[debounced,setDebounced]=useState("");const [profile,setProfile]=useState<Player|null>(null),[invitee,setInvitee]=useState<Player|null>(null);const [mode,setMode]=useState(defaults.get("mode")||"ace_high"),[points,setPoints]=useState(defaults.get("points")||"300");
+ const [,navigate]=useLocation();const {toast}=useToast();
+ const [searchOpen,setSearchOpen]=useState(false),[q,setQ]=useState(""),[debounced,setDebounced]=useState("");const [profile,setProfile]=useState<Player|null>(null),[invitee,setInvitee]=useState<Player|null>(null);
+ // TEMPORARY: game invites are pinned to a single mode/point-goal combo (see ONLINE_GAME_MODE)
+ // because the online player pool is too small to split across every combination.
+ const mode=ONLINE_GAME_MODE,points=ONLINE_POINT_GOAL;
  useEffect(()=>{const t=setTimeout(()=>setDebounced(q.trim()),300);return()=>clearTimeout(t)},[q]);
  const friends=useQuery<{friends:Player[]}>({queryKey:["/api/friends"],refetchInterval:15000,staleTime:5000});
  const requests=useQuery<{requests:Request[];gameInvites:GameInvite[]}>({queryKey:["/api/friends/requests"],refetchInterval:10000,staleTime:3000});
@@ -40,6 +43,6 @@ export default function PlayWithFriends(){
   <section><h2 className="text-xs font-bold tracking-widest text-muted-foreground mb-2">FRIEND REQUESTS</h2><div className="space-y-2">{requests.data?.requests.length?requests.data.requests.map(r=><Card key={r.id}><CardContent className="py-4"><p>{r.direction==="incoming"?<><b>{r.player.displayName}</b> wants to be friends.</>:<>Friend request sent to <b>{r.player.displayName}</b>.</>}</p><div className="flex gap-2 mt-3">{r.direction==="incoming"?<><Button size="sm" onClick={()=>mutate.mutate({method:"POST",url:`/api/friends/${r.id}/accept`,data:{}})}>Accept</Button><Button size="sm" variant="outline" onClick={()=>mutate.mutate({method:"POST",url:`/api/friends/${r.id}/decline`,data:{}})}>Decline</Button></>:<Button size="sm" variant="outline" onClick={()=>mutate.mutate({method:"DELETE",url:`/api/friends/${r.id}`})}>Cancel Request</Button>}</div></CardContent></Card>):<p className="text-sm text-muted-foreground">No pending requests.</p>}</div></section>
  </main>
  <Dialog open={!!profile} onOpenChange={()=>setProfile(null)}><DialogContent><DialogHeader><DialogTitle>{profile?.displayName}</DialogTitle><DialogDescription>@{profile?.username}</DialogDescription></DialogHeader>{profile&&<div className="flex items-center gap-4"><Avatar className="h-16 w-16"><AvatarImage src={profile.avatar||undefined}/><AvatarFallback>{initials(profile)}</AvatarFallback></Avatar><div><p className="font-medium">House Spades player</p>{profile.status&&<Badge variant="secondary">{profile.status}</Badge>}</div></div>}</DialogContent></Dialog>
- <Dialog open={!!invitee} onOpenChange={()=>setInvitee(null)}><DialogContent><DialogHeader><DialogTitle>Invite {invitee?.displayName}</DialogTitle><DialogDescription>Choose the existing House Spades game settings for your private room.</DialogDescription></DialogHeader><label className="space-y-2"><span className="text-sm font-medium">Game mode</span><Select value={mode} onValueChange={setMode}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent><SelectItem value="ace_high">Ace High</SelectItem><SelectItem value="joker_joker_deuce_deuce">Joker Joker Deuce Deuce</SelectItem></SelectContent></Select></label><label className="space-y-2"><span className="text-sm font-medium">Point goal</span><Select value={points} onValueChange={setPoints}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent><SelectItem value="100">100</SelectItem><SelectItem value="300">300</SelectItem><SelectItem value="500">500</SelectItem></SelectContent></Select></label><Button onClick={sendInvite}>Send Game Invite</Button></DialogContent></Dialog>
+ <Dialog open={!!invitee} onOpenChange={()=>setInvitee(null)}><DialogContent><DialogHeader><DialogTitle>Invite {invitee?.displayName}</DialogTitle><DialogDescription>Online play is temporarily limited to one mode and point goal while we grow the player base.</DialogDescription></DialogHeader><div className="rounded-md border p-3 space-y-1 text-sm"><p><span className="font-medium">Game mode:</span> Joker Joker Deuce Deuce</p><p><span className="font-medium">Point goal:</span> 100</p></div><Button onClick={sendInvite}>Send Game Invite</Button></DialogContent></Dialog>
  </div>
 }

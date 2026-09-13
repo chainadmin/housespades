@@ -157,6 +157,12 @@ export const POINT_GOAL_VALUES: Record<PointGoal, number> = {
   "500": 500,
 };
 
+// TEMPORARY: the online player pool is too small to split across every mode/point-goal
+// combination, so quick matchmaking, private tables, and friend invites are all pinned to
+// this single combination for now. Solo play against bots is unaffected.
+export const ONLINE_GAME_MODE: GameMode = "joker_joker_deuce_deuce";
+export const ONLINE_POINT_GOAL: PointGoal = "100";
+
 // Player positions at the table
 export const POSITIONS = ["south", "west", "north", "east"] as const;
 export type Position = (typeof POSITIONS)[number];

@@ -9,6 +9,7 @@ import { PointGoalSelector } from "@/components/TimeControlSelector";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAuth } from "@/lib/auth";
 import type { GameMode, PointGoal } from "@shared/schema";
+import { ONLINE_GAME_MODE, ONLINE_POINT_GOAL } from "@shared/schema";
 import { Users, Bot, Trophy, TrendingUp, LogOut, User, ShoppingBag, Settings, Award } from "lucide-react";
 import { Link } from "wouter";
 import houseCardLogo from "@/assets/house-card-logo.png";
@@ -25,7 +26,9 @@ export default function Home() {
   };
 
   const handleFindMatch = () => {
-    navigate(`/online?mode=${selectedMode}&points=${selectedPointGoal}`);
+    // Online play has its own fixed mode/point goal for now — the selectors below
+    // only apply to solo play against bots.
+    navigate(`/online?mode=${ONLINE_GAME_MODE}&points=${ONLINE_POINT_GOAL}`);
   };
 
   const winRate = user && user.gamesPlayed > 0 
@@ -158,10 +161,13 @@ export default function Home() {
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-2">
                   <Button variant="outline" className="w-full" data-testid="button-find-match">
                     Play Online
                   </Button>
+                  <p className="text-xs text-muted-foreground text-center">
+                    Temporarily limited to Joker Joker Deuce Deuce · 100 pts while we grow the player base
+                  </p>
                 </CardContent>
               </Card>
             </motion.div>

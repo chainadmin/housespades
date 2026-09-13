@@ -19,18 +19,18 @@ import {
   getStoredUser,
 } from '@/lib/auth';
 import { useColors } from '@/hooks/useColorScheme';
-import { GameMode, PointGoal } from '@/constants/game';
+import { GameMode, ONLINE_GAME_MODE, ONLINE_POINT_GOAL, PointGoal } from '@/constants/game';
 
 export default function PrivateRoomScreen() {
   const colors = useColors();
   const router = useRouter();
   const params = useLocalSearchParams<{
-    mode?: GameMode;
-    points?: PointGoal;
     intent?: 'create' | 'join';
   }>();
-  const mode: GameMode = params.mode === 'joker_joker_deuce_deuce' ? params.mode : 'ace_high';
-  const points: PointGoal = params.points === '100' || params.points === '500' ? params.points : '300';
+  // TEMPORARY: private tables are pinned to a single mode/point-goal combo (see ONLINE_GAME_MODE)
+  // because the online player pool is too small to split across every combination.
+  const mode: GameMode = ONLINE_GAME_MODE;
+  const points: PointGoal = ONLINE_POINT_GOAL;
   const [joining, setJoining] = useState(params.intent === 'join');
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);

@@ -66,3 +66,9 @@ export const POINT_GOAL_VALUES: Record<PointGoal, number> = {
 
 export const BOT_NAMES = ['SpadeMaster', 'TrickTaker', 'CardShark', 'AceHunter'];
 export const POSITIONS: Position[] = ['south', 'west', 'north', 'east'];
+
+// TEMPORARY: the online player pool is too small to split across every mode/point-goal
+// combination, so quick matchmaking and private tables are pinned to this single
+// combination for now. Solo play against bots is unaffected.
+export const ONLINE_GAME_MODE: GameMode = 'joker_joker_deuce_deuce';
+export const ONLINE_POINT_GOAL: PointGoal = '100';

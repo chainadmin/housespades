@@ -9,7 +9,7 @@ import { z } from "zod";
 import { sign as signCookie } from "cookie-signature";
 import { verifyRemoveAdsWithRevenueCat } from "./purchases";
 import { db } from "./db";
-import { friendships, gameInvites, multiplayerRoomPlayers, multiplayerRooms, users, GAME_MODES, POINT_GOALS } from "@shared/schema";
+import { friendships, gameInvites, multiplayerRoomPlayers, multiplayerRooms, users, GAME_MODES, POINT_GOALS, ONLINE_GAME_MODE, ONLINE_POINT_GOAL } from "@shared/schema";
 import { and, eq, ilike, or, sql } from "drizzle-orm";
 import { presence } from "./presence";
 import { PrivateRoomError, assertHost, assertMember, createPrivateRoom, joinPrivateRoom, leavePrivateRoom, roomView } from "./privateRooms";
@@ -73,9 +73,8 @@ export async function registerRoutes(
 
   app.post("/api/private-rooms", privateRoomHandler(async (req: any, res: any) => {
     const userId = requirePrivateUser(req, res); if (!userId) return;
-    const mode = GAME_MODES.includes(req.body?.gameMode) ? req.body.gameMode : "ace_high";
-    const points = POINT_GOALS.includes(req.body?.pointGoal) ? req.body.pointGoal : "300";
-    res.status(201).json(await createPrivateRoom(userId, { gameMode: mode, pointGoal: points }));
+    // TEMPORARY: online tables are pinned to a single mode/point-goal combo — see ONLINE_GAME_MODE.
+    res.status(201).json(await createPrivateRoom(userId, { gameMode: ONLINE_GAME_MODE, pointGoal: ONLINE_POINT_GOAL }));
   }));
   app.post("/api/private-rooms/join", privateRoomHandler(async (req: any, res: any) => {
     const userId = requirePrivateUser(req, res); if (!userId) return;
@@ -518,7 +517,7 @@ export async function registerRoutes(
   app.post("/api/friends/:id/decline", async (req, res) => { const uid=requireUser(req,res); if(!uid)return; const [f]=await db.update(friendships).set({status:"declined",updatedAt:new Date()}).where(and(eq(friendships.id,+req.params.id),eq(friendships.recipientId,uid),eq(friendships.status,"pending"))).returning(); if(!f)return res.status(404).json({error:"Request not found"}); res.json(f); });
   app.delete("/api/friends/:id", async (req, res) => { const uid=requireUser(req,res); if(!uid)return; const rows=await db.delete(friendships).where(and(eq(friendships.id,+req.params.id),or(eq(friendships.requesterId,uid),eq(friendships.recipientId,uid)))).returning(); if(!rows.length)return res.status(404).json({error:"Friendship not found"}); res.status(204).end(); });
 
-  app.post("/api/game-invites", async (req, res) => { const uid=requireUser(req,res); if(!uid)return; const parsed=inviteSchema.safeParse(req.body); if(!parsed.success)return res.status(400).json({error:"Invalid game invite"}); const host=await storage.getUser(uid); const room=parsed.data.roomId ? await storage.getLobby(parsed.data.roomId) : await storage.createLobby({mode:parsed.data.gameMode,pointGoal:parsed.data.pointGoal,hostId:String(uid),players:[{id:String(uid),name:host?.displayName||host?.username||"Player",isBot:false,isReady:true}],status:"waiting"}); if(!room)return res.status(404).json({error:"Room not found"}); const values=parsed.data.recipientIds.map(recipientId=>({senderId:uid,recipientId,roomId:room.id,gameMode:parsed.data.gameMode,pointGoal:parsed.data.pointGoal,expiresAt:new Date(Date.now()+15*60*1000)})); const created=await db.insert(gameInvites).values(values).returning(); res.status(201).json({room,invites:created}); });
+  app.post("/api/game-invites", async (req, res) => { const uid=requireUser(req,res); if(!uid)return; const parsed=inviteSchema.safeParse(req.body); if(!parsed.success)return res.status(400).json({error:"Invalid game invite"}); const host=await storage.getUser(uid); const gameMode=ONLINE_GAME_MODE, pointGoal=ONLINE_POINT_GOAL; /* TEMPORARY: game invites are pinned to a single mode/point-goal combo — see ONLINE_GAME_MODE. */ const room=parsed.data.roomId ? await storage.getLobby(parsed.data.roomId) : await storage.createLobby({mode:gameMode,pointGoal,hostId:String(uid),players:[{id:String(uid),name:host?.displayName||host?.username||"Player",isBot:false,isReady:true}],status:"waiting"}); if(!room)return res.status(404).json({error:"Room not found"}); const values=parsed.data.recipientIds.map(recipientId=>({senderId:uid,recipientId,roomId:room.id,gameMode,pointGoal,expiresAt:new Date(Date.now()+15*60*1000)})); const created=await db.insert(gameInvites).values(values).returning(); res.status(201).json({room,invites:created}); });
   app.post("/api/game-invites/:id/accept", async (req,res)=>{ const uid=requireUser(req,res);if(!uid)return;const [invite]=await db.update(gameInvites).set({status:"accepted"}).where(and(eq(gameInvites.id,+req.params.id),eq(gameInvites.recipientId,uid),eq(gameInvites.status,"pending"),sql`${gameInvites.expiresAt} > NOW()`)).returning();if(!invite)return res.status(404).json({error:"Invite not found or expired"});const lobby=await storage.getLobby(invite.roomId);const user=await storage.getUser(uid);if(!lobby)return res.status(410).json({error:"Room is no longer available"});if(lobby.players.length>=4)return res.status(409).json({error:"Room is full"});const updated=await storage.updateLobby(lobby.id,{players:[...lobby.players,{id:String(uid),name:user?.displayName||user?.username||"Player",isBot:false,isReady:true}]});res.json({invite,lobby:updated});});
   app.post("/api/game-invites/:id/decline", async(req,res)=>{const uid=requireUser(req,res);if(!uid)return;const [i]=await db.update(gameInvites).set({status:"declined"}).where(and(eq(gameInvites.id,+req.params.id),eq(gameInvites.recipientId,uid),eq(gameInvites.status,"pending"))).returning();if(!i)return res.status(404).json({error:"Invite not found"});res.json(i);});
 
@@ -552,11 +551,12 @@ export async function registerRoutes(
 
   app.post("/api/lobbies", async (req, res) => {
     try {
-      const { mode, pointGoal, hostId, hostName } = req.body;
-      
+      const { hostId, hostName } = req.body;
+
+      // TEMPORARY: online lobbies are pinned to a single mode/point-goal combo — see ONLINE_GAME_MODE.
       const lobby = await storage.createLobby({
-        mode: mode || "ace_high",
-        pointGoal: pointGoal || "300",
+        mode: ONLINE_GAME_MODE,
+        pointGoal: ONLINE_POINT_GOAL,
         hostId,
         players: [{
           id: hostId,
@@ -637,8 +637,7 @@ export async function registerRoutes(
     try {
       // Use session userId first, fallback to body for backwards compatibility
       const userId = req.session.userId || req.body.userId;
-      const { gameMode, pointGoal } = req.body;
-      
+
       if (!userId) {
         return res.status(401).json({ error: "Not authenticated" });
       }
@@ -648,11 +647,10 @@ export async function registerRoutes(
         return res.status(404).json({ error: "User not found" });
       }
 
-      matchmaking.addToQueue(
-        user,
-        gameMode || "ace_high",
-        pointGoal || "300"
-      );
+      // TEMPORARY: matchmaking is pinned to a single mode/point-goal combo — see ONLINE_GAME_MODE.
+      const gameMode = ONLINE_GAME_MODE;
+      const pointGoal = ONLINE_POINT_GOAL;
+      matchmaking.addToQueue(user, gameMode, pointGoal);
 
       console.log(`[Routes] User ${user.username} (id: ${user.id}) joined queue for ${gameMode}-${pointGoal}. Queue size: ${matchmaking.getQueueSize()}`);
 
